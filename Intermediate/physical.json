@@ -1,0 +1,107 @@
+{
+    "datacenters": [
+        {
+            "name": "net",
+            "type": "wirelessnetwork"
+        },
+        {
+            "name": "A",
+            "type": "cloud"
+        }
+    ],
+    "nodes": [
+        {
+            "upports": 0,
+            "bw": 100000000,
+            "downports": 0,
+            "iops": 1000000000,
+            "name": "inter",
+            "datacenter": "net",
+            "type": "intercloud"
+        },
+        {
+            "upports": 0,
+            "bw": 100000000,
+            "downports": 0,
+            "iops": 1000000000,
+            "name": "gwA",
+            "datacenter": "net",
+            "type": "gateway"
+        },
+        {
+            "upports": 0,
+            "bw": 100000000,
+            "downports": 0,
+            "iops": 1000000000,
+            "name": "gwA",
+            "datacenter": "A",
+            "type": "gateway"
+        },
+        {
+            "upports": 0,
+            "bw": 10000000,
+            "downports": 0,
+            "iops": 1000000000,
+            "name": "edge1",
+            "datacenter": "A",
+            "type": "edge",
+            "ports": 4
+        },
+        {
+            "bw": 45000000,
+            "name": "host1",
+            "datacenter": "A",
+            "storage": 1363148800,
+            "type": "host",
+            "mips": 15000,
+            "pes": 8,
+            "ram": 16384000
+        },
+        {
+            "bw": 25000000,
+            "name": "host2",
+            "datacenter": "A",
+            "storage": 1363148800,
+            "type": "host",
+            "mips": 20000,
+            "pes": 8,
+            "ram": 16384000
+        },
+        {
+            "bw": 35000000,
+            "name": "host3",
+            "datacenter": "A",
+            "storage": 1363148800,
+            "type": "host",
+            "mips": 30000,
+            "pes": 8,
+            "ram": 16384000
+        }
+    ],
+    "links": [
+        {
+            "latency": "0.001",
+            "destination": "host1",
+            "name": "LINK1",
+            "source": "edge1"
+        },
+        {
+            "latency": "0.001",
+            "destination": "host2",
+            "name": "LINK2",
+            "source": "edge1"
+        },
+        {
+            "latency": "0.001",
+            "destination": "host3",
+            "name": "LINK3",
+            "source": "edge1"
+        },
+        {
+            "latency": "0",
+            "destination": "gwA",
+            "name": "gwA-inter",
+            "source": "inter"
+        }
+    ]
+}
