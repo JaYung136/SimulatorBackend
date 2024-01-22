@@ -48,34 +48,34 @@
             "ports": 4
         },
         {
-            "bw": 45000000,
+            "bw": 450000000,
             "name": "host1",
             "datacenter": "A",
             "storage": 1363148800,
             "type": "host",
-            "mips": 15000,
-            "pes": 8,
-            "ram": 16384000
+            "mips": 30000,
+            "pes": 2,
+            "ram": 2096000
         },
         {
-            "bw": 25000000,
+            "bw": 250000000,
             "name": "host2",
             "datacenter": "A",
             "storage": 1363148800,
             "type": "host",
             "mips": 20000,
-            "pes": 8,
-            "ram": 16384000
+            "pes": 2,
+            "ram": 2096000
         },
         {
-            "bw": 35000000,
+            "bw": 350000000,
             "name": "host3",
             "datacenter": "A",
             "storage": 1363148800,
             "type": "host",
-            "mips": 30000,
-            "pes": 8,
-            "ram": 16384000
+            "mips": 25000,
+            "pes": 2,
+            "ram": 2096000
         }
     ],
     "links": [

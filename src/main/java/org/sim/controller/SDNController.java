@@ -4,6 +4,7 @@ package org.sim.controller;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import org.apache.commons.math3.util.Pair;
 import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.LogWriter;
@@ -25,6 +26,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 //@Scope(value = "singleton")
@@ -529,6 +531,43 @@ public class SDNController {
         return flag;
     }
 
+    public double getLatencyTime(Workload workload){
+        double finishTime = WorkloadResultWriter.getWorkloadFinishTime(workload);
+        double startTime = WorkloadResultWriter.getWorkloadStartTime(workload);
+        if (finishTime > 0)
+            return finishTime - startTime;
+        else
+            return -1;
+    }
+    public void plotLatency(List<Workload> wls) throws Exception {
+        // workload 制作 map. key:src+dst value:list<workload>/double[][]点集
+        Map<String, Map<Double, Double>> messages2pointset = new HashMap<>();
+        for (int i=0; i<wls.size(); ++i){
+            Workload wl = wls.get(i);
+            String key = wl.submitVmName+"->"+wl.destVmName;
+            Map<Double, Double> value = messages2pointset.get(key);
+            if(value == null){
+                value = new HashMap<>();
+            }
+            value.put(wl.time, getLatencyTime(wl));//Map<提交时间，延迟>
+            messages2pointset.put(key, value);
+        }
+        List<double[][]> data = new ArrayList<>();
+        for(String key:messages2pointset.keySet()){
+            Map<Double, Double> messages = messages2pointset.get(key);
+            double[] starttimes = messages.keySet().stream().mapToDouble(i->i).toArray();
+            double[] latencys = messages.values().stream().mapToDouble(i->i).toArray();
+            double[][] datai = {starttimes, latencys};
+            data.add(datai);
+//            System.out.println(messages);
+//            System.out.println(Arrays.toString(starttimes));
+//            System.out.println(Arrays.toString(latencys));
+//            System.out.println("-------------------------------------------------");
+        }
+        List<String> keys = messages2pointset.keySet().stream().collect(Collectors.toList());
+        ScatterGraph.plot(data, keys);
+    }
+
     @RequestMapping("/run")
     public ResultDTO run() throws IOException {
         CloudSim.HalfDuplex = false;
@@ -556,6 +595,7 @@ public class SDNController {
             log = LogWriter.getLogger(bwutil_result);
             log.printLine("</Links>");
             outputdelay();
+            plotLatency(wls);
             List<WorkloadResult> wrlist = new ArrayList<>();
             for (Workload workload : wls) {
                 //------------------------------------------ calculate total time

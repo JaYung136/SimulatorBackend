@@ -14,7 +14,7 @@
 	<name>sim</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>13</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -125,6 +125,13 @@
 			<groupId>com.vlkan.rfos</groupId>
 			<artifactId>rotating-fos</artifactId>
 			<version>0.9.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+<!--			<version>1.0.19</version>-->
+			<version>1.5.3</version>
 		</dependency>
 	</dependencies>
 
