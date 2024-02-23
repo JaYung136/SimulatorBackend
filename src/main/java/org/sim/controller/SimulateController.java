@@ -9,6 +9,7 @@ import org.sim.cloudbus.cloudsim.Log;
 import org.sim.service.Constants;
 import org.sim.service.ContainerInfo;
 import org.sim.service.YamlWriter;
+import org.sim.workflowsim.Task;
 import org.sim.workflowsim.XmlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.integration.IntegrationProperties;
@@ -31,8 +32,8 @@ import java.util.*;
 @RestController
 @CrossOrigin
 public class SimulateController {
-//    @Autowired
-    private service service = null;
+
+    private service service;
 
     /**
      *
@@ -78,6 +79,7 @@ public class SimulateController {
         Constants.app2Con = new HashMap<>();
         Constants.repeatTime = 1;
         Constants.finishTime = 0.0;
+        service = new service();
     }
 
     /**
@@ -96,6 +98,7 @@ public class SimulateController {
         Constants.ip2taskName = new HashMap<>();
         Constants.name2Ips = new HashMap<>();
         Constants.finishTime = 0.0;
+        service = new service();
     }
 
     /**
@@ -223,6 +226,7 @@ public class SimulateController {
             Constants.hostFile = hostfile;
             XmlUtil util = new XmlUtil(1);
             util.parseHostXml(hostfile);
+            Constants.hosts = util.getHostList();
         }catch (IOException e){
             r.message = e.getMessage();
             r.code = CODE.FAILED;
@@ -358,7 +362,7 @@ public class SimulateController {
             r.code = CODE.FAILED;
             System.out.print(e.getMessage());
         }
-        r.message = "upload successfully";
+        r.message = "上传FaultInject失败";
         r.code = CODE.SUCCESS;
         return r;
     }
@@ -368,7 +372,6 @@ public class SimulateController {
     @RequestMapping(value = "/startSimulate")
     public Message startScheduleAndSimulate(@RequestBody Map<String, Integer> req) {
         try{
-            service = new service();
             Message m = new Message();
             if(Constants.hostFile == null)  {
                 return Message.Fail("host输入文件不存在");
@@ -418,17 +421,38 @@ public class SimulateController {
             String jsonStr = sb.toString();
             com.alibaba.fastjson.JSONArray objects = com.alibaba.fastjson.JSON.parseArray(jsonStr);
             int size = objects.size();
+            Log.printLine("更新后的调度结果：");
+            List<Pair<Double, Double>> hosts = new ArrayList<>();
+            for(Host h: Constants.hosts) {
+                hosts.add(new Pair<Double, Double>(Double.valueOf(h.getNumberOfPes()), Double.valueOf(h.getRamProvisioner().getRam())));
+            }
             for(int i = 0; i < size; i++){
                 com.alibaba.fastjson.JSONObject object = objects.getJSONObject(i);
                 Result r  = object.toJavaObject(Result.class);
                 Constants.staticApp2Host.put(r.app, r.host);
-                Integer hostId = 0;
+                Log.printLine("任务" + r.app + " ===> 节点" + r.host);
+                Integer hostId = -1;
                 for(Host h: Constants.hosts) {
                     if(h.getName().equals(r.host)) {
                         hostId = h.getId();
                         break;
                     }
                 }
+                if(hostId == -1) {
+                    Log.printLine(r.host + "不存在");
+                    return ResultDTO.success(r.host + "不存在");
+                }
+                Double pes = hosts.get(hostId).getKey();
+                Double ram = hosts.get(hostId).getValue();
+                Double totalRetPe = Constants.hosts.get(hostId).getNumberOfPes() * (1 - Constants.cpuUp);
+                Double totalRetRam = Constants.hosts.get(hostId).getRamProvisioner().getRam() * (1 - Constants.ramUp);
+                pes -= r.pes * 1000;
+                ram -= r.ram;
+                if(pes <= totalRetPe || ram <= totalRetRam) {
+                    Log.printLine("物理机" + r.host + "超载");
+                    return ResultDTO.error("物理机" + r.host + "超载");
+                }
+                hosts.add(hostId, new Pair<>(pes, ram));
                 Constants.schedulerResult.put(r.app, hostId);
             }
             Constants.results = new ArrayList<>();
@@ -441,7 +465,7 @@ public class SimulateController {
             Constants.apps = new ArrayList<>();
             Constants.ip2taskName = new HashMap<>();
             Constants.name2Ips = new HashMap<>();
-            service.simulate(8);
+            simulate(8, 3);
             YamlWriter writer = new YamlWriter();
             try {
                 String path = System.getProperty("user.dir")+"\\OutputFiles\\yaml";

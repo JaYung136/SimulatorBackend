@@ -189,7 +189,7 @@ public class service {
              */
             //List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), 1);
             List<CondorVM> vmlist0 = null;
-            if(!Constants.ifSimulate && arithmetic != 5)
+            if(!Constants.ifSimulate && arithmetic != 5 && arithmetic != 7)
                 vmlist0 = parseVm(wfEngine.getSchedulerId(0));
             else
                 vmlist0 = createVM(wfEngine.getSchedulerId(0), 1);
@@ -268,7 +268,7 @@ public class service {
                 case 4:
                 case 6:
                 case 7:
-                    v = new VmAllocationPolicyK8s(hostList);
+                    //v = new VmAllocationPolicyK8s(hostList);
                     break;
                 case 8:
                     break;
@@ -300,30 +300,38 @@ public class service {
         }
         String lastTime = "";
         Map<String, Boolean> ifLog = new HashMap<>();
-        Log.printLine("========== OUTPUT ==========");
-        Log.printLine("Task Name" + indent + "Task ID" + indent + "STATUS" + indent
-                + "Host ID" + indent + indent
-                + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
+        if(Constants.ifSimulate) {
+            Log.printLine("========== OUTPUT ==========");
+            Log.printLine("Task Name" + indent + "Task ID" + indent + "STATUS" + indent
+                    + "Host ID" + indent + indent
+                    + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
+        }
         DecimalFormat dft = new DecimalFormat("###.##");
         for (Job job : list) {
             jobs.put(job.getCloudletId(), true);
             if(job.getTaskList().size() == 0)
                 continue;
-            Log.print(indent + job.getTaskList().get(0).name + indent + indent);
+            if(Constants.ifSimulate)
+                Log.print(indent + job.getTaskList().get(0).name + indent + indent);
             if (job.getClassType() == Parameters.ClassType.STAGE_IN.value) {
-                Log.print("Stage-in");
+                if(Constants.ifSimulate)
+                    Log.print("Stage-in");
             }
             for (Task task : job.getTaskList()) {
-                Log.print(task.getCloudletId() + ",");
+                if(Constants.ifSimulate)
+                    Log.print(task.getCloudletId() + ",");
             }
-            Log.print(indent);
+            if(Constants.ifSimulate)
+                Log.print(indent);
 
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
-                Log.print("SUCCESS");
-                Log.printLine(indent + indent + indent + job.getVmId()
-                        + indent + indent + indent + dft.format(job.getActualCPUTime())
-                        + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                        + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+                if(Constants.ifSimulate) {
+                    Log.print("SUCCESS");
+                    Log.printLine(indent + indent + indent + job.getVmId()
+                            + indent + indent + indent + dft.format(job.getActualCPUTime())
+                            + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
+                            + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+                }
                 lastTime = dft.format(job.getFinishTime());
                 if(job.getTaskList().size() >= 1 && !ifLog.containsKey(job.getTaskList().get(0).name)) {
                     Result r = new Result();
@@ -337,8 +345,8 @@ public class service {
                         if(t1 - job.getExecStartTime() < start) {
 
                         } else {
-                            r.pausestart = job.getExecStartTime() + start;
-                            r.pauseend = r.pausestart + last;
+                            r.pausestart = start;
+                            r.pauseend = last;
                         }
                     }
                     //r.host = "host" + job.getVmId();
@@ -349,28 +357,35 @@ public class service {
                             break;
                         }
                     }
+                    if(host == null) {
+                        continue;
+                    }
                     r.host = host.getName();
                     r.name = job.getTaskList().get(0).getType();
+                    r.pes = Double.valueOf(job.getTaskList().get(0).getNumberOfPes()) / 1000;
+                    r.ram = job.getTaskList().get(0).getRam();
+                    if(Constants.pause.get(job.getTaskList().get(0).getCloudletId()) != null) {
+                        r.pausestart = Constants.pause.get(job.getTaskList().get(0).getCloudletId()).getKey();
+                        r.pauseend = Constants.pause.get(job.getTaskList().get(0).getCloudletId()).getValue();
+                    }
                     Constants.results.add(r);
                     ifLog.put(job.getTaskList().get(0).name, true);
                 }
             } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
-                Log.print("FAILED");
-                Log.printLine(indent + indent + indent + job.getVmId()
-                        + indent + indent + indent + dft.format(job.getActualCPUTime())
-                        + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                        + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+                if(Constants.ifSimulate) {
+                    Log.print("FAILED");
+                    Log.printLine(indent + indent + indent + job.getVmId()
+                            + indent + indent + indent + dft.format(job.getActualCPUTime())
+                            + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
+                            + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+                }
             }
         }
-        Log.printLine(Constants.repeatTime + "周期下，任务群总完成时间为：" + lastTime);
+        if(Constants.ifSimulate)
+            Log.printLine(Constants.repeatTime + "周期下，任务群总完成时间为：" + lastTime);
+        if(!Constants.ifSimulate)
+            return;
         try {
-           /* Log.printLine("this job is not contained: ");
-            for(int i = 1; i <= 101; i++) {
-                if(!jobs.get(i))
-                    Log.printLine(i);
-            }*/
-            Double cpuP = 0.0;
-            Double ramP = 0.0;
             int size_T = 0;
             File file = new File(Constants.LOG_PATH);
             if(!file.exists()) {
@@ -400,8 +415,6 @@ public class service {
                 t.setAttribute("cpuUtilization", Constants.logs.get(i).cpuUtilization + "");
                 t.setAttribute("ramUtilization", Constants.logs.get(i).ramUtilization + "");
                 r.addContent(t);
-                cpuP += Double.parseDouble(Constants.logs.get(i).cpuUtilization);
-                ramP += Double.parseDouble(Constants.logs.get(i).ramUtilization);
                 Double cpu = cpuUtil.get(Constants.logs.get(i).hostId);
                 Double ram = ramUtil.get(Constants.logs.get(i).hostId);
                 cpu += Double.parseDouble(Constants.logs.get(i).cpuUtilization);

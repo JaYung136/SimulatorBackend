@@ -11,7 +11,7 @@ public class Result {
     public String type="cn";
     public String datacenter="A";
     public Integer mips=500;
-    public Integer pes=1;
-    public Integer ram=512;
+    public Double pes=1.0;
+    public Double ram=512.0;
     public Integer size=1000;
 }
