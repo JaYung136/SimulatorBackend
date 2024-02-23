@@ -37,9 +37,16 @@ public class SimApplication {
 		path = System.getProperty("user.dir")+"\\OutputFiles\\hostUtil";
 		dir = new File(path);
 		dir.mkdirs();
+		path = System.getProperty("user.dir")+"\\OutputFiles\\bandwidthUtil";
+		dir = new File(path);
+		dir.mkdirs();
+		path = System.getProperty("user.dir")+"\\OutputFiles\\latency";
+		dir = new File(path);
+		dir.mkdirs();
 		path = System.getProperty("user.dir")+"\\OutputFiles\\faultLog";
 		dir = new File(path);
 		dir.mkdirs();
+		System.out.println("后端已启动");
 		SpringApplication.run(SimApplication.class, args);
 	}
 

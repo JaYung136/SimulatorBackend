@@ -50,7 +50,7 @@ public class ScatterGraph {
             TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
             SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
             String filename = matter.format(new Date()).toString();
-            saveAsFile(chart,"OutputFiles/Graphs/"+filename+".png",2000, 1000);
+            saveAsFile(chart,"OutputFiles/Graphs/"+filename+".png",1200, 800);
         }catch (Exception e){
             e.printStackTrace();
         }

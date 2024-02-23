@@ -57,8 +57,12 @@ public class SDNController {
     @RequestMapping("/halfduplex")
     public ResultDTO halfduplex(@RequestBody String req) {
         JSONObject state = new JSONObject(req);
-        halfDuplex = state.getBoolean("switchstate");
-        System.out.println(String.valueOf(halfDuplex));
+        halfDuplex = !state.getBoolean("switchstate");
+        if (halfDuplex) {
+//            System.out.println("半双工");
+        } else {
+//            System.out.println("全双工");
+        }
         CloudSim.HalfDuplex = halfDuplex;
         return ResultDTO.success("ok");
     }
