@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adag xmlns:xsi="http://www.w3.org/2001/XMLSchema">
+    <node name="host1" memory="2096000" storage="1363148800" cores="2" mips="30000" bandwidth="450" />
+</adag>

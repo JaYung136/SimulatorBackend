@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adag xmlns:xsi="http://www.w3.org/2001/XMLSchema">
+    <node name="host1" memory="30720" storage="1363148800" mips="30000" bandwidth="450" />
+    <node name="host2" memory="30720" storage="1363148800" cores="4" mips="20000" bandwidth="250" />
+    <node name="host3" memory="30720" storage="1363148800" cores="8" mips="25000" bandwidth="350" />
+    <node name="host4" memory="30720" storage="1363148800" cores="4" mips="18000" bandwidth="300" />
+    <node name="host5" memory="30720" storage="1363148800" cores="8" mips="21000" bandwidth="280" />
+    <node name="host6" memory="30720" storage="1363148800" cores="8" mips="18000" bandwidth="570" />
+    <node name="host7" memory="30720" storage="1363148800" cores="6" mips="38000" bandwidth="570" />
+    <node name="host8" memory="30720" storage="1363148800" cores="8" mips="38000" bandwidth="660" />
+    <utilization type = "cpu" up = "0.70" />
+    <utilization type = "memory" up = "0.70"/>
+</adag>
+

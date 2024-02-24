@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adag xmlns:xsi="http://www.w3.org/2001/XMLSchema">
+    <!-- 3个主机，在1个平台里。平台内部网络为“A” -->
+    <node name="host1" network="A" memory="16384000" storage="1363148800" cores="8" mips="35000" bandwidth="45" />
+    <node name="host2" network="A" memory="16384000" storage="1363148800" cores="8" mips="20000" bandwidth="25" />
+    <node name="host3" network="A" memory="16384000" storage="1363148800" cores="8" mips="30000" bandwidth="35" />
+    <utilization type = "cpu" up = "1.0" />
+    <utilization type = "memory" up = "1.0"/>
+    <utilization type = "bandwidth" up = "1.0"/>
+</adag>

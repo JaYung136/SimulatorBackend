@@ -1,0 +1,16 @@
+# ----------------------------------- Spring Setting --------------------------------------
+spring:
+  application:
+    name: simulator
+  main:
+    banner-mode: off
+# ----------------------------------- Server Setting ------------------------------
+server:
+  port: 8082
+# ----------------------------------- log Setting ---------------------------------
+#关闭 启动springboot打印的一堆消息
+logging:
+  level:
+    root: off
+    org:
+      springframework: off

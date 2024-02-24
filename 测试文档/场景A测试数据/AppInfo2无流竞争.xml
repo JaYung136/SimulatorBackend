@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInfo RleaseDate="27/01/2021 21:52:29" ICDVerison="BP2.3.1">
+    <!-- application中， Name为必填项，表示应用名； IpAddress为必填项，表示ip地址； ComputeTime为必填项，表示应用运行一个周期的平均时间； RequiredMemorySize为必填项，表示应用需求的内存； CpuRequest为选填项，单位为m, 1000表示需要占有一个cpu核，默认为1000； Period为必填项，表示应用周期间隔时长-->
+    <application Name="HF_SM_1" Guid="a96ef0520" IpAddress="10.31.40.1" Hardware="host1" ComputeTime="1" CpuRequest="1000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="10000" Key="True" Priority="1" UpBandwidth="40" DownBandwidth="10" Parent="">
+    </application>
+    <application Name="HF_SM_2" Guid="a96ef0521" IpAddress="10.31.40.2" Hardware="host2" ComputeTime="1" CpuRequest="1000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="10000" Key="True" Priority="2" UpBandwidth="50" DownBandwidth="30" Parent="">
+        <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="3200" RefreshPeriod="40">
+            <A664Message MessageID="-1" Name="po_A664_Messge" Guid="a3be142f6" MessageSize="3200" TransmissionIntervalMinimum="40">
+                <A653SamplingPort Name="HF_po_A664_Port" Guid="a96ef0520" Direction="Destination" MessageSize="3200" SamplePeriod="15" AppName="RGW1_A664_In" PartitionName="" Hardware="" PartitionId="" IpAddress="10.31.40.1"/>
+            </A664Message>
+        </A653SamplingPort>
+    </application>
+</AppInfo>
