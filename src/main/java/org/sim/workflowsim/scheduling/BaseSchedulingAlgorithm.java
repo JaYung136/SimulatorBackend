@@ -33,6 +33,10 @@ import java.util.List;
  * @date Apr 9, 2013
  */
 public abstract class BaseSchedulingAlgorithm implements SchedulingAlgorithmInterface {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5ae75145f27ee66af79323908ebf18fed3de314a
     /**
      * the job list.
      */

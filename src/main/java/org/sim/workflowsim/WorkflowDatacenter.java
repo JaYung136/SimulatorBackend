@@ -307,7 +307,7 @@ public class WorkflowDatacenter extends Datacenter {
             }
         }
         for (FileItem file : requiredFiles) {
-            //The input file is not an output File 
+            //The input file is not an output File
             if (file.isRealInputFile(requiredFiles)) {
                 double maxBwth = 0.0;
                 List siteList = ReplicaCatalog.getStorageList(file.getName());
@@ -374,7 +374,7 @@ public class WorkflowDatacenter extends Datacenter {
                          * handled here
                          */
                         //We should add but since CondorVm has a small capability it often fails
-                        //We currently don't use this storage to do anything meaningful. It is left for future. 
+                        //We currently don't use this storage to do anything meaningful. It is left for future.
                         //condorVm.addLocalFile(file);
                         ReplicaCatalog.addFileToStorage(file.getName(), Integer.toString(vmId));
                         break;
@@ -397,7 +397,9 @@ public class WorkflowDatacenter extends Datacenter {
             setLastProcessTime(currentTime);
             return;
         }
+
         //Log.printLine("当前时间: " + currentTime);
+
         if(currentTime > getLastProcessTime()) {
             double minTime = updateCloudletProcessingWithoutSchedulingFutureEventsForce();
             if(minTime < CloudSim.clock() + 0.11) {
@@ -440,6 +442,7 @@ public class WorkflowDatacenter extends Datacenter {
         double timeDiff = currentTime - getLastProcessTime();
         double timeFrameDatacenterEnergy = 0.0;
         String indent = "\t";
+
         //Log.printLine("\n\n---------------------------集群资源占用情况------------------------------------------\n\n");
         //Log.printLine("节点" + indent + "cpu使用" + indent + "内存使用" + indent + "运行容器" );
         DecimalFormat dft = new DecimalFormat("###.##");

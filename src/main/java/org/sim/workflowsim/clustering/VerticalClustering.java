@@ -116,7 +116,11 @@ public class VerticalClustering extends BasicClustering {
                             addTasks2Job(taskList);
                             taskList.clear();
 
+<<<<<<< HEAD
                         } else {//cNum ==1
+=======
+                        } else {//cNum==1
+>>>>>>> 5ae75145f27ee66af79323908ebf18fed3de314a
                             //cut and add new
 
                             if (!taskList.isEmpty()) {

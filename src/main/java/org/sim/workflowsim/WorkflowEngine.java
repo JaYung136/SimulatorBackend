@@ -15,6 +15,7 @@
  */
 package org.sim.workflowsim;
 
+
 import org.sim.cloudbus.cloudsim.*;
 import org.sim.cloudbus.cloudsim.core.CloudSim;
 import org.sim.cloudbus.cloudsim.core.CloudSimTags;
@@ -135,7 +136,7 @@ public final class WorkflowEngine extends SimEntity {
         getScheduler(0).submitVmList(list);
         setVmList(list);
     }
-    
+
     public List<? extends Vm> getAllVmList(){
         if(this.vmList != null && !this.vmList.isEmpty()){
             return this.vmList;
@@ -199,6 +200,7 @@ public final class WorkflowEngine extends SimEntity {
                 }catch (Exception e) {
 
                 }
+
             default:
                 processOtherEvent(ev);
                 break;
@@ -259,7 +261,7 @@ public final class WorkflowEngine extends SimEntity {
     public void bindSchedulerDatacenter(int datacenterId) {
         bindSchedulerDatacenter(datacenterId, 0);
     }
-   
+
     /**
      * Process a submit event
      *
@@ -369,10 +371,14 @@ public final class WorkflowEngine extends SimEntity {
      */
     protected void processOtherEvent(SimEvent ev) {
         /*if (ev == null) {
+=======
+        if (ev == null) {
+>>>>>>> 5ae75145f27ee66af79323908ebf18fed3de314a
             Log.printLine(getName() + ".processOtherEvent(): " + "Error - an event is null.");
             return;
         }
         Log.printLine(getName() + ".processOtherEvent(): "
+<<<<<<< HEAD
                 + "Error - event unknown by this DatacenterBroker.");*/
     }
 

@@ -5,6 +5,8 @@ target/
 !**/src/test/**/target/
 
 /测试文档/文档集合
+*.zip
+*.7z
 
 ### STS ###
 .apt_generated

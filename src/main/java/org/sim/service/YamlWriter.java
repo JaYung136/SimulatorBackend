@@ -40,7 +40,9 @@ public class YamlWriter {
         Log.printLine("YamlWriter: write yaml");
         Map<String, Boolean> judge = new HashMap<>();
         Exception ret = null;
+
         int writeNum = 0;
+
         for(int i = 0; i < pods.size(); i++) {
             try {
                 if (((Job) pods.get(i)).getTaskList().size() < 1) {
@@ -88,8 +90,11 @@ public class YamlWriter {
 
                 Yaml yaml = new Yaml(options);
                 String yamlString = yaml.dumpAs(c, Tag.MAP, DumperOptions.FlowStyle.BLOCK);
+
                 String pathFile = path + "\\pod" + writeNum + ".yml";
                 writeNum ++;
+//                String pathFile = path + "\\pod" + pods.get(i).getCloudletId() + ".yml";
+
                 FileWriter writer = new FileWriter(pathFile);
                 writer.write(yamlString);
                 writer.close();
