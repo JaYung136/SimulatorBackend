@@ -223,6 +223,10 @@ public class SimulateController {
             File hostfile = new File(InputDir,"Input_Hosts.xml");
             boolean dr = hostfile.getParentFile().mkdirs(); //创建目录
             file.transferTo(hostfile);
+            Message m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\Host.xsd"), hostfile);
+            if(m.code == CODE.FAILED) {
+                return m;
+            }
             Constants.hostFile = hostfile;
             XmlUtil util = new XmlUtil(1);
             util.parseHostXml(hostfile);
@@ -354,6 +358,10 @@ public class SimulateController {
             File faultfile = new File(InputDir,"Input_Fault.xml");
             boolean dr = faultfile.getParentFile().mkdirs(); //创建目录
             file.transferTo(faultfile);
+            Message m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\FaultInject.xsd"), faultfile);
+            if(m.code == CODE.FAILED) {
+                return m;
+            }
             Constants.faultFile = faultfile;
             XmlUtil util = new XmlUtil(1);
             util.parseHostXml(faultfile);
