@@ -426,7 +426,9 @@ public class WorkflowDatacenter extends Datacenter {
                     data[4] = getId();
                     send(getId(), ((double) targetHost.getBw() / (2 * 8000)), CloudSimTags.CLOUDLET_MOVE, data);
                     super.addMigrateNum();
-                    Log.printLine("迁移 " + data[0] +"(正运行在" + oldHost.getName() + ") 至" + "节点 " + targetHost.getName());
+                    Log.printLine("时间" + CloudSim.clock() + ": 迁移 " + ((Job)rcl.getCloudlet()).getTaskList().get(0).name +"(正运行在" + oldHost.getName() + ") 至" + "节点 " + targetHost.getName());
+                    Log.printLine(oldHost.getName() + "cpu资源占用 " + oldHost.getUtilizationOfCpu() + " ; 内存占用 " + targetHost.getUtilizationOfRam());
+                    Log.printLine(targetHost.getName() + " cpu资源占用 " + targetHost.getUtilizationOfCpu() + " ; 内存占用 " + targetHost.getUtilizationOfRam());
                     //break;
                 }
             }
@@ -455,14 +457,13 @@ public class WorkflowDatacenter extends Datacenter {
             if (time < minTime) {
                 minTime = time;
             }
-            if(currentTime - lastLogTime >= 1) {
+            if(currentTime - lastLogTime >= 0.5) {
                 lastLogTime = currentTime;
                 Constants.logs.add(new LogEntity(dft.format(CloudSim.clock()), dft.format(host.getUtilizationOfCpu()), dft.format(host.getUtilizationOfRam()), host.getId()));
             }
         }
 
         checkCloudletCompletion();
-        Log.printLine();
         setLastProcessTime(currentTime);
         return minTime;
     }

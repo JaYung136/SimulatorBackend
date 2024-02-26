@@ -267,6 +267,8 @@ public class service {
                     break;
                 case 4:
                 case 6:
+                    v = new VmAllocationPolicyMaxMin(hostList);
+                    break;
                 case 7:
                     //v = new VmAllocationPolicyK8s(hostList);
                     break;
@@ -451,7 +453,7 @@ public class service {
                 ra += Constants.hosts.get(i).getRam() * ramAverage.get(i);
                 meanCpu += cpuAverage.get(i);
                 meanRam += ramAverage.get(i);
-                cs += Constants.hosts.get(i).getNumberOfPes();
+                cs += Constants.hosts.get(i).getNumberOfPes() / 1000;
                 ras += Constants.hosts.get(i).getRam();
                 r.addContent(t);
             }
