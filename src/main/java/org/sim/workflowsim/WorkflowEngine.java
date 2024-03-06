@@ -15,7 +15,6 @@
  */
 package org.sim.workflowsim;
 
-
 import org.sim.cloudbus.cloudsim.*;
 import org.sim.cloudbus.cloudsim.core.CloudSim;
 import org.sim.cloudbus.cloudsim.core.CloudSimTags;
@@ -200,7 +199,6 @@ public final class WorkflowEngine extends SimEntity {
                 }catch (Exception e) {
 
                 }
-
             default:
                 processOtherEvent(ev);
                 break;
@@ -227,9 +225,16 @@ public final class WorkflowEngine extends SimEntity {
             if(CloudSim.clock() >= start) {
                 ifRepeat = true;
                 iterator.remove();
-                int newId = getJobsList().size() + getJobsSubmittedList().size();
-                // Log.printLine("jobs: " + getJobsList().size());
-                getJobsList().addAll(ReclusteringEngine.process(job, newId));
+                if(job.getTaskList().size() >= 1 && job.getTaskList().get(0).needWait) {
+                    job.getTaskList().get(0).needWait = false;
+                    List l = new ArrayList();
+                    l.add(job);
+                    sendNow(this.getSchedulerId(0), CloudSimTags.CLOUDLET_SUBMIT, l);
+                } else {
+                    int newId = getJobsList().size() + getJobsSubmittedList().size();
+                    // Log.printLine("jobs: " + getJobsList().size());
+                    getJobsList().addAll(ReclusteringEngine.process(job, newId));
+                }
             }
         }
         send(this.getId(), 1, WorkflowSimTags.ENGINE_EVENT);
@@ -269,7 +274,7 @@ public final class WorkflowEngine extends SimEntity {
      */
     protected void processJobSubmit(SimEvent ev) {
         List<? extends Cloudlet> list = (List) ev.getData();
-        Log.printLine("rec: " + list.size());
+        //Log.printLine("rec: " + list.size());
         this.vmAllocationPolicy = new VmAllocationPolicyK8s(Constants.hosts);
         setJobsList(list);
         for(Cloudlet j: list) {
@@ -337,15 +342,16 @@ public final class WorkflowEngine extends SimEntity {
 
                 }
                 computeTime.put(job.getTaskList().get(0).name, time);
-               // schedule(getId(), job.getTaskList().get(0).getPeriodTime(), WorkflowSimTags.JOB_NEED_REPEAT, job);
+                // schedule(getId(), job.getTaskList().get(0).getPeriodTime(), WorkflowSimTags.JOB_NEED_REPEAT, job);
                 if(time < Constants.repeatTime)
                     startTime.put(job, CloudSim.clock() + job.getTaskList().get(0).getPeriodTime());
             }
         }
 
         getJobsReceivedList().add(job);
+        Log.printLine(job.getCloudletId() + " 返回");
         jobsSubmitted--;
-        //Log.printLine("Job submitted: " + jobsSubmitted  + "job received: " + getJobsReceivedList().size());
+        Log.printLine("Job submitted: " + jobsSubmitted  + "job received: " + getJobsReceivedList().size());
         if (getJobsList().isEmpty() && jobsSubmitted == 0 && shouldStop()) {
             //send msg to all the schedulers
             shouldStop = true;
@@ -355,6 +361,7 @@ public final class WorkflowEngine extends SimEntity {
                 sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
             }
         } else {
+            Log.printLine("cloudlet submit");
             sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
         }
         if(start) {
@@ -371,14 +378,10 @@ public final class WorkflowEngine extends SimEntity {
      */
     protected void processOtherEvent(SimEvent ev) {
         /*if (ev == null) {
-=======
-        if (ev == null) {
->>>>>>> 5ae75145f27ee66af79323908ebf18fed3de314a
             Log.printLine(getName() + ".processOtherEvent(): " + "Error - an event is null.");
             return;
         }
         Log.printLine(getName() + ".processOtherEvent(): "
-<<<<<<< HEAD
                 + "Error - event unknown by this DatacenterBroker.");*/
     }
 
@@ -406,7 +409,7 @@ public final class WorkflowEngine extends SimEntity {
      * @post $none
      */
     protected void submitJobs() {
-       // Log.printLine("Workflow engine submit "+getJobsList().size()+"jobs");
+        // Log.printLine("Workflow engine submit "+getJobsList().size()+"jobs");
         List<Job> list = getJobsList();
         Map<Integer, List> allocationList = new HashMap<>();
         for (int i = 0; i < getSchedulers().size(); i++) {
@@ -424,6 +427,8 @@ public final class WorkflowEngine extends SimEntity {
                 for (Job parent : parentList) {
                     if (!hasJobListContainsID(this.getJobsReceivedList(), parent.getCloudletId())) {
                         flag = false;
+                        if(parent.getTaskList().size() >= 1)
+                            Log.printLine(job.getTaskList().get(0).name + " 还有父任务"+ parent.getTaskList().get(0).name +"没有运行");
                         break;
                     }
                 }
@@ -471,19 +476,74 @@ public final class WorkflowEngine extends SimEntity {
                     if (index % interval == 0) {
                         //create a new one
                         //Log.printLine("cc");
-                        schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, subList);
+                        List<Job> trueList = new ArrayList<>();
+                        for(Object j: subList) {
+                            Job job = (Job)j;
+                            if(job.getTaskList().size() >= 1) {
+                                Task t = job.getTaskList().get(0);
+                                if(t.needWait) {
+                                    Double p = t.getPeriodTime();
+                                    Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
+                                    //t.needWait = false;
+                                    startTime.put(job, CloudSim.clock() + waitTime);
+                                } else {
+                                    trueList.add(job);
+                                }
+                            } else {
+                                trueList.add(job);
+                            }
+                        }
+                        schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, trueList);
                         delay += delaybase;
                         subList = new ArrayList();
                     }
                 }
                 if (!subList.isEmpty()) {
-                    schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, subList);
+                    List<Job> trueList = new ArrayList<>();
+                    for(Object j: subList) {
+                        Job job = (Job)j;
+                        if(job.getTaskList().size() >= 1) {
+                            Task t = job.getTaskList().get(0);
+                            if(t.needWait) {
+                                Double p = t.getPeriodTime();
+                                Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
+                                //t.needWait = false;
+                                startTime.put(job, CloudSim.clock() + waitTime);
+                            } else {
+                                trueList.add(job);
+                            }
+                        } else {
+                            trueList.add(job);
+                        }
+                    }
+                    schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, trueList);
                 }
             } else if (!submittedList.isEmpty()) {
                 if(!Constants.ifSimulate && Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.K8S)
                     sendNow(this.getId(), CloudSimTags.VM_CREATE, submittedList);
-                else
-                    sendNow(this.getSchedulerId(i), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
+                else {
+                    List<Job> trueList = new ArrayList<>();
+                    for(Object j: submittedList) {
+                        Job job = (Job)j;
+                        if(job.getTaskList().size() >= 1) {
+                            Task t = job.getTaskList().get(0);
+                            if(t.needWait) {
+                                Log.printLine(t.name + "need to wait before running");
+                                Double p = t.getPeriodTime();
+                                Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
+                                //t.needWait = false;
+                                startTime.put(job, CloudSim.clock() + waitTime);
+                            } else {
+                                trueList.add(job);
+                            }
+                        } else {
+                            trueList.add(job);
+                        }
+                    }
+                    sendNow(this.getSchedulerId(i), CloudSimTags.CLOUDLET_SUBMIT, trueList);
+                    //sendNow(this.getSchedulerId(i), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
+                }
+
             }
         }
     }

@@ -14,4 +14,5 @@ public class Result {
     public Double pes=1.0;
     public Double ram=512.0;
     public Integer size=1000;
+    public Double period;
 }
