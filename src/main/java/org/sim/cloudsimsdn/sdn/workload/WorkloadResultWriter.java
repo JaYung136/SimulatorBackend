@@ -12,6 +12,7 @@ import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.LogWriter;
 import org.sim.cloudsimsdn.sdn.main.LogPrinter;
+import org.sim.controller.AssignInfo;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -89,12 +90,18 @@ public class WorkloadResultWriter {
 	}
 
 	private List<Workload> flushWorkloadBuffer() {
+		System.out.println("3111@@@@@@@@@@@@@@@@@@@@");
 		List<Workload> oldbuffer = workloadBuffer;
+		List<Workload> res = new ArrayList<>();
 		for(Workload wl:workloadBuffer) {
-			printWorkload(wl);
+			System.out.println("3112@@@@@@@@@@@@@@@@@@@@");
+			Workload wlupdated = printWorkload(wl);
+			System.out.println("3113@@@@@@@@@@@@@@@@@@@@");
+			res.add(wlupdated);
 		}
+		System.out.println("3114`@@@@@@@@@@@@@@@@@@@@");
 		workloadBuffer = new ArrayList<Workload>(workloadBufferSize);
-		return oldbuffer;
+		return res;
 	}
 
 
@@ -108,7 +115,7 @@ public class WorkloadResultWriter {
 //		}
 //	}
 //
-	public void printWorkload(Workload wl) {//TODO:打印单条workload
+	public Workload printWorkload(Workload wl) {//TODO:打印单条workload
 		if(!headPrinted) {
 			this.printHead(wl);
 			headPrinted = true;
@@ -131,11 +138,66 @@ public class WorkloadResultWriter {
 			this.timeoutNum++;
 		}
 		else {
+			System.out.println("31121@@@@@@@@@@@@@@@@@@@@");
 			printRequest(wl.request, true);
 
 //			BigDecimal temServeTime = new BigDecimal(getWorkloadFinishTime(wl)).subtract(new BigDecimal(getWorkloadStartTime(wl)));
 
+			// TODO:Workload类新建 DAG调度时间 和 总端到端时间，在此计算
 			serveTime= getWorkloadFinishTime(wl) - getWorkloadStartTime(wl);//temServeTime.doubleValue();
+			wl.networkfinishtime = getWorkloadFinishTime(wl);
+			AssignInfo destinfo = CloudSim.assignInfoMap.get(wl.destVmName);
+			Double loopstart = destinfo.starttime;
+			Double loopend = destinfo.endtime;
+			Double ps = destinfo.pausestart;
+			Double pe = destinfo.pauseend;
+			/**
+			 * 以周期为循环，不断迭代找到最合适的end2end接收时间
+			 * 一次循环中：
+			 * if net>=下一循环start
+			 * 		到下一循环
+			 * if net>  循环end && net<下一循环start
+			 *		wl.end2endfinishtime = 下一循环start;
+			 * if net<=循环end && net>=循环start+ps+pe
+			 * 		wl.end2endfinishtime = net;
+			 * if net<循环start+ps+pe && net>循环start+ps
+			 * 		wl.end2endfinishtime = 循环start+ps+pe;
+			 * if net<=循环start+ps && net>=循环start
+			 * 		wl.end2endfinishtime = net;
+			 * if net<循环start
+			 * 		wl.end2endfinishtime = 循环start;
+			 */
+			System.out.println("31122@@@@@@@@@@@@@@@@@@@@");
+			while (true){
+				System.out.println("networkfinishtime:"+wl.networkfinishtime+" loopstart:"+loopstart+" loopend:"+loopend);
+				if(wl.networkfinishtime >= loopstart + destinfo.containerperiod){
+					loopstart += destinfo.containerperiod;
+					loopend += destinfo.containerperiod;
+					continue;
+				}
+				if(wl.networkfinishtime > loopend && wl.networkfinishtime < loopstart + destinfo.containerperiod){
+					wl.end2endfinishtime = loopstart + destinfo.containerperiod;
+					break;
+				}
+				if(wl.networkfinishtime <= loopend && wl.networkfinishtime >= loopstart+ps+pe){
+					wl.end2endfinishtime = wl.networkfinishtime;
+					break;
+				}
+				if(wl.networkfinishtime<loopstart+ps+pe && wl.networkfinishtime>loopstart+ps){
+					wl.end2endfinishtime = loopstart+ps+pe;
+					break;
+				}
+				if(wl.networkfinishtime<=loopstart+ps && wl.networkfinishtime>=loopstart){
+					wl.end2endfinishtime = wl.networkfinishtime;
+					break;
+				}
+				if (wl.networkfinishtime<loopstart) {
+					wl.end2endfinishtime = loopstart;
+					break;
+				}
+			}
+			System.out.println("31123@@@@@@@@@@@@@@@@@@@@");
+			wl.dagschedulingtime = wl.end2endfinishtime - wl.networkfinishtime;
 			maxPerTime = (maxPerTime > serveTime)? maxPerTime : serveTime;
 			printDetail(String.format(LogPrinter.fFloat, serveTime));
 			printDetail("\n");
@@ -147,6 +209,7 @@ public class WorkloadResultWriter {
 			}
 			printedWorkloadNum++;
 		}
+		return wl;
 	}
 
 
@@ -259,8 +322,9 @@ public class WorkloadResultWriter {
 
 	public List<Workload> printStatistics() {
 		//threadExit();
+		System.out.println("311@@@@@@@@@@@@@@@@@@@@");
 		List<Workload> wls = flushWorkloadBuffer(); //打印表格
-
+		System.out.println("312@@@@@@@@@@@@@@@@@@@@");
 //		printLine("#======================================");
 //		printLine("#Number of workloads:" + printedWorkloadNum);
 //		printLine("#Timeout workloads:" + timeoutNum);

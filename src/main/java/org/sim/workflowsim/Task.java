@@ -37,11 +37,11 @@ import java.util.List;
 public class Task extends Cloudlet {
 
     /*
-     * The list of parent tasks. 
+     * The list of parent tasks.
      */
     private List<Task> parentList;
     /*
-     * The list of child tasks. 
+     * The list of child tasks.
      */
     private List<Task> childList;
     /*
@@ -49,22 +49,22 @@ public class Task extends Cloudlet {
      */
     private List<FileItem> fileList;
     /*
-     * The priority used for research. Not used in current version. 
+     * The priority used for research. Not used in current version.
      */
     private int priority;
     /*
-     * The depth of this task. Depth of a task is defined as the furthest path 
-     * from the root task to this task. It is set during the workflow parsing 
-     * stage. 
+     * The depth of this task. Depth of a task is defined as the furthest path
+     * from the root task to this task. It is set during the workflow parsing
+     * stage.
      */
     private int depth;
     /*
-     * The impact of a task. It is used in research. 
+     * The impact of a task. It is used in research.
      */
     private double impact;
 
     /*
-     * The type of a task. 
+     * The type of a task.
      */
     private String type;
 
@@ -85,6 +85,7 @@ public class Task extends Cloudlet {
     private double compute = 0;
 
     public String name;
+    public boolean needWait = true;
 
     public void setRam(double r) {
         this.ram = r;

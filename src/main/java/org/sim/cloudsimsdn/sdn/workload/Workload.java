@@ -14,11 +14,14 @@ package org.sim.cloudsimsdn.sdn.workload;
  * @author Jungmin Son
  * @since CloudSimSDN 1.0
  */
-public class Workload implements Comparable<Workload> {
+public class  Workload implements Comparable<Workload> {
 	public int workloadId;
 	public int jobId;
 	public int appId;
-	public double time;
+	public double time; //开始时刻
+	public double networkfinishtime; //网络传输结束时刻
+	public double end2endfinishtime; //端到端传输结束结束时刻
+	public double dagschedulingtime; //DAG调度的等待时间
 	public int submitVmId;
 	public String submitVmName;
 	public String destVmName;

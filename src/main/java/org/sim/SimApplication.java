@@ -47,7 +47,9 @@ public class SimApplication {
 		dir = new File(path);
 		dir.mkdirs();
 		System.out.println("后端已启动");
+		System.setProperty("java.awt.headless","false");
 		SpringApplication.run(SimApplication.class, args);
+
 	}
 
 }

@@ -195,6 +195,8 @@ public class WorkloadParser {
 //					&& (parsedWorkloads.size() < numRequests)
 			){
 /*************************************************************/
+				// TODO: 创建一条 workload
+				// TODO: Workload类新建域，每条workload的目标容器的 “name、单个周期开始结束时间、周期间隔、暂停时间” / 或者直接读 assign JsonObject
 				String[] splitLine = line.split(",");
 				Queue<String> lineitems = new LinkedList<String>(Arrays.asList(splitLine));
 				// 比如待解析数据：[number],[periodtime],0,vm01,0,5,l12,vm02,10000,5,,,,

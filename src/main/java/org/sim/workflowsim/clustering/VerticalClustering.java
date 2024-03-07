@@ -115,12 +115,7 @@ public class VerticalClustering extends BasicClustering {
                             taskList.add(node);
                             addTasks2Job(taskList);
                             taskList.clear();
-
-<<<<<<< HEAD
                         } else {//cNum ==1
-=======
-                        } else {//cNum==1
->>>>>>> 5ae75145f27ee66af79323908ebf18fed3de314a
                             //cut and add new
 
                             if (!taskList.isEmpty()) {
@@ -154,7 +149,7 @@ public class VerticalClustering extends BasicClustering {
             }
         }
         mHasChecked.clear();
-        super.clean();        
+        super.clean();
         updateDependencies();
         addClustDelay();
     }
@@ -171,9 +166,9 @@ public class VerticalClustering extends BasicClustering {
             switch (name) {
                 case "mBackground":
                     //remove all of its parents of mProjectPP
-                    
+
                     for (int j = 0; j < node.getParentList().size(); j++) {
-                        
+
                         Task parent = (Task) node.getParentList().get(j);
                         if (parent.getType().equals("mProjectPP")) {
                             j--;
@@ -183,7 +178,7 @@ public class VerticalClustering extends BasicClustering {
                     }   break;
                 case "mAdd":
                     for (int j = 0; j < node.getParentList().size(); j++) {
-                        
+
                         Task parent = (Task) node.getParentList().get(j);
                         String pName = parent.getType();
                         if (pName.equals("mBackground") || pName.equals("mShrink")) {

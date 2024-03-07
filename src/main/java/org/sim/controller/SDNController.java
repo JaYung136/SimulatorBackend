@@ -4,7 +4,7 @@ package org.sim.controller;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import org.apache.commons.math3.util.Pair;
+import org.jfree.data.xy.XYSeries;
 import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.LogWriter;
@@ -26,7 +26,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
+import static org.sim.controller.MyPainter.main;
+import static org.sim.controller.MyPainter.paintMultiGraph;
 
 @RestController
 //@Scope(value = "singleton")
@@ -326,19 +329,32 @@ public class SDNController {
         Map<String, Double> pausestartmap = new HashMap<>();
         Map<String, Double> pauseendmap = new HashMap<>();
 
+        assignInfoMap = new HashMap<>();
+
         for(Object obj : json) {
             JSONObject host = (JSONObject) obj;
             startmap.put(host.getString("name"), Double.parseDouble(host.getString("start")));
             endmap.put(host.getString("name"), Double.parseDouble(host.getString("end")));
             pausestartmap.put(host.getString("name"), host.getDouble("pausestart"));
             pauseendmap.put(host.getString("name"), host.getDouble("pauseend"));
+
+            AssignInfo ai = new AssignInfo(
+                    host.getString("app"),
+                    host.getString("name"),
+                    Double.parseDouble(host.getString("start")),
+                    Double.parseDouble(host.getString("end")),
+                    host.getDouble("pausestart"),
+                    host.getDouble("pauseend"),
+                    host.getDouble("containerperiod")
+            );
+            assignInfoMap.put(host.getString("name"), ai);
         }
 
         //读appinfo.xml 写workload.csv
         String xml = Files.readString(Path.of(input_app));
         JSONArray apps = XML.toJSONObject(xml).getJSONObject("AppInfo").getJSONArray("application");
         String filePath = workloadf;
-
+        // TODO: 拓展Workload表格。新建colonm，记录每条workload的目标容器的 “name"(第8列，name.2)、(单个周期开始结束时间、周期间隔、暂停时间)/自行读 assign JsonObject
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write("count,period,atime,name.1,zeros,w.1.1,link.1.2,name.2,p.1.2,w.2.1,link.2.3,name.3,p.2.3,w.3\n");
             for(Object obj : apps){
@@ -544,32 +560,65 @@ public class SDNController {
             return -1;
     }
     public void plotLatency(List<Workload> wls) throws Exception {
+        paintMultiGraph(wls);
+
+//        MyPainter p = new MyPainter("as");
+//        p.setSize(500, 500);
+//        XYSeries[] xySeries = new XYSeries[3];
+//        for(int i = 0; i < 3; i++) {
+//            xySeries[i] = new XYSeries("asa" + i);
+//            xySeries[i].add(i, i + 10);
+//            xySeries[i].add(i + 10, i + 20);
+//        }
+//        p.paint(xySeries, "as");
+
+
         // workload 制作 map. key:src+dst value:list<workload>/double[][]点集
-        Map<String, Map<Double, Double>> messages2pointset = new HashMap<>();
-        for (int i=0; i<wls.size(); ++i){
-            Workload wl = wls.get(i);
-            String key = wl.submitVmName+"->"+wl.destVmName;
-            Map<Double, Double> value = messages2pointset.get(key);
-            if(value == null){
-                value = new HashMap<>();
-            }
-            value.put(wl.time, getLatencyTime(wl));//Map<提交时间，延迟>
-            messages2pointset.put(key, value);
-        }
-        List<double[][]> data = new ArrayList<>();
-        for(String key:messages2pointset.keySet()){
-            Map<Double, Double> messages = messages2pointset.get(key);
-            double[] starttimes = messages.keySet().stream().mapToDouble(i->i).toArray();
-            double[] latencys = messages.values().stream().mapToDouble(i->i).toArray();
-            double[][] datai = {starttimes, latencys};
-            data.add(datai);
-//            System.out.println(messages);
-//            System.out.println(Arrays.toString(starttimes));
-//            System.out.println(Arrays.toString(latencys));
-//            System.out.println("-------------------------------------------------");
-        }
-        List<String> keys = messages2pointset.keySet().stream().collect(Collectors.toList());
-        ScatterGraph.plot(data, keys);
+//        Map<String, Map<Double, Double>> messages2pointset = new HashMap<>();
+//        Map<String, Map<Double, Double>> messages2pointsetEND = new HashMap<>();
+//        Map<String, Map<Double, Double>> messages2pointsetDAG = new HashMap<>();
+//        for (int i=0; i<wls.size(); ++i){
+//            Workload wl = wls.get(i);
+//            String key = wl.submitVmName+"->"+wl.destVmName;
+//            Map<Double, Double> value = new HashMap<>(); //messages2pointset.get(key);
+//            Map<Double, Double> valueEND = new HashMap<>(); //messages2pointsetEND.get(key);
+//            Map<Double, Double> valueDAG = new HashMap<>();  //messages2pointsetDAG.get(key);
+////            if(value == null){
+////                value = new HashMap<>();
+////            }
+//            value.put(wl.time, getLatencyTime(wl));//Map<提交时间，网络延迟>
+//            valueEND.put(wl.time, wl.end2endfinishtime - wl.time);//Map<提交时间，端到端总延迟>
+//            valueDAG.put(wl.time,wl.end2endfinishtime - wl.networkfinishtime);//Map<提交时间，DAG调度延迟>
+//            messages2pointset.put(key, value);
+//            messages2pointsetEND.put(key,valueEND);
+//            messages2pointsetDAG.put(key,valueDAG);
+//        }
+//        List<double[][]> data = new ArrayList<>();
+//        List<double[][]> dataEND = new ArrayList<>();
+//        List<double[][]> dataDAG = new ArrayList<>();
+//        for(String key:messages2pointset.keySet()){
+//            Map<Double, Double> messages = messages2pointset.get(key);
+//            Map<Double, Double> messagesEND = messages2pointsetEND.get(key);
+//            Map<Double, Double> messagesDAG = messages2pointsetDAG.get(key);
+//            double[] latencys = messages.values().stream().mapToDouble(i->i).toArray();
+//            double[] starttimes = messages.keySet().stream().mapToDouble(i->i).toArray();
+//            double[] latencysEND = messagesEND.values().stream().mapToDouble(i->i).toArray();
+//            double[] latencysDAG = messagesDAG.values().stream().mapToDouble(i->i).toArray();
+//            double[][] datai = {starttimes, latencys};
+//            double[][] dataiEND = {starttimes, latencysEND};
+//            double[][] dataiDAG = {starttimes, latencysDAG};
+//            data.add(datai);
+//            dataEND.add(dataiEND);
+//            dataDAG.add(dataiDAG);
+////            System.out.println(messages);
+////            System.out.println(Arrays.toString(starttimes));
+////            System.out.println(Arrays.toString(latencys));
+////            System.out.println("-------------------------------------------------");
+//        }
+//        List<String> keys = messages2pointset.keySet().stream().collect(Collectors.toList());
+//        ScatterGraph.plot("网络延迟",data, keys);
+//        ScatterGraph.plot("端到端总延迟",dataEND, keys);
+//        ScatterGraph.plot("DAG延迟",dataDAG, keys);
     }
 
     @RequestMapping("/run")
@@ -599,6 +648,7 @@ public class SDNController {
             log = LogWriter.getLogger(bwutil_result);
             log.printLine("</Links>");
             outputdelay();
+            System.out.println("plot latency");
             plotLatency(wls);
             List<WorkloadResult> wrlist = new ArrayList<>();
             for (Workload workload : wls) {

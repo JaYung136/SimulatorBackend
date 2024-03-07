@@ -49,7 +49,7 @@ public class ScatterGraph {
         try {
             TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
             SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
-            String filename = matter.format(new Date()).toString();
+            String filename = graphname+matter.format(new Date()).toString();
             saveAsFile(chart,"OutputFiles/Graphs/"+filename+".png",1200, 800);
         }catch (Exception e){
             e.printStackTrace();
@@ -90,9 +90,10 @@ public class ScatterGraph {
         }
     }
 
-    public static void plot(List<double[][]> data, List<String> keys) {
+    public static void plot(String graphname, List<double[][]> data, List<String> keys) {
+        System.out.println("开始画图");
         ScatterGraph scatterGraph_ = new ScatterGraph();
-        JFreeChart chart = scatterGraph_.makescatterchart(data, "延迟图像", keys);
+        JFreeChart chart = scatterGraph_.makescatterchart(data, graphname, keys);
     }
 
     public static void main(String[] args) {

@@ -13,6 +13,7 @@ import org.sim.cloudsimsdn.core.predicates.Predicate;
 import org.sim.cloudsimsdn.core.predicates.PredicateAny;
 import org.sim.cloudsimsdn.core.predicates.PredicateNone;
 import org.sim.cloudsimsdn.sdn.WirelessScheduler;
+import org.sim.controller.AssignInfo;
 
 import java.util.*;
 
@@ -42,8 +43,8 @@ public class CloudSim {
     public static double bwMaxutil = 0.0;
 	public static double bwTotalutil = 0.0;
 	public static int bwUtilnum = 0;
-
-	/** The id of CIS entity. */
+	public static Map<String, AssignInfo> assignInfoMap = null;
+    /** The id of CIS entity. */
 	private static int cisId = -1;
 
 	/** The id of CloudSimShutdown entity. */

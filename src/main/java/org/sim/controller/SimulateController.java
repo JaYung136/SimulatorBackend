@@ -154,7 +154,7 @@ public class SimulateController {
         JSONArray array = new JSONArray();
         for(Result result: Constants.results) {
             JSONObject obj = new JSONObject().put("app", result.app).put("pausestart", result.pausestart).put("pauseend", result.pauseend).put("name", result.name).put("host", result.host).put("start", result.start).put("end", result.finish).put("size", result.size)
-                    .put("mips", result.mips).put("pes", result.pes).put("type", result.type).put("datacenter", result.datacenter).put("ram", result.ram);
+                    .put("mips", result.mips).put("pes", result.pes).put("type", result.type).put("datacenter", result.datacenter).put("ram", result.ram).put("containerperiod", result.period);
             array.put(obj);
         }
         try {
