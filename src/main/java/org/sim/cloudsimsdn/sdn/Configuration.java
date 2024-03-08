@@ -82,7 +82,7 @@ public class Configuration {
 	//////////////////////////// Default value
 	public static final double CPU_SIZE_MULTIPLY = 1;	// Multiply all the CPU size for scale. Default =1 (No amplify)
 	public static final double NETWORK_PACKET_SIZE_MULTIPLY = 1;	// Multiply all the network packet size. Default =1 (No amplify)
-	public static double monitoringTimeInterval = 1; //TODO: 修改“monitor”间隙 default 0.01
+	public static double monitoringTimeInterval = 0.01; //TODO: 修改“monitor”间隙 10微秒监测一次
 	// every 1800 seconds, polling utilization.
 	public static final double overbookingTimeWindowInterval = monitoringTimeInterval;	// Time interval between points
 	public static final double overbookingTimeWindowNumPoints = 1;//Double.POSITIVE_INFINITY;	// No migration. How many points to track

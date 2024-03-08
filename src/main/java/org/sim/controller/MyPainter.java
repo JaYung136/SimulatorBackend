@@ -82,7 +82,7 @@ public class MyPainter extends JFrame {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
-        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+pngName+matter.format(new Date()).toString()+".png", 1200, 800);
+        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
     }
 
     public static void paintMultiGraph(List<Workload> wls) throws Exception {

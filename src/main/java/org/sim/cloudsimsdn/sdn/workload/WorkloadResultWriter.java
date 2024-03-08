@@ -169,7 +169,7 @@ public class WorkloadResultWriter {
 			 */
 			System.out.println("31122@@@@@@@@@@@@@@@@@@@@");
 			while (true){
-				System.out.println("networkfinishtime:"+wl.networkfinishtime+" loopstart:"+loopstart+" loopend:"+loopend);
+//				System.out.println("networkfinishtime:"+wl.networkfinishtime+" loopstart:"+loopstart+" loopend:"+loopend);
 				if(wl.networkfinishtime >= loopstart + destinfo.containerperiod){
 					loopstart += destinfo.containerperiod;
 					loopend += destinfo.containerperiod;

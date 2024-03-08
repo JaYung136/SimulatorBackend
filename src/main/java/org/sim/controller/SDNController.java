@@ -320,6 +320,7 @@ public class SDNController {
         writer.write(jsonPrettyPrintString);
         writer.close();
     }
+    public double contractRate = 0.00001; // 容器调度的单位为 10微秒。
     public void convertworkload() throws IOException{
         //读result1制作ip->starttime/endtime的字典
         String content = Files.readString(Path.of(input_container));
@@ -341,11 +342,11 @@ public class SDNController {
             AssignInfo ai = new AssignInfo(
                     host.getString("app"),
                     host.getString("name"),
-                    Double.parseDouble(host.getString("start")),
-                    Double.parseDouble(host.getString("end")),
-                    host.getDouble("pausestart"),
-                    host.getDouble("pauseend"),
-                    host.getDouble("containerperiod")
+                    Double.parseDouble(host.getString("start"))*contractRate,
+                    Double.parseDouble(host.getString("end"))*contractRate,
+                    host.getDouble("pausestart")*contractRate,
+                    host.getDouble("pauseend")*contractRate,
+                    host.getDouble("containerperiod")*contractRate
             );
             assignInfoMap.put(host.getString("name"), ai);
         }
@@ -559,67 +560,6 @@ public class SDNController {
         else
             return -1;
     }
-    public void plotLatency(List<Workload> wls) throws Exception {
-        paintMultiGraph(wls);
-
-//        MyPainter p = new MyPainter("as");
-//        p.setSize(500, 500);
-//        XYSeries[] xySeries = new XYSeries[3];
-//        for(int i = 0; i < 3; i++) {
-//            xySeries[i] = new XYSeries("asa" + i);
-//            xySeries[i].add(i, i + 10);
-//            xySeries[i].add(i + 10, i + 20);
-//        }
-//        p.paint(xySeries, "as");
-
-
-        // workload 制作 map. key:src+dst value:list<workload>/double[][]点集
-//        Map<String, Map<Double, Double>> messages2pointset = new HashMap<>();
-//        Map<String, Map<Double, Double>> messages2pointsetEND = new HashMap<>();
-//        Map<String, Map<Double, Double>> messages2pointsetDAG = new HashMap<>();
-//        for (int i=0; i<wls.size(); ++i){
-//            Workload wl = wls.get(i);
-//            String key = wl.submitVmName+"->"+wl.destVmName;
-//            Map<Double, Double> value = new HashMap<>(); //messages2pointset.get(key);
-//            Map<Double, Double> valueEND = new HashMap<>(); //messages2pointsetEND.get(key);
-//            Map<Double, Double> valueDAG = new HashMap<>();  //messages2pointsetDAG.get(key);
-////            if(value == null){
-////                value = new HashMap<>();
-////            }
-//            value.put(wl.time, getLatencyTime(wl));//Map<提交时间，网络延迟>
-//            valueEND.put(wl.time, wl.end2endfinishtime - wl.time);//Map<提交时间，端到端总延迟>
-//            valueDAG.put(wl.time,wl.end2endfinishtime - wl.networkfinishtime);//Map<提交时间，DAG调度延迟>
-//            messages2pointset.put(key, value);
-//            messages2pointsetEND.put(key,valueEND);
-//            messages2pointsetDAG.put(key,valueDAG);
-//        }
-//        List<double[][]> data = new ArrayList<>();
-//        List<double[][]> dataEND = new ArrayList<>();
-//        List<double[][]> dataDAG = new ArrayList<>();
-//        for(String key:messages2pointset.keySet()){
-//            Map<Double, Double> messages = messages2pointset.get(key);
-//            Map<Double, Double> messagesEND = messages2pointsetEND.get(key);
-//            Map<Double, Double> messagesDAG = messages2pointsetDAG.get(key);
-//            double[] latencys = messages.values().stream().mapToDouble(i->i).toArray();
-//            double[] starttimes = messages.keySet().stream().mapToDouble(i->i).toArray();
-//            double[] latencysEND = messagesEND.values().stream().mapToDouble(i->i).toArray();
-//            double[] latencysDAG = messagesDAG.values().stream().mapToDouble(i->i).toArray();
-//            double[][] datai = {starttimes, latencys};
-//            double[][] dataiEND = {starttimes, latencysEND};
-//            double[][] dataiDAG = {starttimes, latencysDAG};
-//            data.add(datai);
-//            dataEND.add(dataiEND);
-//            dataDAG.add(dataiDAG);
-////            System.out.println(messages);
-////            System.out.println(Arrays.toString(starttimes));
-////            System.out.println(Arrays.toString(latencys));
-////            System.out.println("-------------------------------------------------");
-//        }
-//        List<String> keys = messages2pointset.keySet().stream().collect(Collectors.toList());
-//        ScatterGraph.plot("网络延迟",data, keys);
-//        ScatterGraph.plot("端到端总延迟",dataEND, keys);
-//        ScatterGraph.plot("DAG延迟",dataDAG, keys);
-    }
 
     @RequestMapping("/run")
     public ResultDTO run() throws IOException {
@@ -648,8 +588,8 @@ public class SDNController {
             log = LogWriter.getLogger(bwutil_result);
             log.printLine("</Links>");
             outputdelay();
-            System.out.println("plot latency");
-            plotLatency(wls);
+            System.out.println("绘制延迟图像");
+            paintMultiGraph(wls);
             List<WorkloadResult> wrlist = new ArrayList<>();
             for (Workload workload : wls) {
                 //------------------------------------------ calculate total time
