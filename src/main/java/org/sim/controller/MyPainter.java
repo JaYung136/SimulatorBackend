@@ -74,7 +74,7 @@ public class MyPainter extends JFrame {
         for(XYSeries xy: xys) {
             xySeriesCollection.addSeries(xy);
         }
-        JFreeChart chart = ChartFactory.createXYLineChart(pngName, "发送时刻", "延迟", xySeriesCollection);
+        JFreeChart chart = ChartFactory.createXYLineChart(pngName, "发送时刻(微秒)", "延迟(微秒)", xySeriesCollection);
         ChartPanel chartPanel = new ChartPanel(chart);
         //chartPanel.setPreferredSize(new Dimension(100 ,100));
         setContentPane(chartPanel);
@@ -91,13 +91,13 @@ public class MyPainter extends JFrame {
         Map<String, XYSeries> xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
-            String key = "消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
+            String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
             XYSeries line = xySerieMap.get(key);
             //如果不存在这条线就新建
             if (line ==null) {
                 line = new XYSeries(key);
             }
-            line.add(wl.time, wl.networkfinishtime-wl.time);
+            line.add(wl.time*1000000, (wl.networkfinishtime-wl.time)*1000000);
             xySerieMap.put(key, line);
         }
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "网络延迟图像");
@@ -107,32 +107,32 @@ public class MyPainter extends JFrame {
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
-            String key = "消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
+            String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
             XYSeries line = xySerieMap.get(key);
             //如果不存在这条线就新建
             if (line ==null) {
                 line = new XYSeries(key);
             }
-            line.add(wl.time, wl.end2endfinishtime-wl.time);
+            line.add(wl.time*1000000, (wl.end2endfinishtime-wl.time)*1000000);
             xySerieMap.put(key, line);
         }
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "端到端延迟图像");
 
-        p = new MyPainter("DAG延迟图像");
+        p = new MyPainter("调度等待延迟图像");
         p.setSize(500, 500);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
-            String key = "消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
+            String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
             XYSeries line = xySerieMap.get(key);
             //如果不存在这条线就新建
             if (line ==null) {
                 line = new XYSeries(key);
             }
-            line.add(wl.time, wl.end2endfinishtime-wl.networkfinishtime);
+            line.add(wl.time*1000000, (wl.end2endfinishtime-wl.networkfinishtime)*1000000);
             xySerieMap.put(key, line);
         }
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "DAG延迟图像");
+        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "调度等待延迟图像");
     }
 
     public static void main(String[] args) throws Exception {

@@ -11,5 +11,6 @@ public class WorkloadResult {
     public String time;
 
     public String destid;
+    public String msgname;
 }
 

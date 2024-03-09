@@ -1,10 +1,7 @@
 package org.sim.controller;
 
-//import com.reins.bookstore.service.LoginService;
-
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import org.jfree.data.xy.XYSeries;
 import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.LogWriter;
@@ -28,7 +25,6 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
-import static org.sim.controller.MyPainter.main;
 import static org.sim.controller.MyPainter.paintMultiGraph;
 
 @RestController
@@ -39,7 +35,7 @@ public class SDNController {
     private String input_topo = "./InputFiles/Input_TopoInfo.xml";
     private String input_host = "./InputFiles/Input_Hosts.xml";
     private String input_container = "./Intermediate/assign.json";
-    private String input_app = "./InputFiles/Input_AppInfo.xml";
+    public static String input_app = "./InputFiles/Input_AppInfo.xml";
     private String physicalf = "./Intermediate/physical.json";
     private String virtualf = "./Intermediate/virtual.json";
     private String workloadf = "./Intermediate/messages.csv";
@@ -50,6 +46,7 @@ public class SDNController {
     private boolean halfDuplex = false;
     public int containerPeriodCount = 3;
     public double latencyScore = 0;
+    public static double simulationStopTime = 1000.0; //仿真持续时间，微秒
 
     @RequestMapping("/hello")
     public String hello(){
@@ -320,7 +317,8 @@ public class SDNController {
         writer.write(jsonPrettyPrintString);
         writer.close();
     }
-    public double contractRate = 0.00001; // 容器调度的单位为 10微秒。
+    public static double contractRate = 0.00001; // 容器调度的单位为 10 微秒。
+    public static JSONArray pure_msgs = new JSONArray();
     public void convertworkload() throws IOException{
         //读result1制作ip->starttime/endtime的字典
         String content = Files.readString(Path.of(input_container));
@@ -341,7 +339,7 @@ public class SDNController {
 
             AssignInfo ai = new AssignInfo(
                     host.getString("app"),
-                    host.getString("name"),
+                    host.getString("name"), //ip
                     Double.parseDouble(host.getString("start"))*contractRate,
                     Double.parseDouble(host.getString("end"))*contractRate,
                     host.getDouble("pausestart")*contractRate,
@@ -456,32 +454,33 @@ public class SDNController {
         return;
     }
 
-    public ResultDTO outputdelay() throws IOException{
-        // 读取CSV文件
-        CSVReader csvReader = new CSVReaderBuilder(new FileReader(workload_result)).build();
-        List<String[]> csvData = csvReader.readAll();
-
+    public ResultDTO outputdelay(List<Workload> wls) throws IOException{
         //创建xml
         File file = new File(latency_result);
         file.createNewFile();
-
         // 写入
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<NetworkDelay>\n<Messages>\n");
-
         int count = 0;
         double totaltime = 0.0;
-        for (int i = 1; i < csvData.size(); i++) {
-            String[] row = csvData.get(i);
+
+        for(int i=0; i<wls.size(); ++i){
+            Workload msg = wls.get(i);
             try {
-                bw.write("\t<Message Src=\"" + row[1].trim() + "\" Dst=\"" + row[2].trim() + "\" StartTime=\"" + row[4].trim() + "\" EndTime=\"" + row[15].trim() + "\" NetworkTime=\"" + row[18].trim() + "\" PkgSizeKB=\"" + row[12].trim() + "\">\n\t</Message>\n");
+                bw.write("\t<Message MessageName=\"" + msg.msgName + "\" Src=\"" + msg.submitVmName + "\" Dst=\"" + msg.destVmName + "\" StartTime=\"" + msg.time + "\" EndTime=\"" + msg.end2endfinishtime
+                        + "\" NetworkTime=\"" + (msg.networkfinishtime-msg.time)
+                        + "\" WaitingTime=\"" + (msg.end2endfinishtime-msg.networkfinishtime)
+                        + "\" EndtoEndTime=\"" + (msg.end2endfinishtime-msg.time)
+                        + "\" PkgSizeKB=\"" + msg.submitPktSize + "\">\n\t</Message>\n");
                 ++count;
-                totaltime += Double.parseDouble(row[18].trim());
+                totaltime += msg.networkfinishtime-msg.time;
             }
             catch (Exception e) {
-                bw.write("\t<Message Src=\"" + row[1].trim() + "\" Dst=\"" + row[2].trim() + "\" StartTime=\"" + row[4].trim() + "\" EndTime=\"TimeOut\" NetworkTime=\"TimeOut\" PkgSizeKB=\"" + row[12].trim() + "\">\n\t</Message>\n");
+                bw.write("\t<Message MessageName=\"" + msg.msgName + "\" Src=\"" + msg.submitVmName + "\" Dst=\"" + msg.destVmName + "\" StartTime=\"" + msg.time + "\" EndTime=\"TimeOut\" " +
+                        "NetworkTime=\"TimeOut\" WaitingTime=\"X\" EndtoEndTime=\"X\" " +
+                        "PkgSizeKB=\"" + msg.submitPktSize + "\">\n\t</Message>\n");
             }
         }
 
@@ -587,7 +586,7 @@ public class SDNController {
             List<Workload> wls = simulator.main(args);
             log = LogWriter.getLogger(bwutil_result);
             log.printLine("</Links>");
-            outputdelay();
+            outputdelay(wls);
             System.out.println("绘制延迟图像");
             paintMultiGraph(wls);
             List<WorkloadResult> wrlist = new ArrayList<>();
@@ -602,6 +601,7 @@ public class SDNController {
                     Time = finishTime - startTime;
                 //------------------------------------------
                 WorkloadResult wr = new WorkloadResult();
+                wr.msgname = workload.msgName;
                 wr.jobid = workload.jobId;
                 wr.workloadid = workload.workloadId;
                 wr.vmid = workload.submitVmName;

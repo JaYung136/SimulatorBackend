@@ -43,6 +43,7 @@ public class CloudSim {
     public static double bwMaxutil = 0.0;
 	public static double bwTotalutil = 0.0;
 	public static int bwUtilnum = 0;
+	/** IP -> AssignInfo. */
 	public static Map<String, AssignInfo> assignInfoMap = null;
     /** The id of CIS entity. */
 	private static int cisId = -1;

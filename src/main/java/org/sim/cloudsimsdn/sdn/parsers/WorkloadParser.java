@@ -7,28 +7,23 @@
  */
 package org.sim.cloudsimsdn.sdn.parsers;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.XML;
 import org.sim.cloudsimsdn.Cloudlet;
 import org.sim.cloudsimsdn.UtilizationModel;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.physicalcomponents.SDNDatacenter;
 import org.sim.cloudsimsdn.sdn.workload.*;
+import org.sim.controller.AssignInfo;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
-/**
- * Parse [request].csv file.
- *
- * File format : req_time, vm_name(1), pkt_size(1), cloudlet_len(1),
- *                         vm_name(2), pkt_size(2), cloudlet_len(2),
- *                         ...
- *
- * @author Jungmin Son
- * @since CloudSimSDN 1.0
- */
+import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
+import static org.sim.controller.SDNController.*;
 
 public class WorkloadParser {
 	private static final int NUM_PARSE_EACHTIME = 200;
@@ -47,7 +42,6 @@ public class WorkloadParser {
 	private WorkloadResultWriter resultWriter = null;
 
 	private int workloadNum = 0;
-	private String destVMName;
 
 	private BufferedReader bufReader = null;
 
@@ -125,51 +119,45 @@ public class WorkloadParser {
 	}
 
 	// Cloud_Len -> /FlowId/ -> ToVmId -> PktSize
-	private Request parseRequest(int fromVmId, Queue<String> lineitems) {
-		if(lineitems.size() <= 0)
-		{
-			System.err.println("No REQUEST! ERROR");
-			return null;
-		}
-
-		long cloudletLen = Long.parseLong(lineitems.poll());
-		cloudletLen*=Configuration.CPU_SIZE_MULTIPLY;
-
-		Request req = new Request(userId);
-		Cloudlet cl = generateCloudlet(req.getRequestId(), fromVmId, (int) cloudletLen);
-		//this.parsedCloudlets.add(cl);
-
-		Processing proc = new Processing(cl);
-		req.addActivity(proc);
-
-		if(lineitems.size() != 0) {
-			// Has more requests after this. Create a transmission and add
-			String linkName = lineitems.poll();
-			Integer flowId = this.flowNames.get(linkName);
-
-			if(flowId == null) {
-				throw new IllegalArgumentException("No such link name in virtual.json:"+linkName);
-			}
-
-			String vmName = lineitems.poll();
-			destVMName = vmName;
-			int toVmId = getVmId(vmName);
-			SDNDatacenter toDC = (SDNDatacenter) SDNDatacenter.findDatacenterGlobal(toVmId);
-
-			long pktSize = Long.parseLong(lineitems.poll());
-			pktSize*=Configuration.NETWORK_PACKET_SIZE_MULTIPLY;
-			if(pktSize<0)
-				pktSize=0;
-
-			Request nextReq = parseRequest(toVmId, lineitems);
-
-			Transmission trans = new Transmission(fromVmId, toVmId, pktSize, flowId, nextReq);
-			req.addActivity(trans);
-		} else {
-			// this is the last request.
-		}
-		return req;
-	}
+//	private Request parseRequest(int fromVmId, Queue<String> lineitems) {
+//		long cloudletLen = Long.parseLong(lineitems.poll());
+//		cloudletLen*=Configuration.CPU_SIZE_MULTIPLY;
+//
+//		Request req = new Request(userId);
+//		Cloudlet cl = generateCloudlet(req.getRequestId(), fromVmId, (int) cloudletLen);
+//		//this.parsedCloudlets.add(cl);
+//
+//		Processing proc = new Processing(cl);
+//		req.addActivity(proc);
+//
+//		if(lineitems.size() != 0) {
+//			// Has more requests after this. Create a transmission and add
+//			String linkName = lineitems.poll();
+//			Integer flowId = this.flowNames.get(linkName);
+//
+//			if(flowId == null) {
+//				throw new IllegalArgumentException("No such link name in virtual.json:"+linkName);
+//			}
+//
+//			String vmName = lineitems.poll();
+//			destVMName = vmName;
+//			int toVmId = getVmId(vmName);
+//			SDNDatacenter toDC = (SDNDatacenter) SDNDatacenter.findDatacenterGlobal(toVmId);
+//
+//			long pktSize = Long.parseLong(lineitems.poll());
+//			pktSize*=Configuration.NETWORK_PACKET_SIZE_MULTIPLY;
+//			if(pktSize<0)
+//				pktSize=0;
+//
+//			Request nextReq = parseRequest(toVmId, lineitems);
+//
+//			Transmission trans = new Transmission(fromVmId, toVmId, pktSize, flowId, nextReq);
+//			req.addActivity(trans);
+//		} else {
+//			// this is the last request.
+//		}
+//		return req;
+//	}
 
 	private void openFile() {
 		try {
@@ -185,83 +173,208 @@ public class WorkloadParser {
 			e.printStackTrace();
 		}
 	}
-
+	private List<Double> calMsgStarttimes(Double starttime, Double pausestart, Double pauseend, Double endtime, Double containerperiod, Double msgperiod, Double simulationend) {
+		ArrayList<Double> stimes = new ArrayList<>();
+		// 迭代多个容器生命周期
+		while(endtime < simulationend*0.000001){
+			/**
+			 * 容器的一个生命周期时间内，计算所有的消息发送时间
+			 * |(starttime)--------(starttime+pausestart)|  暂停  |(starttime+pausestart+pauseend)--------(endtime)|
+			 * while starttime <= msgtime < starttime+pausestart:
+			 * 		msgtime += msgperiod;
+			 * while starttime+pausestart+pauseend <= msgtime < endtime:
+			 * 		msgtime += msgperiod;
+			 */
+			Double msgtime = starttime;
+			while(starttime <= msgtime && msgtime < starttime+pausestart){
+				stimes.add(msgtime);
+				msgtime += msgperiod;
+			}
+			msgtime = starttime+pausestart+pauseend;
+			while(starttime+pausestart+pauseend <= msgtime && msgtime < endtime){
+				stimes.add(msgtime);
+				msgtime += msgperiod;
+			}
+			starttime += containerperiod;
+			endtime += containerperiod;
+		}
+		return stimes;
+	}
 	private void parseNext(int numRequests) {
 		String line;
-
-		try {
+		System.out.println("########################");
+		try{
+//			JSONArray pure_msgs = new JSONArray();
+			String xml = Files.readString(Path.of(input_app));
+			JSONArray apps = XML.toJSONObject(xml).getJSONObject("AppInfo").getJSONArray("application");
+			/**
+			 * 制作纯净消息，仅包含必要字段：
+			 * Name 消息名
+			 * SrcIP 发送方容器ip
+			 * DstIP 接收方容器ip
+			 * DstName 接收方任务名称
+			 * AppPeriod 任务周期 单位秒
+			 * MsgPeriod 消息周期 单位秒
+			 * MessageSize 消息大小
+			 */
 			int jobid = 1;
-			while (((line = bufReader.readLine()) != null)
-//					&& (parsedWorkloads.size() < numRequests)
-			){
-/*************************************************************/
-				// TODO: 创建一条 workload
-				// TODO: Workload类新建域，每条workload的目标容器的 “name、单个周期开始结束时间、周期间隔、暂停时间” / 或者直接读 assign JsonObject
-				String[] splitLine = line.split(",");
-				Queue<String> lineitems = new LinkedList<String>(Arrays.asList(splitLine));
-				// 比如待解析数据：[number],[periodtime],0,vm01,0,5,l12,vm02,10000,5,,,,
-				Integer periodCount = Integer.parseInt(lineitems.poll());// number
-				Double periodTime = Double.parseDouble(lineitems.poll());
-				for (int i=0; i<periodCount; ++i) {
-					Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
-					Queue<String> lineitemscopy = new LinkedList<String>(lineitems);
-					// 比如待解析数据：0,vm01,0,5,l12,vm02,10000,5,,,,
-					wl.time = Double.parseDouble(lineitemscopy.poll());// start_time
-					wl.time += i * periodTime;
-					// For debug only
-					if(wl.time < this.forcedStartTime || wl.time > this.forcedFinishTime) // Skip Workloads before the set start time
-						continue;
-					String vmName = lineitemscopy.poll();
-					wl.submitVmId = getVmId(vmName);
-					wl.submitVmName = vmName;
-					wl.submitPktSize = Integer.parseInt(lineitemscopy.poll());
-					wl.request = parseRequest(wl.submitVmId, lineitemscopy);
-					wl.destVmName = destVMName;
-					parsedWorkloads.add(wl);
+			for(Object obj : apps) {
+				JSONObject app = (JSONObject) obj;
+				String src = app.getString("IpAddress");
+				Double appPeriod = app.getDouble("Period")*contractRate;
+				JSONObject tem = app.getJSONObject("A653SamplingPort").getJSONObject("A664Message");
+				Object dataField = tem.opt("A653SamplingPort");
+				//case1:向>1个cn发送数据包
+				if (dataField instanceof JSONArray) {
+					JSONArray msgs = (JSONArray) dataField;
+					for(Object objj: msgs){
+						JSONObject msg = (JSONObject) objj;
+						JSONObject puremsg = new JSONObject();
+						puremsg.put("Name", msg.getString("Name"))
+								.put("SrcIP",src)
+								.put("DstIP",msg.getString("IpAddress"))
+								.put("DstName",msg.getString("AppName"))
+								.put("AppPeriod",appPeriod)
+								.put("MsgPeriod", (msg.getInt("SamplePeriod"))*contractRate)
+								.put("MessageSize",msg.getInt("MessageSize")*1.0)//单位Kb?
+						;
+						pure_msgs.put(puremsg);
+						/** TODO: 为每条message创建workload示例
+						 *根据容器起始、暂停开始、暂停结束、容器结束、容器周期间隔、消息周期间隔、仿真截止时间
+						 * 得到若干的消息起始时间
+						 */
+						AssignInfo ai = assignInfoMap.get(src);
+						double MsgPeriod = msg.getInt("SamplePeriod") * contractRate;
+						List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
+								ai.containerperiod, MsgPeriod, simulationStopTime);
+						for(Double msgstart : msgStarttimes){
+							Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
+							wl.msgName = msg.getString("Name");
+							wl.time = msgstart;
+							wl.submitVmName = src;
+							wl.submitVmId = getVmId(src);
+							wl.destVmName = msg.getString("IpAddress");
+							wl.destVmId = getVmId(wl.destVmName);
+							wl.submitPktSize = msg.getInt("MessageSize")*1.0;
+							Request req = new Request(userId);
+							req.addActivity(
+									new Processing(
+											generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
+									)
+							);
+							Request endreq = new Request(userId);
+							endreq.addActivity(
+									new Processing(
+											generateCloudlet(req.getRequestId(), wl.destVmId, 0)
+									)
+							);
+							req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, (long) wl.submitPktSize, this.flowNames.get("default"), endreq));
+							wl.request = req;
+							parsedWorkloads.add(wl);
+							++jobid;
+						}
+						/****************************/
+					}
 				}
-				++jobid;
-/*************************************************************/
-//				//System.out.println("parsing:"+line);
-//				Workload tr = new Workload(workloadNum++, this.resultWriter);
-//
+				//case2:仅向1个cn发送数据包
+				else {
+					JSONObject msg = (JSONObject) dataField;
+					JSONObject puremsg = new JSONObject();
+					puremsg.put("Name", msg.getString("Name"))
+							.put("SrcIP",src)
+							.put("DstIP",msg.getString("IpAddress"))
+							.put("DstName",msg.getString("AppName"))
+							.put("AppPeriod",appPeriod)
+							.put("MsgPeriod", msg.getInt("SamplePeriod")*contractRate)
+							.put("MessageSize",msg.getInt("MessageSize")*1.0)//单位Kb?
+					;
+					pure_msgs.put(puremsg);
+					/** TODO: 为每条message创建workload实例
+					 *根据容器起始、暂停开始、暂停结束、容器结束、容器周期间隔、消息周期间隔、仿真截止时间
+					 * 得到若干的消息起始时间
+					 */
+					AssignInfo ai = assignInfoMap.get(src);
+					double MsgPeriod = msg.getInt("SamplePeriod") * contractRate;
+					List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
+							ai.containerperiod, MsgPeriod, simulationStopTime);
+					for(Double msgstart : msgStarttimes){
+						Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
+						wl.msgName = msg.getString("Name");
+						wl.time = msgstart;
+						wl.submitVmName = src;
+						wl.submitVmId = getVmId(src);
+						wl.destVmName = msg.getString("IpAddress");
+						wl.destVmId = getVmId(wl.destVmName);
+						wl.submitPktSize = msg.getInt("MessageSize")*1.0;
+						Request req = new Request(userId);
+						req.addActivity(
+								new Processing(
+										generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
+								)
+						);
+						Request endreq = new Request(userId);
+						endreq.addActivity(
+								new Processing(
+										generateCloudlet(req.getRequestId(), wl.destVmId, 0)
+								)
+						);
+						req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, (long) wl.submitPktSize, this.flowNames.get("default"), endreq));
+						parsedWorkloads.add(wl);
+						wl.request = req;
+						++jobid;
+					}
+					/****************************/
+				}
+			}
+
+//			String jsonPrettyPrintString = pure_msgs.toString(4);
+//			//保存格式化后的json
+//			FileWriter writer = new FileWriter("aaaaaaaa.json");
+//			writer.write(jsonPrettyPrintString);
+//			writer.close();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
+
+//		try {
+//			int jobid = 1;
+//			while (((line = bufReader.readLine()) != null)
+////					&& (parsedWorkloads.size() < numRequests)
+//			){
+///*************************************************************/
+//				// TODO: 创建一条 workload
+//				// TODO: Workload类新建域，每条workload的目标容器的 “name、单个周期开始结束时间、周期间隔、暂停时间” / 或者直接读 assign JsonObject
 //				String[] splitLine = line.split(",");
 //				Queue<String> lineitems = new LinkedList<String>(Arrays.asList(splitLine));
 //				// 比如待解析数据：[number],[periodtime],0,vm01,0,5,l12,vm02,10000,5,,,,
-//				tr.time = Double.parseDouble(lineitems.poll());// start_time
-//				// For debug only
-//				if(tr.time < this.forcedStartTime || tr.time > this.forcedFinishTime) // Skip Workloads before the set start time
-//					continue;
-//
-//				String vmName = lineitems.poll();
-//				tr.submitVmId = getVmId(vmName);
-//				tr.submitVmName = vmName;
-//				tr.submitPktSize = Integer.parseInt(lineitems.poll());
-//
-//				tr.request = parseRequest(tr.submitVmId, lineitems);
-//
-//				parsedWorkloads.add(tr);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//		try {
-//			bufReader.close();
+//				Integer periodCount = Integer.parseInt(lineitems.poll());// number
+//				Double periodTime = Double.parseDouble(lineitems.poll());
+//				for (int i=0; i<periodCount; ++i) {
+//					Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
+//					Queue<String> lineitemscopy = new LinkedList<String>(lineitems);
+//					// 比如待解析数据：0,vm01,0,5,l12,vm02,10000,5,,,,
+//					wl.time = Double.parseDouble(lineitemscopy.poll());// start_time
+//					wl.time += i * periodTime;
+//					// For debug only
+//					if(wl.time < this.forcedStartTime || wl.time > this.forcedFinishTime) // Skip Workloads before the set start time
+//						continue;
+//					String vmName = lineitemscopy.poll();
+//					wl.submitVmId = getVmId(vmName);
+//					wl.submitVmName = vmName;
+//					wl.submitPktSize = Integer.parseInt(lineitemscopy.poll());
+//					wl.request = parseRequest(wl.submitVmId, lineitemscopy);
+//					wl.destVmName = destVMName;
+//					parsedWorkloads.add(wl);
+//				}
+//				++jobid;
+//			}
 //		} catch (IOException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-	}
 
-	/*
-	private String getOutputFilename(String filename) {
-		String ext = LogWriter.getExtension(this.file);
-		String dir = LogWriter.getPath(this.file);
-		String name = "result_"+LogWriter.getBaseName(this.file);
-		System.err.println(dir+"/"+name+"."+ext);
-		return dir+"/"+name+"."+ext;
 	}
-	*/
 
 	public int getWorkloadNum() {
 		return workloadNum;

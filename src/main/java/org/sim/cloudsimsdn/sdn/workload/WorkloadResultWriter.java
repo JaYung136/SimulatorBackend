@@ -45,7 +45,7 @@ public class WorkloadResultWriter {
 	//WorkloadResultWriterThread thread;
 
 	public WorkloadResultWriter(String file) {
-		df.setMaximumFractionDigits(3);
+		df.setMaximumFractionDigits(8);
 		df.setGroupingUsed(false);
 
 		this.filename = file;
@@ -124,6 +124,7 @@ public class WorkloadResultWriter {
 		double serveTime;
 
 		printDetailInt(wl.workloadId);
+		printDetail(" " + wl.msgName + ",");
 		printDetail(" " + wl.submitVmName + ",");
 		printDetail(" " + wl.destVmName + ",");
 		printDetailInt(wl.appId);
@@ -305,6 +306,7 @@ public class WorkloadResultWriter {
 
 	private void printHead(Workload sample) {
 		print(String.format(LogPrinter.fString, "Workload_ID"));
+		print(String.format(LogPrinter.fString, "MessageName"));
 		print(String.format(LogPrinter.fString, "Src_App"));
 		print(String.format(LogPrinter.fString, "Dst_App"));
 		print(String.format(LogPrinter.fString, "App_ID"));

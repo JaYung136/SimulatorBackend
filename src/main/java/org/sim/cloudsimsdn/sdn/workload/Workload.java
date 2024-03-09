@@ -25,13 +25,15 @@ public class  Workload implements Comparable<Workload> {
 	public int submitVmId;
 	public String submitVmName;
 	public String destVmName;
-	public int submitPktSize;
+	public int destVmId;
+	public double submitPktSize;
 
 	public Request request;
 
 	public WorkloadResultWriter resultWriter;
 
 	public boolean failed = false;
+	public String msgName;
 
 	public Workload(int workloadId, int jobId, WorkloadResultWriter writer) {
 		this.workloadId = workloadId;
