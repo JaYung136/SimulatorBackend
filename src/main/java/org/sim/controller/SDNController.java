@@ -26,6 +26,7 @@ import java.util.*;
 
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
 import static org.sim.controller.MyPainter.paintMultiGraph;
+import static org.sim.controller.MyPainter.paintSingleMsgGraph;
 
 @RestController
 //@Scope(value = "singleton")
@@ -47,12 +48,35 @@ public class SDNController {
     public int containerPeriodCount = 3;
     public double latencyScore = 0;
     public static double simulationStopTime = 1000.0; //仿真持续时间，微秒
-
+    List<Workload> wls = new ArrayList<>();
     @RequestMapping("/hello")
     public String hello(){
         System.out.println("simulator可访问");
         return "This is simulator backend";
     }
+
+    @RequestMapping("/setsimulationtime")
+    public ResultDTO setSimulationTime(@RequestBody String req) {
+        JSONObject content = new JSONObject(req);
+        int time = content.getInt("time");
+        simulationStopTime = time;
+        System.out.println("设置仿真持续时间："+simulationStopTime+"微秒");
+        return ResultDTO.success("ok");
+    }
+
+    @RequestMapping("specifiedmsg")
+    public ResultDTO specifySingleMsg(@RequestBody String req) {
+        JSONObject content = new JSONObject(req);
+        String name = content.getString("msgname");
+        System.out.println("查看单条消息："+name);
+        try {
+            paintSingleMsgGraph(wls, name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResultDTO.success("ok");
+    }
+
 
     @RequestMapping("/halfduplex")
     public ResultDTO halfduplex(@RequestBody String req) {
@@ -583,12 +607,13 @@ public class SDNController {
             log.printLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             log.printLine("<Links Timespan=\"" + Configuration.monitoringTimeInterval + "\">");
             simulator = new SimpleExampleInterCloud();
-            List<Workload> wls = simulator.main(args);
+            wls.clear();
+            wls.addAll( simulator.main(args) );
             log = LogWriter.getLogger(bwutil_result);
             log.printLine("</Links>");
             outputdelay(wls);
             System.out.println("绘制延迟图像");
-            paintMultiGraph(wls);
+            paintMultiGraph(wls, true);
             List<WorkloadResult> wrlist = new ArrayList<>();
             for (Workload workload : wls) {
                 //------------------------------------------ calculate total time

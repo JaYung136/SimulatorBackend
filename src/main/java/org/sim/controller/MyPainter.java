@@ -2,6 +2,8 @@ package org.sim.controller;
 
 
 import org.jfree.chart.*;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.sim.cloudsimsdn.sdn.workload.Workload;
@@ -69,7 +71,7 @@ public class MyPainter extends JFrame {
         }
     }
 
-    public void paint(XYSeries[] xys, String pngName) throws Exception {
+    public void paint(XYSeries[] xys, String pngName, boolean save) throws Exception {
         XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
         for(XYSeries xy: xys) {
             xySeriesCollection.addSeries(xy);
@@ -78,14 +80,80 @@ public class MyPainter extends JFrame {
         ChartPanel chartPanel = new ChartPanel(chart);
         //chartPanel.setPreferredSize(new Dimension(100 ,100));
         setContentPane(chartPanel);
-
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
-        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
+        setVisualUI(chart);
+        if(save)
+            saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
+    }
+    public void setVisualUI(JFreeChart chart){
+        ChartFrame frame = new ChartFrame("2D scatter plot", chart, true);
+        XYPlot xyplot = (XYPlot) chart.getPlot();
+        xyplot.setBackgroundPaint(Color.white);//设置背景面板颜色
+        ValueAxis vaaxis = xyplot.getDomainAxis();
+        vaaxis.setAxisLineStroke(new BasicStroke(1.5f));//设置坐标轴粗细
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
     }
 
-    public static void paintMultiGraph(List<Workload> wls) throws Exception {
+    public static void paintSingleMsgGraph(List<Workload> wls, String name) throws Exception {
+        MyPainter p = new MyPainter(name+"网络延迟图像");
+        p.setSize(300, 200);
+        Map<String, XYSeries> xySerieMap = new HashMap<>();
+        for(int i = 0; i < wls.size(); i++) {
+            Workload wl = wls.get(i);
+            String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
+            if(!Objects.equals(key, name))
+                continue;
+            XYSeries line = xySerieMap.get(key);
+            //如果不存在这条线就新建
+            if (line ==null) {
+                line = new XYSeries(key);
+            }
+            line.add(wl.time*1000000, (wl.networkfinishtime-wl.time)*1000000);
+            xySerieMap.put(key, line);
+        }
+        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"网络延迟图像", false);
+
+        p = new MyPainter(name+"端到端延迟图像");
+        p.setSize(300, 200);
+        xySerieMap = new HashMap<>();
+        for(int i = 0; i < wls.size(); i++) {
+            Workload wl = wls.get(i);
+            String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
+            if(!Objects.equals(key, name))
+                continue;
+            XYSeries line = xySerieMap.get(key);
+            //如果不存在这条线就新建
+            if (line ==null) {
+                line = new XYSeries(key);
+            }
+            line.add(wl.time*1000000, (wl.end2endfinishtime-wl.time)*1000000);
+            xySerieMap.put(key, line);
+        }
+        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"端到端延迟图像", false);
+
+        p = new MyPainter(name+"调度等待延迟图像");
+        p.setSize(300, 200);
+        xySerieMap = new HashMap<>();
+        for(int i = 0; i < wls.size(); i++) {
+            Workload wl = wls.get(i);
+            String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
+            if(!Objects.equals(key, name))
+                continue;
+            XYSeries line = xySerieMap.get(key);
+            //如果不存在这条线就新建
+            if (line ==null) {
+                line = new XYSeries(key);
+            }
+            line.add(wl.time*1000000, (wl.end2endfinishtime-wl.networkfinishtime)*1000000);
+            xySerieMap.put(key, line);
+        }
+        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"调度等待延迟图像", false);
+    }
+    public static void paintMultiGraph(List<Workload> wls, Boolean save) throws Exception {
         MyPainter p = new MyPainter("网络延迟图像");
         p.setSize(500, 500);
         Map<String, XYSeries> xySerieMap = new HashMap<>();
@@ -100,7 +168,7 @@ public class MyPainter extends JFrame {
             line.add(wl.time*1000000, (wl.networkfinishtime-wl.time)*1000000);
             xySerieMap.put(key, line);
         }
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "网络延迟图像");
+        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "网络延迟图像", save);
 
         p = new MyPainter("端到端延迟图像");
         p.setSize(500, 500);
@@ -116,7 +184,7 @@ public class MyPainter extends JFrame {
             line.add(wl.time*1000000, (wl.end2endfinishtime-wl.time)*1000000);
             xySerieMap.put(key, line);
         }
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "端到端延迟图像");
+        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "端到端延迟图像", save);
 
         p = new MyPainter("调度等待延迟图像");
         p.setSize(500, 500);
@@ -132,7 +200,7 @@ public class MyPainter extends JFrame {
             line.add(wl.time*1000000, (wl.end2endfinishtime-wl.networkfinishtime)*1000000);
             xySerieMap.put(key, line);
         }
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "调度等待延迟图像");
+        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "调度等待延迟图像", save);
     }
 
     public static void main(String[] args) throws Exception {
@@ -144,7 +212,7 @@ public class MyPainter extends JFrame {
             xySeries[i].add(i, i + 10);
             xySeries[i].add(i + 10, i + 20);
         }
-        p.paint(xySeries, "as");
+        p.paint(xySeries, "as", true);
     }
 
 
