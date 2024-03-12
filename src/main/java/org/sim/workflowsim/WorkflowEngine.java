@@ -338,7 +338,7 @@ public final class WorkflowEngine extends SimEntity {
                     time = 1;
                 }else {
                     time ++;
-                    Log.printLine(job.getTaskList().get(0).name + " 结束周期 " + time);
+                    //Log.printLine(job.getTaskList().get(0).name + " 结束周期 " + time);
 
                 }
                 computeTime.put(job.getTaskList().get(0).name, time);
@@ -349,9 +349,9 @@ public final class WorkflowEngine extends SimEntity {
         }
 
         getJobsReceivedList().add(job);
-        Log.printLine(job.getCloudletId() + " 返回");
+        //Log.printLine(job.getCloudletId() + " 返回");
         jobsSubmitted--;
-        Log.printLine("Job submitted: " + jobsSubmitted  + "job received: " + getJobsReceivedList().size());
+        //Log.printLine("Job submitted: " + jobsSubmitted  + "job received: " + getJobsReceivedList().size());
         if (getJobsList().isEmpty() && jobsSubmitted == 0 && shouldStop()) {
             //send msg to all the schedulers
             shouldStop = true;
@@ -361,7 +361,7 @@ public final class WorkflowEngine extends SimEntity {
                 sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
             }
         } else {
-            Log.printLine("cloudlet submit");
+            //Log.printLine("cloudlet submit");
             sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
         }
         if(start) {
@@ -427,8 +427,8 @@ public final class WorkflowEngine extends SimEntity {
                 for (Job parent : parentList) {
                     if (!hasJobListContainsID(this.getJobsReceivedList(), parent.getCloudletId())) {
                         flag = false;
-                        if(parent.getTaskList().size() >= 1)
-                            Log.printLine(job.getTaskList().get(0).name + " 还有父任务"+ parent.getTaskList().get(0).name +"没有运行");
+                        //if(parent.getTaskList().size() >= 1)
+                        //    Log.printLine(job.getTaskList().get(0).name + " 还有父任务"+ parent.getTaskList().get(0).name +"没有运行");
                         break;
                     }
                 }
@@ -466,7 +466,7 @@ public final class WorkflowEngine extends SimEntity {
 
             double delaybase = delay;
             int size = submittedList.size();
-            Log.printLine(size);
+            //Log.printLine(size);
             if (interval > 0 && interval <= size) {
                 int index = 0;
                 List subList = new ArrayList();
@@ -528,7 +528,7 @@ public final class WorkflowEngine extends SimEntity {
                         if(job.getTaskList().size() >= 1) {
                             Task t = job.getTaskList().get(0);
                             if(t.needWait) {
-                                Log.printLine(t.name + "need to wait before running");
+                                //Log.printLine(t.name + "need to wait before running");
                                 Double p = t.getPeriodTime();
                                 Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
                                 //t.needWait = false;

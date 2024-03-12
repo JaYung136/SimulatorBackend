@@ -87,6 +87,22 @@ public class MyPainter extends JFrame {
         if(save)
             saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
     }
+
+    public void paintCPU(XYSeries[] xys, String pngName) throws Exception {
+        XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
+        for(XYSeries xy: xys) {
+            xySeriesCollection.addSeries(xy);
+        }
+        JFreeChart chart = ChartFactory.createXYLineChart(pngName, "时刻(微秒)", "利用率(%)", xySeriesCollection);
+        ChartPanel chartPanel = new ChartPanel(chart);
+        //chartPanel.setPreferredSize(new Dimension(100 ,100));
+        setContentPane(chartPanel);
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
+        SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
+        matter.format(new Date()).toString();
+        setVisualUI(chart);
+        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
+    }
     public void setVisualUI(JFreeChart chart){
         ChartFrame frame = new ChartFrame("2D scatter plot", chart, true);
         XYPlot xyplot = (XYPlot) chart.getPlot();

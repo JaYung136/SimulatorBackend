@@ -409,7 +409,7 @@ public class service {
             }
             Element root = new Element("root");
             Document doc = new Document(root);
-            int hostSize = hostList.size();
+            int hostSize = Constants.hosts.size();
             Element r = null;
             for(int i = 0; i < Constants.logs.size(); i++) {
                 if(i % hostSize == 0) {
@@ -417,12 +417,12 @@ public class service {
                         break;
                     }
                     r = new Element("Utilization");
-                    r.setAttribute("time", Constants.logs.get(i).time+"");
+                    r.setAttribute("time", Constants.logs.get(i).time);
                 }
                 Element t = new Element("Host");
-                t.setAttribute("id", String.valueOf(i % hostSize));
-                t.setAttribute("cpuUtilization", Constants.logs.get(i).cpuUtilization + "");
-                t.setAttribute("ramUtilization", Constants.logs.get(i).ramUtilization + "");
+                t.setAttribute("name", Constants.hosts.get(i % hostSize).getName());
+                t.setAttribute("cpuUtilization", Constants.logs.get(i).cpuUtilization);
+                t.setAttribute("ramUtilization", Constants.logs.get(i).ramUtilization);
                 r.addContent(t);
                 xySeries[i % hostSize].add(Double.parseDouble(Constants.logs.get(i).time), Double.parseDouble(Constants.logs.get(i).cpuUtilization));
                 Double cpu = cpuUtil.get(Constants.logs.get(i).hostId);
@@ -476,10 +476,10 @@ public class service {
             varianceCpu /= hostSize;
             varianceRam /= hostSize;
             Element t = new Element("cpuUtilization");
-            t.setAttribute("value",  dfs.format(c / cs)+ "");
+            t.setAttribute("value", dfs.format(c / cs));
             r.addContent(t);
             t = new Element("ramUtilization");
-            t.setAttribute("value", dfs.format(ra / ras) + "");
+            t.setAttribute("value", dfs.format(ra / ras));
             r.addContent(t);
             doc.getRootElement().addContent(r);
             r = new Element("Variance");
@@ -500,13 +500,13 @@ public class service {
             doc = new Document(root);
             for(FaultRecord rs: Constants.records) {
                 Element e = new Element("FaultRecord");
-                e.setAttribute("time", dfs.format(rs.time) + "");
+                e.setAttribute("time", dfs.format(rs.time));
                 e.setAttribute("jobName", rs.name);
                 doc.getRootElement().addContent(e);
             }
             xmlOutput.output(doc, new FileOutputStream(file));
             MyPainter painter = new MyPainter("CPU Usage");
-            painter.paint(xySeries, "cpu_usage", true);
+            painter.paintCPU(xySeries, "cpu_usage");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
