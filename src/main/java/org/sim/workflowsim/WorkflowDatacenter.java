@@ -442,7 +442,6 @@ public class WorkflowDatacenter extends Datacenter {
         double currentTime = CloudSim.clock();
         double minTime = Double.MAX_VALUE;
         double timeDiff = currentTime - getLastProcessTime();
-        double timeFrameDatacenterEnergy = 0.0;
         String indent = "\t";
 
         //Log.printLine("\n\n---------------------------集群资源占用情况------------------------------------------\n\n");

@@ -1,8 +1,10 @@
 package org.sim.service;
 
+import org.jfree.data.xy.XYSeries;
 import org.sim.cloudbus.cloudsim.*;
 import org.sim.cloudbus.cloudsim.*;
 import org.sim.cloudbus.cloudsim.core.CloudSim;
+import org.sim.controller.MyPainter;
 import org.sim.controller.Result;
 import org.sim.service.result.FaultRecord;
 import org.sim.workflowsim.*;
@@ -292,7 +294,6 @@ public class service {
     protected void printJobList(List<Job> list) {
         String indent = "    ";
         Log.printLine();
-        //Log.printLine("ll: " + list.size());
         Map<Integer, Boolean> jobs = new HashMap<>();
         for(int i = 1; i <= 101; i++) {
             jobs.put(i, false);
@@ -300,6 +301,7 @@ public class service {
         for(Task t: Constants.taskList) {
             Result r = new Result();
         }
+
         String lastTime = "";
         Map<String, Boolean> ifLog = new HashMap<>();
         if(Constants.ifSimulate) {
@@ -401,6 +403,10 @@ public class service {
                 cpuUtil.add(0.0);
                 ramUtil.add(0.0);
             }
+            XYSeries[] xySeries = new XYSeries[Constants.hosts.size()];
+            for(int i = 0; i < Constants.hosts.size(); i++) {
+                xySeries[i] = new XYSeries(Constants.hosts.get(i).getName());
+            }
             Element root = new Element("root");
             Document doc = new Document(root);
             int hostSize = hostList.size();
@@ -418,6 +424,7 @@ public class service {
                 t.setAttribute("cpuUtilization", Constants.logs.get(i).cpuUtilization + "");
                 t.setAttribute("ramUtilization", Constants.logs.get(i).ramUtilization + "");
                 r.addContent(t);
+                xySeries[i % hostSize].add(Double.parseDouble(Constants.logs.get(i).time), Double.parseDouble(Constants.logs.get(i).cpuUtilization));
                 Double cpu = cpuUtil.get(Constants.logs.get(i).hostId);
                 Double ram = ramUtil.get(Constants.logs.get(i).hostId);
                 cpu += Double.parseDouble(Constants.logs.get(i).cpuUtilization);
@@ -498,8 +505,12 @@ public class service {
                 doc.getRootElement().addContent(e);
             }
             xmlOutput.output(doc, new FileOutputStream(file));
+            MyPainter painter = new MyPainter("CPU Usage");
+            painter.paint(xySeries, "cpu_usage", true);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
