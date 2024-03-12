@@ -85,6 +85,7 @@ public class MyPainter extends JFrame {
         matter.format(new Date()).toString();
         setVisualUI(chart);
         if(save)
+//        if(false)
             saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
     }
     public void setVisualUI(JFreeChart chart){

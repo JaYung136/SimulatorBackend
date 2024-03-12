@@ -8,6 +8,7 @@
 
 package org.sim.cloudsimsdn.sdn.virtualcomponents;
 
+import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.PacketScheduler;
 import org.sim.cloudsimsdn.sdn.PacketSchedulerTimeShared;
@@ -306,20 +307,12 @@ public class Channel {
 	public boolean changeBandwidth(double newBandwidth){
 		if (newBandwidth == allocatedBandwidth)
 			return false; //nothing changed
-
-		boolean isChanged = this.updatePacketProcessing();
+		double timenow = CloudSim.clock();
+//		boolean isChanged = this.updatePacketProcessing();
 		this.allocatedBandwidth = newBandwidth;
 
 		if(this.allocatedBandwidth == Double.NEGATIVE_INFINITY || this.allocatedBandwidth == Double.POSITIVE_INFINITY)
 		{
-			int a = 0;
-			a = 0;
-			a = 0;
-			a = 0;
-			a = 0;
-			a = 0;
-			a = 0;
-			a = 0;
 			throw new RuntimeException("Allocated bandwidth infinity!!"+this);
 		}
 
@@ -328,7 +321,7 @@ public class Channel {
 			throw new RuntimeException("Allocated bandwidth negative!!"+this);
 		}
 
-		return isChanged;
+		return true;
 	}
 
 	public double getAllocatedBandwidth() {
@@ -572,7 +565,9 @@ public class Channel {
 	 * 若 channel 中有包传输完成，return true
 	 */
 	public boolean updatePacketProcessing() {
+		double timenow = CloudSim.clock();
 		long processedBytes = packetScheduler.updatePacketProcessing();
+		// TODO:次步将传输的bytes数累积到link的成员变量里
 		this.increaseProcessedBytes(processedBytes); // for monitoring
 
 		if(packetScheduler.getCompletedTransmission().isEmpty()
