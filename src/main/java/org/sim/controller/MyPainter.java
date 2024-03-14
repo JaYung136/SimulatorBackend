@@ -1,12 +1,14 @@
 package org.sim.controller;
 
 
+import org.jdom2.Element;
 import org.jfree.chart.*;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.sim.cloudsimsdn.sdn.workload.Workload;
+import org.sim.service.Constants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -88,12 +90,25 @@ public class MyPainter extends JFrame {
             saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
     }
 
-    public void paintCPU(XYSeries[] xys, String pngName) throws Exception {
+
+    public void paintCPU() throws Exception {
+        XYSeries[] xySeries = new XYSeries[Constants.hosts.size()];
+        for(int i = 0; i < Constants.hosts.size(); i++) {
+            xySeries[i] = new XYSeries(Constants.hosts.get(i).getName());
+        }
+        for(int i = 0; i < Constants.logs.size(); i++) {
+            if(i % Constants.hosts.size() == 0) {
+                if(Double.parseDouble(Constants.logs.get(i).time) >= Constants.finishTime) {
+                    break;
+                }
+            }
+            xySeries[i % Constants.hosts.size()].add(Double.parseDouble(Constants.logs.get(i).time), Double.parseDouble(Constants.logs.get(i).cpuUtilization));
+        }
         XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
-        for(XYSeries xy: xys) {
+        for(XYSeries xy: xySeries) {
             xySeriesCollection.addSeries(xy);
         }
-        JFreeChart chart = ChartFactory.createXYLineChart(pngName, "时刻(微秒)", "利用率(%)", xySeriesCollection);
+        JFreeChart chart = ChartFactory.createXYLineChart("cpu_utilization", "时刻(微秒)", "利用率(%)", xySeriesCollection);
         ChartPanel chartPanel = new ChartPanel(chart);
         //chartPanel.setPreferredSize(new Dimension(100 ,100));
         setContentPane(chartPanel);
@@ -101,7 +116,7 @@ public class MyPainter extends JFrame {
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
         setVisualUI(chart);
-        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
+        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+"cpu_utilization.png", 1200, 800);
     }
     public void setVisualUI(JFreeChart chart){
         ChartFrame frame = new ChartFrame("2D scatter plot", chart, true);

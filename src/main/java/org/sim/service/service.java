@@ -505,8 +505,8 @@ public class service {
                 doc.getRootElement().addContent(e);
             }
             xmlOutput.output(doc, new FileOutputStream(file));
-            MyPainter painter = new MyPainter("CPU Usage");
-            painter.paintCPU(xySeries, "cpu_usage");
+            /*MyPainter painter = new MyPainter("CPU Usage");
+            painter.paintCPU(xySeries, "cpu_usage");*/
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
