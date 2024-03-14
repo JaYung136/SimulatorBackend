@@ -53,7 +53,7 @@
             "datacenter": "A",
             "storage": 1363148800,
             "type": "host",
-            "mips": 35000,
+            "mips": 15000,
             "pes": 8,
             "ram": 16384000
         },

@@ -611,6 +611,8 @@ public class SDNController {
             log.printLine("</Links>");
             outputdelay(wls);
             System.out.println("绘制延迟图像");
+            MyPainter p = new MyPainter("as");
+            p.paintCPU();
             paintMultiLatencyGraph(wls, true);
             paintMultiLinkGraph(linkUtilMap, true);
             List<WorkloadResult> wrlist = new ArrayList<>();
