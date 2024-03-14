@@ -112,7 +112,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 
 	@Override
 	public void startEntity() { //TODO:这里开始 “monitor”
-		send(this.getId(), Configuration.monitoringTimeInterval, CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION);
+//		send(this.getId(), Configuration.monitoringTimeInterval, CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION);
 		send(this.getId(), Configuration.monitoringTimeInterval, CloudSimTagsSDN.MONITOR_BW_UTILIZATION);
 	}
 
@@ -145,7 +145,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 				break;
 			case CloudSimTagsSDN.MONITOR_BW_UTILIZATION:
 				double timenow = CloudSim.clock();
-				this.updateBWMonitor(Configuration.monitoringTimeInterval);
+				double highestLinkUtilThisUnit = this.updateBWMonitor(Configuration.monitoringTimeInterval);
 				Set<Integer> excludetags = new HashSet<Integer>();
 				excludetags.add(CloudSimTagsSDN.MONITOR_BW_UTILIZATION);
 				excludetags.add(CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION);
@@ -224,7 +224,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 	public Packet addPacketToChannel(Packet orgPkt) {
 		double timenow = CloudSim.clock();
 		Packet pkt = orgPkt;
-		channelManager.updatePacketProcessing();
+//		channelManager.updatePacketProcessing(); //TODO(尝试):???注释此行，添加包前不更新channel
 		int src = pkt.getOrigin();
 		int dst = pkt.getDestination();
 		int flowId = pkt.getFlowId();
@@ -311,12 +311,12 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		send(dc.getId(), latency, CloudSimTagsSDN.SDN_PACKET_FAILED, pkt);
 	}
 
-	public void sendAdjustAllChannelEvent() {
-		if(CloudSim.clock() != lastAdjustAllChannelTime) {
-			send(getId(), 0, CloudSimTagsSDN.SDN_INTERNAL_CHANNEL_PROCESS);
-			lastAdjustAllChannelTime = CloudSim.clock();
-		}
-	}
+//	public void sendAdjustAllChannelEvent() {
+//		if(CloudSim.clock() != lastAdjustAllChannelTime) {
+//			send(getId(), 0, CloudSimTagsSDN.SDN_INTERNAL_CHANNEL_PROCESS);
+//			lastAdjustAllChannelTime = CloudSim.clock();
+//		}
+//	}
 
 	private void processWirelessTimeSlot(String chankey) {
 		List<Channel> list = CloudSim.wirelessScheduler.GetChanList(chankey);
@@ -497,7 +497,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 	}
 
 	// for monitoring
-	public void updateBWMonitor(double monitoringTimeUnit) {
+	public double updateBWMonitor(double monitoringTimeUnit) {
 		double highest=0;
 		// Update utilization of all links
 		Set<Link> links = new HashSet<Link>(this.topology.getAllLinks());
@@ -507,7 +507,8 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		}
 		//System.err.println(CloudSim.clock()+": Highest utilization of Links = "+highest);
 
-		channelManager.updateMonitor(monitoringTimeUnit);
+//		channelManager.updateMonitor(monitoringTimeUnit);
+		return highest;
 	}
 
 	private void updateHostMonitor(double monitoringTimeUnit) {
