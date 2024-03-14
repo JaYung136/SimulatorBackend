@@ -214,11 +214,11 @@ public class VmAllocationPolicySimple extends VmAllocationPolicy {
 	public List<Map<String, Object>> optimizeAllocation(List<? extends Vm> vmList) {
 		// TODO Auto-generated method stub
 		//Log.printLine("Start to optimize allocation");
-		Log.printLine("尝试优化摆放");
+		//Log.printLine("尝试优化摆放");
 		List<Host> overUtilizedHosts = new ArrayList<>();
 		for(Host h : Constants.hosts) {
 			if(h.getUtilizationOfCpu() >= Constants.cpuUp || h.getUtilizationOfRam() >= Constants.ramUp) {
-				Log.printLine("节点 " + h.getName() + " 资源占用率过高");
+				//Log.printLine("节点 " + h.getName() + " 资源占用率过高");
 				overUtilizedHosts.add(h);
 			}
 		}

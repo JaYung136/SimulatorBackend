@@ -1,7 +1,5 @@
 package org.sim.controller;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.LogWriter;
@@ -25,7 +23,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
-import static org.sim.controller.MyPainter.paintMultiGraph;
+import static org.sim.controller.MyPainter.paintMultiLatencyGraph;
 import static org.sim.controller.MyPainter.paintSingleMsgGraph;
 
 @RestController
@@ -44,6 +42,7 @@ public class SDNController {
     private String latency_result = "./OutputFiles/latency/output_latency.xml";
     private String bwutil_result = "./OutputFiles/bandwidthUtil/link_utilization.xml";
     private Map<String, Long> wirelessChan_bw = new HashMap<>();
+    public static Map<String, LinkUtil> linkUtilMap = new HashMap<>() ;
     private boolean halfDuplex = false;
     public int containerPeriodCount = 3;
     public double latencyScore = 0;
@@ -613,7 +612,8 @@ public class SDNController {
             log.printLine("</Links>");
             outputdelay(wls);
             System.out.println("绘制延迟图像");
-            paintMultiGraph(wls, true);
+            paintMultiLatencyGraph(wls, true);
+            paintMultiLinkGraph(linkUtilMap, true);
             List<WorkloadResult> wrlist = new ArrayList<>();
             for (Workload workload : wls) {
                 //------------------------------------------ calculate total time
@@ -647,4 +647,5 @@ public class SDNController {
             return ResultDTO.error(e.getMessage());
         }
     }
+
 }

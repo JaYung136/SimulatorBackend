@@ -14,9 +14,12 @@ import org.sim.cloudsimsdn.sdn.monitor.MonitoringValues;
 import org.sim.cloudsimsdn.sdn.physicalcomponents.switches.GatewaySwitch;
 import org.sim.cloudsimsdn.sdn.physicalcomponents.switches.IntercloudSwitch;
 import org.sim.cloudsimsdn.sdn.virtualcomponents.Channel;
+import org.sim.controller.LinkUtil;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.sim.controller.SDNController.linkUtilMap;
 
 /**
  * This is physical link between hosts and switches to build physical topology.
@@ -230,11 +233,16 @@ public class Link {
 	private long monitoringProcessedBytesPerUnitDown = 0;
 
 	public double updateMonitor(double logTime, double timeUnit) {
+		LinkUtil lu = linkUtilMap.get(this.linkname);
+		if(lu == null){
+			lu= new LinkUtil(CloudSim.clock(), timeUnit, this.linkname,
+					this.lowOrder.toString(),this.highOrder.toString(), this.totalBW);
+		}
+
 		long capacity = (long) (this.totalBW * timeUnit);
 		double utilization1 = (double)monitoringProcessedBytesPerUnitUp / capacity * 100;
 		mvUp.add(utilization1, logTime);
-		if(monitoringProcessedBytesPerUnitUp != 0
-				&& this.lowOrder instanceof IntercloudSwitch != true
+		if(this.lowOrder instanceof IntercloudSwitch != true
 				&& this.highOrder instanceof IntercloudSwitch != true
 				&& this.lowOrder instanceof GatewaySwitch != true
 				&& this.highOrder instanceof GatewaySwitch != true){
@@ -246,12 +254,13 @@ public class Link {
 			CloudSim.bwMaxutil=(CloudSim.bwMaxutil > utilization1)?CloudSim.bwMaxutil:utilization1;
 			this.accumuUtil += utilization1;
 //			System.out.printf("num:%d thistime:%.6f total:%.6f max:%.6f\n", CloudSim.bwUtilnum,utilization1,CloudSim.bwTotalutil,CloudSim.bwMaxutil);
+			lu.UnitUtilForward.add(utilization1);
+			lu.printable = true;
 		}
 
 		double utilization2 = (double)monitoringProcessedBytesPerUnitDown / capacity * 100;
 		mvDown.add(utilization2, logTime);
-		if(monitoringProcessedBytesPerUnitDown != 0
-				&& this.lowOrder instanceof IntercloudSwitch != true
+		if(this.lowOrder instanceof IntercloudSwitch != true
 				&& this.highOrder instanceof IntercloudSwitch != true
 				&& this.lowOrder instanceof GatewaySwitch != true
 				&& this.highOrder instanceof GatewaySwitch != true) {
@@ -263,7 +272,10 @@ public class Link {
 			CloudSim.bwMaxutil=(CloudSim.bwMaxutil > utilization2)?CloudSim.bwMaxutil:utilization2;
 			this.accumuUtil += utilization2;
 //			System.out.printf("num:%d thistime:%.6f total:%.6f max:%.6f\n", CloudSim.bwUtilnum,utilization2,CloudSim.bwTotalutil,CloudSim.bwMaxutil);
+			lu.UnitUtilBackward.add(utilization2);
+			lu.printable = true;
 		}
+		linkUtilMap.put(this.linkname, lu);
 		return Double.max(utilization1, utilization2);
 	}
 
