@@ -9,17 +9,16 @@ import java.util.List;
 
 public class LinkUtil {
     public boolean printable = false;
-    public double starttime = 0.0;
     public double timeUnit = 0.0;
     public String linkname;
     public String lowOrder;
     public String highOrder;
     public double totalBW;
+    public List<Double> recordTimes = new ArrayList<>();
     public List<Double> UnitUtilForward = new ArrayList<>();
     public List<Double> UnitUtilBackward = new ArrayList<>();
 
-    public LinkUtil(double clock, double timeUnit, String linkname, String lowOrder, String highOrder, double totalBW) {
-        this.starttime = clock;
+    public LinkUtil(double timeUnit, String linkname, String lowOrder, String highOrder, double totalBW) {
         this.timeUnit = timeUnit;
         this.linkname = linkname;
         this.lowOrder = lowOrder;

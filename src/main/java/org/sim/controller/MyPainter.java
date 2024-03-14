@@ -56,16 +56,16 @@ public class MyPainter extends JFrame {
             outFile.getParentFile().mkdirs();
         }
         out = new FileOutputStream(outputPath);
-        // 保存为PNG
-        ChartUtils.writeChartAsPNG(out, chart, weight, height);
-        // 保存为JPEG
-        // ChartUtils.writeChartAsJPEG(out, chart, weight, height);
-        out.flush();
         if (out != null) {
             try {
+                // 保存为PNG
+                ChartUtils.writeChartAsPNG(out, chart, weight, height);
+                // 保存为JPEG
+                // ChartUtils.writeChartAsJPEG(out, chart, weight, height);
+                out.flush();
                 out.close();
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
 
         }
@@ -77,6 +77,24 @@ public class MyPainter extends JFrame {
             xySeriesCollection.addSeries(xy);
         }
         JFreeChart chart = ChartFactory.createXYLineChart(pngName, "发送时刻(微秒)", "延迟(微秒)", xySeriesCollection);
+        ChartPanel chartPanel = new ChartPanel(chart);
+        //chartPanel.setPreferredSize(new Dimension(100 ,100));
+        setContentPane(chartPanel);
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
+        SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
+        matter.format(new Date()).toString();
+        setVisualUI(chart);
+        if(save)
+//        if(false)
+            saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
+    }
+
+    public void paintLink(XYSeries[] xys, String pngName, boolean save) throws Exception {
+        XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
+        for(XYSeries xy: xys) {
+            xySeriesCollection.addSeries(xy);
+        }
+        JFreeChart chart = ChartFactory.createXYLineChart(pngName, "记录时刻(微秒)", "利用率", xySeriesCollection);
         ChartPanel chartPanel = new ChartPanel(chart);
         //chartPanel.setPreferredSize(new Dimension(100 ,100));
         setContentPane(chartPanel);
@@ -105,7 +123,7 @@ public class MyPainter extends JFrame {
         saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
     }
     public void setVisualUI(JFreeChart chart){
-        ChartFrame frame = new ChartFrame("2D scatter plot", chart, true);
+        ChartFrame frame = new ChartFrame("图像", chart, true);
         XYPlot xyplot = (XYPlot) chart.getPlot();
         xyplot.setBackgroundPaint(Color.white);//设置背景面板颜色
         ValueAxis vaaxis = xyplot.getDomainAxis();
@@ -218,6 +236,27 @@ public class MyPainter extends JFrame {
             xySerieMap.put(key, line);
         }
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "调度等待延迟图像", save);
+    }
+
+
+    public static void paintMultiLinkGraph(Map<String, LinkUtil> lus, Boolean save) throws Exception {
+        MyPainter p = new MyPainter("链路利用率图像");
+        p.setSize(500, 500);
+        Map<String, XYSeries> xySerieMap = new HashMap<>();
+        for (LinkUtil lu : lus.values()) {
+            if(lu.printable == false)
+                continue;
+            String linkname = lu.linkname;
+            XYSeries forwardline = new XYSeries(linkname + "_Forward");
+            XYSeries backwardline = new XYSeries(linkname + "_Backward");
+            for(int i=0; i<lu.recordTimes.size(); ++i) {
+                forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i));
+                backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i));
+            }
+            xySerieMap.put(linkname + "_Forward", forwardline);
+            xySerieMap.put(linkname + "_Backward", backwardline);
+        }
+        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路利用率图像", save);
     }
 
     public static void main(String[] args) throws Exception {

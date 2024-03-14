@@ -235,7 +235,7 @@ public class Link {
 	public double updateMonitor(double logTime, double timeUnit) {
 		LinkUtil lu = linkUtilMap.get(this.linkname);
 		if(lu == null){
-			lu= new LinkUtil(CloudSim.clock(), timeUnit, this.linkname,
+			lu= new LinkUtil(timeUnit, this.linkname,
 					this.lowOrder.toString(),this.highOrder.toString(), this.totalBW);
 		}
 
@@ -255,6 +255,7 @@ public class Link {
 			this.accumuUtil += utilization1;
 //			System.out.printf("num:%d thistime:%.6f total:%.6f max:%.6f\n", CloudSim.bwUtilnum,utilization1,CloudSim.bwTotalutil,CloudSim.bwMaxutil);
 			lu.UnitUtilForward.add(utilization1);
+			lu.recordTimes.add(logTime);
 			lu.printable = true;
 		}
 

@@ -23,8 +23,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
-import static org.sim.controller.MyPainter.paintMultiLatencyGraph;
-import static org.sim.controller.MyPainter.paintSingleMsgGraph;
+import static org.sim.controller.MyPainter.*;
 
 @RestController
 //@Scope(value = "singleton")
