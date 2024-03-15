@@ -596,6 +596,8 @@ public class SDNController {
             System.out.println(e.getMessage());
         }
         try {
+            Helper h = new Helper();
+            h.simForCpu(simulationStopTime);
             convertphytopo();
             convertvirtopo();
             convertworkload();

@@ -36,28 +36,22 @@ public class YamlWriter {
 
     }*/
 
-    public void writeYaml(String path, List<? extends Cloudlet> pods) throws Exception {
+    public void writeYaml(String path) throws Exception {
         Log.printLine("YamlWriter: write yaml");
         Map<String, Boolean> judge = new HashMap<>();
         Exception ret = null;
 
         int writeNum = 0;
 
-        for(int i = 0; i < pods.size(); i++) {
+        for(int i = 0; i < Constants.scheduleResults.size(); i++) {
             try {
-                if (((Job) pods.get(i)).getTaskList().size() < 1) {
-                    continue;
-                }
-                if (((Job) pods.get(i)).getCloudletStatus() == Cloudlet.FAILED) {
-                    continue;
-                }
                 //Log.printLine(((Job)pods.get(i)).getTaskList().get(0).name + " is in writer's hand");
-                if (judge.get(((Job) pods.get(i)).getTaskList().get(0).name) != null) {
+                if (judge.get((Constants.scheduleResults.get(i).name)) != null) {
                     //Log.printLine(((Job)pods.get(i)).getTaskList().get(0).name + " is already write");
                     continue;
                 }
-                judge.put(((Job) pods.get(i)).getTaskList().get(0).name, true);
-                String name = ((Job) pods.get(i)).getTaskList().get(0).name;
+                judge.put(Constants.scheduleResults.get(i).name, true);
+                String name = Constants.scheduleResults.get(i).name;
                 ContainerInfo c = Constants.containerInfoMap.get(name);
                 if(c == null) {
                     Log.printLine(name+"缺少容器信息");
@@ -65,7 +59,7 @@ public class YamlWriter {
                     continue;
                 }
                 Host host = null;
-                Integer hostId = Constants.schedulerResult.get(((Job) pods.get(i)).getTaskList().get(0).name);
+                Integer hostId = Constants.schedulerResult.get(Constants.scheduleResults.get(i).name);
                 if (hostId == null) {
                     continue;
                 }
@@ -79,6 +73,12 @@ public class YamlWriter {
                 assert host != null;
                 String nodeName = host.getName();
                 c.spec.put("nodeName", nodeName);
+                Map<String, Object> resources = new HashMap<>();
+                Map<String, Object> requests = new HashMap<>();
+                requests.put("cpu", Constants.scheduleResults.get(i).cpu + "m");
+                requests.put("memory", Constants.scheduleResults.get(i).ram.intValue() + "Mi");
+                resources.put("requests", requests);
+                ((List<Map<String, Object>>)(c.spec.get("containers"))).get(0).put("resources", resources);
                 c.metadata.put("name", name.replace("_", "").replace(" ", "").replace("-",""));
                 String cName = "container" + name;
                 ((List<Map<String, Object>>)(c.spec.get("containers"))).get(0).put("name", cName.replace("_","").replace(" ","").replace("-",""));

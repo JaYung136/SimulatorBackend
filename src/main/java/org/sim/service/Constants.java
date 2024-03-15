@@ -8,6 +8,7 @@ import org.sim.cloudbus.cloudsim.power.models.PowerModel;
 import org.sim.cloudbus.cloudsim.power.models.PowerModelSpecPowerHpProLiantMl110G4Xeon3040;
 import org.sim.cloudbus.cloudsim.power.models.PowerModelSpecPowerHpProLiantMl110G5Xeon3075;
 import org.sim.controller.Result;
+import org.sim.controller.ScheduleResult;
 import org.sim.service.result.FaultRecord;
 import org.sim.service.result.LogEntity;
 import org.sim.workflowsim.CondorVM;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Constants {
+    public static List<ScheduleResult> scheduleResults = new ArrayList<>();
+
     public static Double finishTime = 0.0;
     public static Double averageMIPS = 0.0;
     public static Boolean ifSimulate = true;
@@ -54,6 +57,7 @@ public class Constants {
     public static Map<String, Integer> faultNum = new HashMap<>();
     public static List<FaultRecord> records = new ArrayList<>();
 
+    public static Double lastTime = 0.0;
 
     public final static PowerModel[] HOST_POWER = {
             new PowerModelSpecPowerHpProLiantMl110G4Xeon3040(),

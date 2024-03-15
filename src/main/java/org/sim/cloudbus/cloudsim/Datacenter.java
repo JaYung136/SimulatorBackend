@@ -12,6 +12,7 @@ import org.sim.cloudbus.cloudsim.core.CloudSimTags;
 import org.sim.cloudbus.cloudsim.core.SimEntity;
 import org.sim.cloudbus.cloudsim.core.SimEvent;
 import org.sim.controller.Result;
+import org.sim.controller.ScheduleResult;
 import org.sim.service.Constants;
 import org.sim.workflowsim.CondorVM;
 
@@ -456,6 +457,7 @@ public class Datacenter extends SimEntity {
 			send(Constants.Scheduler_Id, CloudSim.getMinTimeBetweenEvents(), CloudSimTags.VM_CREATE_ACK, data);
 		}
 		boolean result = getVmAllocationPolicy().allocateHostForVm(vm);
+
         if(!result) {
 			Constants.nodeEnough = false;
 		}
@@ -481,6 +483,8 @@ public class Datacenter extends SimEntity {
 			//r.name = ((CondorVM)vm).getIp();
 			//Constants.results.add(r);
 			Constants.schedulerResult.put(((CondorVM) vm).getName(), getVmAllocationPolicy().getHost(vm).getId());
+			if(vm.getNumberOfPes() != 0)
+				Constants.scheduleResults.add(new ScheduleResult(getVmAllocationPolicy().getHost(vm).getId(), ((CondorVM)vm).getName(), vm.getNumberOfPes(), (double) vm.getRam()));
 			//Log.printLine(((CondorVM) vm).getName());
 			if (vm.isBeingInstantiated()) {
 				vm.setBeingInstantiated(false);

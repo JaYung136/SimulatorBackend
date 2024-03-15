@@ -20,6 +20,7 @@ import org.sim.cloudbus.cloudsim.core.CloudSim;
 import org.sim.cloudbus.cloudsim.core.CloudSimTags;
 import org.sim.cloudbus.cloudsim.core.SimEntity;
 import org.sim.cloudbus.cloudsim.core.SimEvent;
+import org.sim.controller.ScheduleResult;
 import org.sim.service.Constants;
 import org.sim.workflowsim.reclustering.ReclusteringEngine;
 import org.sim.workflowsim.utils.Parameters;
@@ -307,6 +308,7 @@ public final class WorkflowEngine extends SimEntity {
                 sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, job);
                 Log.printLine(task.name + "被分配至节点" + this.vmAllocationPolicy.getHost(containerTmp).getName());
                 Constants.schedulerResult.put(task.name, this.vmAllocationPolicy.getHost(containerTmp).getId());
+                Constants.scheduleResults.add(new ScheduleResult(this.vmAllocationPolicy.getHost(containerTmp).getId(), task.name, task.getNumberOfPes(), task.getRam()));
             }
         }
     }
@@ -343,7 +345,7 @@ public final class WorkflowEngine extends SimEntity {
                 }
                 computeTime.put(job.getTaskList().get(0).name, time);
                 // schedule(getId(), job.getTaskList().get(0).getPeriodTime(), WorkflowSimTags.JOB_NEED_REPEAT, job);
-                if(time < Constants.repeatTime)
+                if(time < Constants.repeatTime || Constants.lastTime != 0.0)
                     startTime.put(job, CloudSim.clock() + job.getTaskList().get(0).getPeriodTime());
             }
         }
@@ -352,11 +354,11 @@ public final class WorkflowEngine extends SimEntity {
         //Log.printLine(job.getCloudletId() + " 返回");
         jobsSubmitted--;
         //Log.printLine("Job submitted: " + jobsSubmitted  + "job received: " + getJobsReceivedList().size());
-        if (getJobsList().isEmpty() && jobsSubmitted == 0 && shouldStop()) {
+        if ((getJobsList().isEmpty() && jobsSubmitted == 0 && shouldStop()) || (Constants.lastTime != 0.0 && CloudSim.clock() >= Constants.lastTime)) {
             //send msg to all the schedulers
             shouldStop = true;
             Constants.finishTime = CloudSim.clock();
-            Log.printLine("任务全部执行结束，记录当前时间：" + Constants.finishTime);
+            Log.printLine("任务全部执行结束，记录当前时间：" + Constants.finishTime + "预期持续时间： " + Constants.lastTime);
             for (int i = 0; i < getSchedulerIds().size(); i++) {
                 sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
             }

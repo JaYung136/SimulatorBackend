@@ -304,6 +304,7 @@ public class service {
 
         String lastTime = "";
         Map<String, Boolean> ifLog = new HashMap<>();
+        Constants.ifSimulate = Constants.ifSimulate && (Constants.lastTime == 0.0);
         if(Constants.ifSimulate) {
             Log.printLine("========== OUTPUT ==========");
             Log.printLine("Task Name" + indent + "Task ID" + indent + "STATUS" + indent
@@ -388,7 +389,7 @@ public class service {
         }
         if(Constants.ifSimulate)
             Log.printLine(Constants.repeatTime + "周期下，任务群总完成时间为：" + lastTime);
-        if(!Constants.ifSimulate)
+        if(Constants.lastTime == 0.0)
             return;
         try {
             int size_T = 0;

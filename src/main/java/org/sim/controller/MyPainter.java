@@ -7,6 +7,7 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.sim.cloudsimsdn.Log;
 import org.sim.cloudsimsdn.sdn.workload.Workload;
 import org.sim.service.Constants;
 
@@ -115,6 +116,7 @@ public class MyPainter extends JFrame {
         for(int i = 0; i < Constants.hosts.size(); i++) {
             xySeries[i] = new XYSeries(Constants.hosts.get(i).getName());
         }
+        Log.printLine("当前LOG数：" + Constants.logs.size());
         for(int i = 0; i < Constants.logs.size(); i++) {
             if(i % Constants.hosts.size() == 0) {
                 if(Double.parseDouble(Constants.logs.get(i).time) >= Constants.finishTime) {
@@ -127,7 +129,7 @@ public class MyPainter extends JFrame {
         for(XYSeries xy: xySeries) {
             xySeriesCollection.addSeries(xy);
         }
-        JFreeChart chart = ChartFactory.createXYLineChart("cpu_utilization", "时刻(微秒)", "利用率(%)", xySeriesCollection);
+        JFreeChart chart = ChartFactory.createXYLineChart("CPU利用率图像", "时刻(微秒)", "利用率(%)", xySeriesCollection);
         ChartPanel chartPanel = new ChartPanel(chart);
         //chartPanel.setPreferredSize(new Dimension(100 ,100));
         setContentPane(chartPanel);
@@ -183,6 +185,7 @@ public class MyPainter extends JFrame {
             line.add(wl.time*1000000, (wl.end2endfinishtime-wl.time)*1000000);
             xySerieMap.put(key, line);
         }
+        Thread.sleep(1000);
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"端到端延迟图像", false);
 
         p = new MyPainter(name+"调度等待延迟图像");
@@ -201,11 +204,12 @@ public class MyPainter extends JFrame {
             line.add(wl.time*1000000, (wl.end2endfinishtime-wl.networkfinishtime)*1000000);
             xySerieMap.put(key, line);
         }
+        Thread.sleep(1000);
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"调度等待延迟图像", false);
     }
     public static void paintMultiLatencyGraph(List<Workload> wls, Boolean save) throws Exception {
         MyPainter p = new MyPainter("网络延迟图像");
-        p.setSize(500, 500);
+        p.setSize(50000, 50000);
         Map<String, XYSeries> xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -234,8 +238,9 @@ public class MyPainter extends JFrame {
             line.add(wl.time*1000000, (wl.end2endfinishtime-wl.time)*1000000);
             xySerieMap.put(key, line);
         }
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "端到端延迟图像", save);
 
+        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "端到端延迟图像", save);
+        Thread.sleep(1000);
         p = new MyPainter("调度等待延迟图像");
         p.setSize(500, 500);
         xySerieMap = new HashMap<>();
@@ -250,13 +255,14 @@ public class MyPainter extends JFrame {
             line.add(wl.time*1000000, (wl.end2endfinishtime-wl.networkfinishtime)*1000000);
             xySerieMap.put(key, line);
         }
+        Thread.sleep(1000);
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "调度等待延迟图像", save);
     }
 
 
     public static void paintMultiLinkGraph(Map<String, LinkUtil> lus, Boolean save) throws Exception {
         MyPainter p = new MyPainter("链路利用率图像");
-        p.setSize(500, 500);
+        p.setSize(50000, 50000);
         Map<String, XYSeries> xySerieMap = new HashMap<>();
         for (LinkUtil lu : lus.values()) {
             if(lu.printable == false)

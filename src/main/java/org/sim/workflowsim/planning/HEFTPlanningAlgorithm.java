@@ -19,6 +19,7 @@ package org.sim.workflowsim.planning;
 import org.apache.commons.math3.util.Pair;
 import org.sim.cloudbus.cloudsim.CloudletSchedulerTimeShared;
 import org.sim.cloudbus.cloudsim.core.CloudSim;
+import org.sim.controller.ScheduleResult;
 import org.sim.service.Constants;
 import org.sim.cloudbus.cloudsim.Consts;
 import org.sim.cloudbus.cloudsim.Host;
@@ -324,6 +325,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         task.setVmId(chosenVM.getId());
         sched.put(task.name, chosenVM);
         Constants.schedulerResult.put(task.name, chosenVM.getId());
+        Constants.scheduleResults.add(new ScheduleResult(chosenVM.getId(), task.name, task.getNumberOfPes(), task.getRam()));
     }
 
     private double findFinishTime(Task task, Host host, double readyTime,

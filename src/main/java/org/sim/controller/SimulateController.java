@@ -65,6 +65,8 @@ public class SimulateController {
      *
      * */
     private void resetAllForScheduler() {
+        Constants.lastTime = 0.0;
+        Constants.scheduleResults = new ArrayList<>();
         Constants.results = new ArrayList<>();
         Constants.logs = new ArrayList<>();
         Constants.resultPods = new ArrayList<>();
@@ -88,6 +90,7 @@ public class SimulateController {
      *
      * */
     private void resetForSimulator() {
+        Constants.lastTime = 0.0;
         Constants.results = new ArrayList<>();
         Constants.logs = new ArrayList<>();
         Constants.resultPods = new ArrayList<>();
@@ -129,10 +132,11 @@ public class SimulateController {
      * 进行仿真，repeatTime表示每个任务运行多少个周期
      *
      * */
-    public Message simulate(Integer a, Integer repeatTime) {
+    public Message simulate(Integer a, Integer repeatTime, Double lastTime) {
         resetForSimulator();
         Constants.repeatTime  = repeatTime;
         Constants.ifSimulate = true;
+        Constants.lastTime = lastTime;
         try {
             service.simulate(a);
             if(!Constants.nodeEnough) {
@@ -143,6 +147,10 @@ public class SimulateController {
         } catch (Exception e) {
             return Message.Fail(e.getMessage());
         }
+    }
+
+    public Message simForCpu(Double lastTime) {
+        return simulate(8, 3, lastTime);
     }
 
     /**
@@ -186,7 +194,7 @@ public class SimulateController {
             File dir = new File(path);
             deleteDir(dir);
             dir.mkdirs();
-            writer.writeYaml(path, Constants.resultPods);
+            writer.writeYaml(path);
             return Message.Success("generate successfully");
         } catch (Exception e) {
             e.printStackTrace();
@@ -394,7 +402,7 @@ public class SimulateController {
                 return m;
             }
             Log.printLine("============================== 开始仿真 ==============================");
-            m = simulate(arithmetic, 3);
+            m = simulate(arithmetic, 3, 0.0);
             if(m.code == CODE.FAILED) {
                 return m;
             }
@@ -473,12 +481,12 @@ public class SimulateController {
             Constants.apps = new ArrayList<>();
             Constants.ip2taskName = new HashMap<>();
             Constants.name2Ips = new HashMap<>();
-            simulate(8, 3);
+            simulate(8, 3, 0.0);
             YamlWriter writer = new YamlWriter();
             try {
                 String path = System.getProperty("user.dir")+"\\OutputFiles\\yaml";
                 File dir = new File(path);
-                writer.writeYaml(path, Constants.resultPods);
+                writer.writeYaml(path);
             } catch (Exception e) {
                 return ResultDTO.error(e.getMessage());
             }

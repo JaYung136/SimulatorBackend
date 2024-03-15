@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: pod
+metadata:
+  name: HFSM1
+  namespace: default
+  labels:
+    type: App
+spec:
+  nodeName: host3
+  containers:
+  - args:
+    - HOSTNAME
+    - KUBERNETES_PORT
+    image: nginx
+    name: containerHFSM1
+    resources:
+      requests:
+        memory: 10000Mi
+        cpu: 1000m
+    command:
+    - printenv
