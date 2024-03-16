@@ -339,7 +339,7 @@ public class SDNController {
         writer.write(jsonPrettyPrintString);
         writer.close();
     }
-    public static double contractRate = 0.00001; // 容器调度的单位为 10 微秒。
+    public static double contractRate = 0.000001; // 容器调度的单位为 1 微秒。
     public static JSONArray pure_msgs = new JSONArray();
     public void convertworkload() throws IOException{
         //读result1制作ip->starttime/endtime的字典

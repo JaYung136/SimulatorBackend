@@ -255,7 +255,7 @@ public class WorkloadParser {
 							wl.submitVmId = getVmId(src);
 							wl.destVmName = msg.getString("IpAddress");
 							wl.destVmId = getVmId(wl.destVmName);
-							wl.submitPktSize = msg.getInt("MessageSize")*1.0;
+							wl.submitPktSize = msg.getInt("MessageSize")*0.008;
 							Request req = new Request(userId);
 							req.addActivity(
 									new Processing(
@@ -286,7 +286,7 @@ public class WorkloadParser {
 							.put("DstName",msg.getString("AppName"))
 							.put("AppPeriod",appPeriod)
 							.put("MsgPeriod", msg.getInt("SamplePeriod")*contractRate)
-							.put("MessageSize",msg.getInt("MessageSize")*1.0)//单位Kb?
+							.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位Kb?
 					;
 					pure_msgs.put(puremsg);
 					/** TODO: 为每条message创建workload实例
@@ -305,7 +305,7 @@ public class WorkloadParser {
 						wl.submitVmId = getVmId(src);
 						wl.destVmName = msg.getString("IpAddress");
 						wl.destVmId = getVmId(wl.destVmName);
-						wl.submitPktSize = msg.getInt("MessageSize")*1.0;
+						wl.submitPktSize = msg.getInt("MessageSize")*0.008;
 						Request req = new Request(userId);
 						req.addActivity(
 								new Processing(

@@ -290,7 +290,6 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 				double tmplatency = 0;//ch.getTotalLatency();
 				for(Node switch_ :ch.nodesAll){ //TODO:在这里加上所有交换时延
 					if(switch_ instanceof EdgeSwitch || switch_ instanceof CoreSwitch){
-						System.out.println("sw bw:"+switch_.getBandwidth());
 						if(switch_.getBandwidth() >= 100000000) //100G
 							tmplatency += 0.1*0.000001; //0.1微秒
 						else if(switch_.getBandwidth() >= 40000000)

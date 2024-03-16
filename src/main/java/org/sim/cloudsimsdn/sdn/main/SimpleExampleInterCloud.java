@@ -188,18 +188,13 @@ public class SimpleExampleInterCloud {
 
 	public static List<Workload> startSimulation(SDNBroker broker, Collection<SDNDatacenter> dcs) {
 		double finishTime = CloudSim.startSimulation();
-		System.out.println("1@@@@@@@@@@@@@@@@@@@@");
 		CloudSim.stopSimulation();
-		System.out.println("2@@@@@@@@@@@@@@@@@@@@");
 		Log.enable();
-		System.out.println("3@@@@@@@@@@@@@@@@@@@@");
 		List<Workload> reswls = broker.printResult();
-		System.out.println("4@@@@@@@@@@@@@@@@@@@@");
 		// Print results when simulation is over
 		List<Workload> wls = broker.getWorkloads();
 		if(wls != null)
 			LogPrinter.printWorkloadList(wls);
-		System.out.println("5@@@@@@@@@@@@@@@@@@@@");
 //		// Print hosts' and switches' total utilization.
 //		List<Host> hostList = getAllHostList(dcs);
 //		List<Switch> switchList = getAllSwitchList(dcs);
