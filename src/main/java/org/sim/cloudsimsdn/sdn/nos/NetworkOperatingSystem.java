@@ -264,20 +264,20 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 /* **********************************************************************/
 				if(ch.isWireless && ch.wirelessLevel == 0){ // 包即将抵达Gateway，新建wirelessUpChan(gateway->intercloud)并addTransmission
 					double delay = ch.getTotalLatency(); // 有线部分的物理链路延迟(srchost->gateway)
-					send(this.datacenter.getId(), delay+0.0000000001, CloudSimTagsSDN.SDN_ARRIVED_GATEWAY, new ChanAndTrans(ch, tr));
+					send(this.datacenter.getId(), 0, CloudSimTagsSDN.SDN_ARRIVED_GATEWAY, new ChanAndTrans(ch, tr));
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
 				if(ch.isWireless && ch.wirelessLevel == 1){ // 包即将抵达intercloud(wirelessnet)，给netDC发消息，新建wirelessDownChan(intercloud->gateway)并addTransmission
 //					double delay = ch.getTotalLatency(); // gateway->intercloud的延迟
-					send(CloudSim.getEntityId("net"),0.0000000001 , CloudSimTagsSDN.SDN_ARRIVED_INTERCLOUD, new ChanAndTrans(ch, tr));
+					send(CloudSim.getEntityId("net"),0 , CloudSimTagsSDN.SDN_ARRIVED_INTERCLOUD, new ChanAndTrans(ch, tr));
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
 				if(ch.isWireless && ch.wirelessLevel == 2){ // 包即将跨平台抵达Gateway，新建EthernetChan(gateway->desthost)并addTransmission
-//					double delay = ch.getTotalLatency(); // intercloud->gateway的延迟
+					double delay = ch.getTotalLatency(); // intercloud->gateway的延迟
 					Packet pkt = tr.getPacket();
 					int vmId = pkt.getDestination();
 					Datacenter dc = SDNDatacenter.findDatacenterGlobal(vmId);
-					send(dc.getId(), 0.0000000001, CloudSimTagsSDN.SDN_ARRIVED_GATEWAY2, new ChanAndTrans(ch, tr));
+					send(dc.getId(), 0, CloudSimTagsSDN.SDN_ARRIVED_GATEWAY2, new ChanAndTrans(ch, tr));
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
 /* **********************************************************************/
@@ -287,10 +287,16 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 				int vmId = pkt.getDestination();
 				Datacenter dc = SDNDatacenter.findDatacenterGlobal(vmId);
 				//Log.printLine(CloudSim.clock() + ": " + getName() + ": Packet completed: "+pkt +". Send to destination:"+ch.getLastNode());
-				double tmplatency = ch.getTotalLatency();
+				double tmplatency = 0;//ch.getTotalLatency();
 				for(Node switch_ :ch.nodesAll){ //TODO:在这里加上所有交换时延
 					if(switch_ instanceof EdgeSwitch || switch_ instanceof CoreSwitch){
-						tmplatency += 0.0000012;
+						System.out.println("sw bw:"+switch_.getBandwidth());
+						if(switch_.getBandwidth() >= 100000000) //100G
+							tmplatency += 0.1*0.000001; //0.1微秒
+						else if(switch_.getBandwidth() >= 40000000)
+							tmplatency += 0.2*0.000001;
+						else
+							tmplatency += 0.5*0.000001;
 					}
 				}
 				sendPacketCompleteEvent(dc, pkt, tmplatency);
