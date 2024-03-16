@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Links Timespan="1.0E-4">
 	<Link Name="LINK2" Starttime="0.000000" Endtime="0.000100" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000000" Endtime="0.000100" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000000" Endtime="0.000100" Src="edge1" Dst="host2" KBytes="28" Util="0.27999999999999997" />
 	<Link Name="LINK1" Starttime="0.000000" Endtime="0.000100" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK1" Starttime="0.000000" Endtime="0.000100" Src="edge1" Dst="host1" KBytes="96" Util="0.96" />
-	<Link Name="LINK3" Starttime="0.000000" Endtime="0.000100" Src="host3" Dst="edge1" KBytes="96" Util="0.96" />
+	<Link Name="LINK1" Starttime="0.000000" Endtime="0.000100" Src="edge1" Dst="host1" KBytes="84" Util="0.84" />
+	<Link Name="LINK3" Starttime="0.000000" Endtime="0.000100" Src="host3" Dst="edge1" KBytes="112" Util="1.1199999999999999" />
 	<Link Name="LINK3" Starttime="0.000000" Endtime="0.000100" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000100" Endtime="0.000200" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000100" Endtime="0.000200" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000100" Endtime="0.000200" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000100" Endtime="0.000200" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000100" Endtime="0.000200" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000100" Endtime="0.000200" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000100" Endtime="0.000200" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000100" Endtime="0.000200" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000200" Endtime="0.000300" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000200" Endtime="0.000300" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000200" Endtime="0.000300" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000200" Endtime="0.000300" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000200" Endtime="0.000300" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000200" Endtime="0.000300" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000200" Endtime="0.000300" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000200" Endtime="0.000300" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000300" Endtime="0.000400" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000300" Endtime="0.000400" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000300" Endtime="0.000400" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000300" Endtime="0.000400" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000300" Endtime="0.000400" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000300" Endtime="0.000400" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000300" Endtime="0.000400" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000300" Endtime="0.000400" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000400" Endtime="0.000500" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000400" Endtime="0.000500" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000400" Endtime="0.000500" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000400" Endtime="0.000500" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000400" Endtime="0.000500" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000400" Endtime="0.000500" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000400" Endtime="0.000500" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000400" Endtime="0.000500" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000500" Endtime="0.000600" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000500" Endtime="0.000600" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000500" Endtime="0.000600" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000500" Endtime="0.000600" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000500" Endtime="0.000600" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000500" Endtime="0.000600" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000500" Endtime="0.000600" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000500" Endtime="0.000600" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000600" Endtime="0.000700" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000600" Endtime="0.000700" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000600" Endtime="0.000700" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000600" Endtime="0.000700" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000600" Endtime="0.000700" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000600" Endtime="0.000700" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000600" Endtime="0.000700" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000600" Endtime="0.000700" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000700" Endtime="0.000800" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000700" Endtime="0.000800" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000700" Endtime="0.000800" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000700" Endtime="0.000800" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000700" Endtime="0.000800" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000700" Endtime="0.000800" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000700" Endtime="0.000800" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000700" Endtime="0.000800" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000800" Endtime="0.000900" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000800" Endtime="0.000900" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000800" Endtime="0.000900" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000800" Endtime="0.000900" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000800" Endtime="0.000900" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000800" Endtime="0.000900" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000800" Endtime="0.000900" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000800" Endtime="0.000900" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 	<Link Name="LINK2" Starttime="0.000900" Endtime="0.001000" Src="host2" Dst="edge1" KBytes="0" Util="0.0" />
-	<Link Name="LINK2" Starttime="0.000900" Endtime="0.001000" Src="edge1" Dst="host2" KBytes="0" Util="0.0" />
+	<Link Name="LINK2" Starttime="0.000900" Endtime="0.001000" Src="edge1" Dst="host2" KBytes="40" Util="0.4" />
 	<Link Name="LINK1" Starttime="0.000900" Endtime="0.001000" Src="host1" Dst="edge1" KBytes="0" Util="0.0" />
 	<Link Name="LINK1" Starttime="0.000900" Endtime="0.001000" Src="edge1" Dst="host1" KBytes="120" Util="1.2" />
-	<Link Name="LINK3" Starttime="0.000900" Endtime="0.001000" Src="host3" Dst="edge1" KBytes="120" Util="1.2" />
+	<Link Name="LINK3" Starttime="0.000900" Endtime="0.001000" Src="host3" Dst="edge1" KBytes="160" Util="1.6" />
 	<Link Name="LINK3" Starttime="0.000900" Endtime="0.001000" Src="edge1" Dst="host3" KBytes="0" Util="0.0" />
 </Links>

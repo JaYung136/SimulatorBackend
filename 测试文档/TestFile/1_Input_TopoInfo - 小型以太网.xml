@@ -12,7 +12,7 @@
         </Link>
         <Link Name="LINK2" Src="edge1" Dst="host2" BW="100" Latency="0.001">
         </Link>
-        <Link Name="LINK3" Src="edge1" Dst="host3" BW="10" Latency="0.001">
+        <Link Name="LINK3" Src="edge1" Dst="host3" BW="100" Latency="0.001">
         </Link>
     </Links>
 </NetworkTopo>
