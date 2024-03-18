@@ -90,16 +90,16 @@ public class WorkloadResultWriter {
 	}
 
 	private List<Workload> flushWorkloadBuffer() {
-		System.out.println("3111@@@@@@@@@@@@@@@@@@@@");
+		//System.out.println("3111@@@@@@@@@@@@@@@@@@@@");
 		List<Workload> oldbuffer = workloadBuffer;
 		List<Workload> res = new ArrayList<>();
 		for(Workload wl:workloadBuffer) {
-			System.out.println("3112@@@@@@@@@@@@@@@@@@@@");
+			//System.out.println("3112@@@@@@@@@@@@@@@@@@@@");
 			Workload wlupdated = printWorkload(wl);
-			System.out.println("3113@@@@@@@@@@@@@@@@@@@@");
+			//System.out.println("3113@@@@@@@@@@@@@@@@@@@@");
 			res.add(wlupdated);
 		}
-		System.out.println("3114`@@@@@@@@@@@@@@@@@@@@");
+		//System.out.println("3114`@@@@@@@@@@@@@@@@@@@@");
 		workloadBuffer = new ArrayList<Workload>(workloadBufferSize);
 		return res;
 	}
@@ -139,7 +139,7 @@ public class WorkloadResultWriter {
 			this.timeoutNum++;
 		}
 		else {
-			System.out.println("31121@@@@@@@@@@@@@@@@@@@@");
+			//System.out.println("31121@@@@@@@@@@@@@@@@@@@@");
 			printRequest(wl.request, true);
 
 //			BigDecimal temServeTime = new BigDecimal(getWorkloadFinishTime(wl)).subtract(new BigDecimal(getWorkloadStartTime(wl)));

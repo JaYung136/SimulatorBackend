@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: pod
 metadata:
-  name: HFSM6
+  name: HFSM7
   namespace: default
 spec:
-  nodeName: host3
+  nodeName: host6
   containers:
   - image: nginx
-    name: containerHFSM6
+    name: containerHFSM7
     resources:
       requests:
-        memory: 60000Mi
+        memory: 600Mi
         cpu: 1000m

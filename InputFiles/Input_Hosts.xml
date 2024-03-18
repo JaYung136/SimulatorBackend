@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <adag xmlns:xsi="http://www.w3.org/2001/XMLSchema">
-<!-- 3个主机，在1个平台里。平台内部网络为“A” -->
-    <node name="host1" network="A" memory="16384000" storage="1363148800" cores="8" mips="15000" bandwidth="45" />
-    <node name="host2" network="A" memory="16384000" storage="1363148800" cores="8" mips="20000" bandwidth="25" />
-    <node name="host3" network="A" memory="16384000" storage="1363148800" cores="8" mips="30000" bandwidth="35" />
+    <!-- 8个主机，分布在4个平台里。平台网络分别为A、B、C、D -->
+    <node name="host1" network="A" memory="2096000" storage="1363148800" cores="2" mips="30000" bandwidth="450" />
+    <node name="host2" network="A" memory="2096000" storage="1363148800" cores="2" mips="20000" bandwidth="250" />
+    <node name="host3" network="B" memory="2096000" storage="1363148800" cores="2" mips="25000" bandwidth="350" />
+    <node name="host4" network="B" memory="2096000" storage="1363148800" cores="2" mips="30000" bandwidth="450" />
+    <node name="host5" network="C" memory="2096000" storage="1363148800" cores="2" mips="20000" bandwidth="250" />
+    <node name="host6" network="C" memory="2096000" storage="1363148800" cores="2" mips="25000" bandwidth="350" />
+    <node name="host7" network="D" memory="2096000" storage="1363148800" cores="2" mips="30000" bandwidth="450" />
+    <node name="host8" network="D" memory="2096000" storage="1363148800" cores="2" mips="20000" bandwidth="250" />
+    <!-- 利用率约束 -->
     <utilization type = "cpu" up = "1.0" />
     <utilization type = "memory" up = "1.0"/>
     <utilization type = "bandwidth" up = "1.0"/>
