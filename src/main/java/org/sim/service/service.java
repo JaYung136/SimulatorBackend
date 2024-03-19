@@ -370,6 +370,7 @@ public class service {
                     r.pes = Double.valueOf(job.getTaskList().get(0).getNumberOfPes()) / 1000;
                     r.ram = job.getTaskList().get(0).getRam();
                     r.period = job.getTaskList().get(0).getPeriodTime();
+                    r.datacenter = host.datacenterName;
                     if(Constants.pause.get(job.getTaskList().get(0).getCloudletId()) != null) {
                         r.pausestart = Constants.pause.get(job.getTaskList().get(0).getCloudletId()).getKey();
                         r.pauseend = Constants.pause.get(job.getTaskList().get(0).getCloudletId()).getValue();
