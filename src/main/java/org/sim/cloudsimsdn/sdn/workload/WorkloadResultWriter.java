@@ -90,16 +90,12 @@ public class WorkloadResultWriter {
 	}
 
 	private List<Workload> flushWorkloadBuffer() {
-		//System.out.println("3111@@@@@@@@@@@@@@@@@@@@");
 		List<Workload> oldbuffer = workloadBuffer;
 		List<Workload> res = new ArrayList<>();
 		for(Workload wl:workloadBuffer) {
-			//System.out.println("3112@@@@@@@@@@@@@@@@@@@@");
 			Workload wlupdated = printWorkload(wl);
-			//System.out.println("3113@@@@@@@@@@@@@@@@@@@@");
 			res.add(wlupdated);
 		}
-		//System.out.println("3114`@@@@@@@@@@@@@@@@@@@@");
 		workloadBuffer = new ArrayList<Workload>(workloadBufferSize);
 		return res;
 	}
@@ -139,7 +135,6 @@ public class WorkloadResultWriter {
 			this.timeoutNum++;
 		}
 		else {
-			//System.out.println("31121@@@@@@@@@@@@@@@@@@@@");
 			printRequest(wl.request, true);
 
 //			BigDecimal temServeTime = new BigDecimal(getWorkloadFinishTime(wl)).subtract(new BigDecimal(getWorkloadStartTime(wl)));
@@ -154,6 +149,7 @@ public class WorkloadResultWriter {
 			Double pe = destinfo.pauseend;
 			/**
 			 * 以周期为循环，不断迭代找到最合适的end2end接收时间
+			 * net:网络传输到达时刻
 			 * 一次循环中：
 			 * if net>=下一循环start
 			 * 		到下一循环
@@ -168,7 +164,6 @@ public class WorkloadResultWriter {
 			 * if net<循环start
 			 * 		wl.end2endfinishtime = 循环start;
 			 */
-			System.out.println("31122@@@@@@@@@@@@@@@@@@@@");
 			while (true){
 //				System.out.println("networkfinishtime:"+wl.networkfinishtime+" loopstart:"+loopstart+" loopend:"+loopend);
 				if(wl.networkfinishtime >= loopstart + destinfo.containerperiod){
@@ -197,7 +192,6 @@ public class WorkloadResultWriter {
 					break;
 				}
 			}
-			System.out.println("31123@@@@@@@@@@@@@@@@@@@@");
 			wl.dagschedulingtime = wl.end2endfinishtime - wl.networkfinishtime;
 			maxPerTime = (maxPerTime > serveTime)? maxPerTime : serveTime;
 			printDetail(String.format(LogPrinter.fFloat, serveTime));
@@ -324,9 +318,7 @@ public class WorkloadResultWriter {
 
 	public List<Workload> printStatistics() {
 		//threadExit();
-		System.out.println("311@@@@@@@@@@@@@@@@@@@@");
 		List<Workload> wls = flushWorkloadBuffer(); //打印表格
-		System.out.println("312@@@@@@@@@@@@@@@@@@@@");
 //		printLine("#======================================");
 //		printLine("#Number of workloads:" + printedWorkloadNum);
 //		printLine("#Timeout workloads:" + timeoutNum);

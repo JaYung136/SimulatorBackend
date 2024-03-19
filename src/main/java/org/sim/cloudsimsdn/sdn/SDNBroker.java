@@ -82,9 +82,7 @@ public class SDNBroker extends SimEntity {
 		double maxServetime = 0.0;
 		for(WorkloadParser wp:workloadId.keySet()) {
 			WorkloadResultWriter wrw = wp.getResultWriter();
-			//System.out.println("31@@@@@@@@@@@@@@@@@@@@");
 			wlsList.addAll(wrw.printStatistics()); //TODO:这里打印workloads
-			//System.out.println("32@@@@@@@@@@@@@@@@@@@@");
 			numWorkloads += wrw.getWorklaodNum();
 			numTimeout +=  wrw.getTimeoutNum();
 			numWorkloadsOver += wrw.getWorklaodNumOvertime();
@@ -103,7 +101,6 @@ public class SDNBroker extends SimEntity {
 			groupTotalServetimeCPU[wp.getGroupId()] += wrw.getServeTimeCPU();
 			groupTotalServetimeNetwork[wp.getGroupId()] += wrw.getServeTimeNetwork();
 		}
-		//System.out.println("33@@@@@@@@@@@@@@@@@@@@");
 		Log.printLine("================ latency =================");
 		Log.printLine("消息总数: "+ numWorkloads);
 //		Log.printLine("消息总延迟: "+ totalServetimeNetwork);
@@ -111,7 +108,6 @@ public class SDNBroker extends SimEntity {
 			Log.printLine("消息平均延迟: "+ totalServetime/numWorkloads);
 			Log.printLine("消息最大延迟: "+ maxServetime);
 		}
-		//System.out.println("34@@@@@@@@@@@@@@@@@@@@");
 		return wlsList;
 	}
 
