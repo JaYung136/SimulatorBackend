@@ -142,11 +142,6 @@ public class PhysicalTopologyParser {
 		return dcNameType;
 	}
 
-//	private void parse(NetworkOperatingSystem nos) {
-//		parseNode(null);
-//		parseLink();
-//	}
-
 	/**
 	 * parse switch 和 host
 	 * 并在该函数中创建 dc 与 wirelessGateway 之间的映射

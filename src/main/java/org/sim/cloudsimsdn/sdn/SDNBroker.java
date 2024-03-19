@@ -188,7 +188,7 @@ public class SDNBroker extends SimEntity {
 	private void processApplication(int userId, String vmsFileName){
 		SDNDatacenter defaultDC = SDNBroker.datacenters.entrySet().iterator().next().getValue();
 		VirtualTopologyParser parser = new VirtualTopologyParser(defaultDC.getName(), vmsFileName, userId); //TODO: vm 到 host 的硬绑定
-		// 对于每个 dc，新建 vm(s)。由对应的 nos管理。
+		// TODO:对于每个 dc，新建 vm(s)。由对应的 nos管理。
 		for(String dcName: SDNBroker.datacenters.keySet()) {
 			SDNDatacenter dc = SDNBroker.datacenters.get(dcName);
 			NetworkOperatingSystem nos = dc.getNOS();

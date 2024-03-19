@@ -226,7 +226,9 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		Packet pkt = orgPkt;
 //		channelManager.updatePacketProcessing(); //TODO(尝试):???注释此行，添加包前不更新channel
 		int src = pkt.getOrigin();
+		String srchostname = ((SDNVm) NetworkOperatingSystem.findVmGlobal(src)).getHostName();
 		int dst = pkt.getDestination();
+		String dsthostname = ((SDNVm) NetworkOperatingSystem.findVmGlobal(dst)).getHostName();
 		int flowId = pkt.getFlowId();
 //		System.out.println("消息【id:"+pkt.getPacketId()+"】【src:"+findHost(src)+"】->【dst:"+findHost(dst)+"】");
 
@@ -268,7 +270,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
 				if(ch.isWireless && ch.wirelessLevel == 1){ // 包即将抵达intercloud(wirelessnet)，给netDC发消息，新建wirelessDownChan(intercloud->gateway)并addTransmission
-//					double delay = ch.getTotalLatency(); // gateway->intercloud的延迟
+					double delay = ch.getTotalLatency(); // gateway->intercloud的延迟
 					send(CloudSim.getEntityId("net"),0 , CloudSimTagsSDN.SDN_ARRIVED_INTERCLOUD, new ChanAndTrans(ch, tr));
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
