@@ -152,7 +152,7 @@ public class MyPainter extends JFrame {
 
     public static void paintSingleMsgGraph(List<Workload> wls, String name) throws Exception {
         MyPainter p = new MyPainter(name+"网络延迟图像");
-        p.setSize(300, 200);
+        p.setSize(50000, 50000);
         Map<String, XYSeries> xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -170,7 +170,7 @@ public class MyPainter extends JFrame {
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"网络延迟图像", false);
 
         p = new MyPainter(name+"端到端延迟图像");
-        p.setSize(300, 200);
+        p.setSize(50000, 50000);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -189,7 +189,7 @@ public class MyPainter extends JFrame {
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"端到端延迟图像", false);
 
         p = new MyPainter(name+"调度等待延迟图像");
-        p.setSize(300, 200);
+        p.setSize(50000, 50000);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -225,7 +225,7 @@ public class MyPainter extends JFrame {
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "网络延迟图像", save);
 
         p = new MyPainter("端到端延迟图像");
-        p.setSize(500, 500);
+        p.setSize(50000, 50000);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -242,7 +242,7 @@ public class MyPainter extends JFrame {
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "端到端延迟图像", save);
         Thread.sleep(1000);
         p = new MyPainter("调度等待延迟图像");
-        p.setSize(500, 500);
+        p.setSize(50000, 50000);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -268,16 +268,35 @@ public class MyPainter extends JFrame {
             if(lu.printable == false)
                 continue;
             String linkname = lu.linkname;
-            XYSeries forwardline = new XYSeries(linkname + "_Forward");
-            XYSeries backwardline = new XYSeries(linkname + "_Backward");
+            XYSeries forwardline = new XYSeries(linkname+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]");
+            XYSeries backwardline = new XYSeries(linkname+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]");
             for(int i=0; i<lu.recordTimes.size(); ++i) {
                 forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i));
                 backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i));
             }
-            xySerieMap.put(linkname + "_Forward", forwardline);
-            xySerieMap.put(linkname + "_Backward", backwardline);
+            xySerieMap.put(linkname+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]", forwardline);
+            xySerieMap.put(linkname+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]", backwardline);
         }
         p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路利用率图像", save);
+    }
+
+    public static void paintSingleLinkGraph(Map<String, LinkUtil> lus, String name) throws Exception {
+        MyPainter p = new MyPainter(name+"利用率图像");
+        p.setSize(50000, 50000);
+        Map<String, XYSeries> xySerieMap = new HashMap<>();
+        for (LinkUtil lu : lus.values()) {
+            if(lu.printable == false || !lu.linkname.equals(name))
+                continue;
+            XYSeries forwardline = new XYSeries(name+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]");
+            XYSeries backwardline = new XYSeries(name+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]");
+            for(int i=0; i<lu.recordTimes.size(); ++i) {
+                forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i));
+                backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i));
+            }
+            xySerieMap.put(name+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]", forwardline);
+            xySerieMap.put(name+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]", backwardline);
+        }
+        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"利用率图像", false);
     }
 
     public static void main(String[] args) throws Exception {

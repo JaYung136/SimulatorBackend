@@ -84,6 +84,7 @@ public class Host {
 
 	private double previousRam = 0;
 
+	public String datacenterName;
 	int count = 0;
 
 	/**

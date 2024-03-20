@@ -489,35 +489,34 @@ public class Channel {
 
 	// For monitor
 	private MonitoringValues mv = new MonitoringValues(MonitoringValues.ValueType.DataRate_BytesPerSecond);
-	private long monitoringProcessedBytes = 0;
+	private double monitoringProcessedBytes = 0;
 
-	public long updateMonitor(double logTime, double timeUnit) {
-		//long capacity = (long) (this.getBw() * timeUnit);
-		long processedBytes = monitoringProcessedBytes;
-
-		double dataRate = (double)monitoringProcessedBytes / timeUnit;
-		mv.add(dataRate, logTime);
-
-		monitoringProcessedBytes = 0;
-
-		//LogWriter log = LogWriter.getLogger("channel_bw_utilization.csv");
-		//log.printLine(this+","+logTime+","+dataRate);
-
-		return processedBytes;
-	}
+//	public double updateMonitor(double logTime, double timeUnit) {
+//		//long capacity = (long) (this.getBw() * timeUnit);
+//		double processedBytes = monitoringProcessedBytes;
+//
+//		double dataRate = (double)monitoringProcessedBytes / timeUnit;
+//		mv.add(dataRate, logTime);
+//
+//		monitoringProcessedBytes = 0;
+//
+//		//LogWriter log = LogWriter.getLogger("channel_bw_utilization.csv");
+//		//log.printLine(this+","+logTime+","+dataRate);
+//
+//		return processedBytes;
+//	}
 
 	public MonitoringValues getMonitoringValuesLinkUtilization() {
 		return mv;
 	}
 
-	private void increaseProcessedBytes(long processedThisRound) {
+	private void increaseProcessedBytes(double processedThisRound) {
 		this.monitoringProcessedBytes += processedThisRound;
 
 		// Add processed bytes to each link.
 		for(int i=0; i<nodes.size()-1; i++) {
 			Node from = nodes.get(i);
 			Link link = links.get(i);
-
 			link.increaseProcessedBytes(from, processedThisRound);
 		}
 
@@ -566,7 +565,7 @@ public class Channel {
 	 */
 	public boolean updatePacketProcessing() {
 		double timenow = CloudSim.clock();
-		long processedBytes = packetScheduler.updatePacketProcessing();
+		double processedBytes = packetScheduler.updatePacketProcessing();
 		// TODO:次步将传输的bytes数累积到link的成员变量里
 		this.increaseProcessedBytes(processedBytes); // for monitoring
 

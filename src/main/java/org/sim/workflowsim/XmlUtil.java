@@ -423,6 +423,7 @@ public final class XmlUtil {
                         String cores = node.getAttributeValue("cores");
                         String mips = node.getAttributeValue("mips");
                         String bandwidth = node.getAttributeValue("bandwidth");
+                        String network = node.getAttributeValue("network");
                         Integer memory_MB = Integer.parseInt(memory);
                         Long storage_MB = Long.parseLong(storage);
                         Integer pes_size = Integer.parseInt(cores);
@@ -441,6 +442,7 @@ public final class XmlUtil {
                                 //WFCConstants.HOST_POWER[2]);
                         host.setName(name);
                         host.setCloudletScheduler(new CloudletSchedulerTimeShared());
+                        host.datacenterName = network;
                         this.hostList.add(host);
                         Log.printLine("new Host " + hostId + " with pe: " + pes_size + " ram: " + memory_MB + " mips: " + mips + " storage: " + storage + " bandwidth: " + bandwidth);
                         hostId ++;

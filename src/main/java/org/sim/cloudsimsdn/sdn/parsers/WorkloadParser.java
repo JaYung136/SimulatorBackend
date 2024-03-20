@@ -55,7 +55,7 @@ public class WorkloadParser {
 
 		String result_file = getResultFileName(this.file);
 		resultWriter = new WorkloadResultWriter(result_file);
-		openFile();
+//		openFile();
 	}
 
 	public void forceStartTime(double forcedStartTime) {
@@ -67,16 +67,7 @@ public class WorkloadParser {
 	}
 
 	public static String getResultFileName(String fileName) {
-		String result_file = null;
-		int indexSlash = fileName.lastIndexOf("/");
-		if(indexSlash != -1) {
-			String path_folder = fileName.substring(0, indexSlash+1);
-			String path_file = fileName.substring(indexSlash+1);
-			result_file = "./Intermediate/"/*path_folder*/ + "result_" + path_file;
-		}
-		else {
-			result_file = "result_"+fileName;
-		}
+		String result_file = workload_result;
 		return result_file;
 	}
 
@@ -222,7 +213,12 @@ public class WorkloadParser {
 				JSONObject app = (JSONObject) obj;
 				String src = app.getString("IpAddress");
 				Double appPeriod = app.getDouble("Period")*contractRate;
-				JSONObject tem = app.getJSONObject("A653SamplingPort").getJSONObject("A664Message");
+				JSONObject tem = app.getJSONObject("A653SamplingPort");
+				try{
+					tem = tem.getJSONObject("A664Message");
+				}catch (Exception e){
+					continue;
+				}
 				Object dataField = tem.opt("A653SamplingPort");
 				//case1:向>1个cn发送数据包
 				if (dataField instanceof JSONArray) {
@@ -318,7 +314,7 @@ public class WorkloadParser {
 										generateCloudlet(req.getRequestId(), wl.destVmId, 0)
 								)
 						);
-						req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, (long) wl.submitPktSize, this.flowNames.get("default"), endreq));
+						req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
 						parsedWorkloads.add(wl);
 						wl.request = req;
 						++jobid;
@@ -327,52 +323,14 @@ public class WorkloadParser {
 				}
 			}
 
-//			String jsonPrettyPrintString = pure_msgs.toString(4);
-//			//保存格式化后的json
-//			FileWriter writer = new FileWriter("aaaaaaaa.json");
-//			writer.write(jsonPrettyPrintString);
-//			writer.close();
+			String jsonPrettyPrintString = pure_msgs.toString(4);
+			//保存格式化后的json
+			FileWriter writer = new FileWriter(workloadf);
+			writer.write(jsonPrettyPrintString);
+			writer.close();
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-
-
-//		try {
-//			int jobid = 1;
-//			while (((line = bufReader.readLine()) != null)
-////					&& (parsedWorkloads.size() < numRequests)
-//			){
-///*************************************************************/
-//				// TODO: 创建一条 workload
-//				// TODO: Workload类新建域，每条workload的目标容器的 “name、单个周期开始结束时间、周期间隔、暂停时间” / 或者直接读 assign JsonObject
-//				String[] splitLine = line.split(",");
-//				Queue<String> lineitems = new LinkedList<String>(Arrays.asList(splitLine));
-//				// 比如待解析数据：[number],[periodtime],0,vm01,0,5,l12,vm02,10000,5,,,,
-//				Integer periodCount = Integer.parseInt(lineitems.poll());// number
-//				Double periodTime = Double.parseDouble(lineitems.poll());
-//				for (int i=0; i<periodCount; ++i) {
-//					Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
-//					Queue<String> lineitemscopy = new LinkedList<String>(lineitems);
-//					// 比如待解析数据：0,vm01,0,5,l12,vm02,10000,5,,,,
-//					wl.time = Double.parseDouble(lineitemscopy.poll());// start_time
-//					wl.time += i * periodTime;
-//					// For debug only
-//					if(wl.time < this.forcedStartTime || wl.time > this.forcedFinishTime) // Skip Workloads before the set start time
-//						continue;
-//					String vmName = lineitemscopy.poll();
-//					wl.submitVmId = getVmId(vmName);
-//					wl.submitVmName = vmName;
-//					wl.submitPktSize = Integer.parseInt(lineitemscopy.poll());
-//					wl.request = parseRequest(wl.submitVmId, lineitemscopy);
-//					wl.destVmName = destVMName;
-//					parsedWorkloads.add(wl);
-//				}
-//				++jobid;
-//			}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 
 	}
 

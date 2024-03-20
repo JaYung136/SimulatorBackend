@@ -283,17 +283,17 @@ public class ChannelManager {
 		return getChannelKey(origin,destination)+"-"+appId;
 	}
 
-	public void updateMonitor(double monitoringTimeUnit) {
-		// Update bandwidth consumption of all channels
-		for(Channel ch:channelTable.values()) {
-			long processedBytes = ch.updateMonitor(CloudSim.clock(), monitoringTimeUnit);
-		}
-
-		for(Channel ch:tempRemovedChannels) {
-			long processedBytes = ch.updateMonitor(CloudSim.clock(), monitoringTimeUnit);
-		}
-		this.resetTempRemovedChannel();
-
-	}
+//	public void updateMonitor(double monitoringTimeUnit) {
+//		// Update bandwidth consumption of all channels
+//		for(Channel ch:channelTable.values()) {
+//			long processedBytes = ch.updateMonitor(CloudSim.clock(), monitoringTimeUnit);
+//		}
+//
+//		for(Channel ch:tempRemovedChannels) {
+//			long processedBytes = ch.updateMonitor(CloudSim.clock(), monitoringTimeUnit);
+//		}
+//		this.resetTempRemovedChannel();
+//
+//	}
 
 }

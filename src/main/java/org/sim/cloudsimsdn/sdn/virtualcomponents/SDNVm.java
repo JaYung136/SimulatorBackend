@@ -183,7 +183,7 @@ public class SDNVm extends Vm {
 	}
 
 	private MonitoringValues mvBW = new MonitoringValues(MonitoringValues.ValueType.DataRate_BytesPerSecond);
-	private long monitoringProcessedBytesPerUnit = 0;
+	private double monitoringProcessedBytesPerUnit = 0;
 
 	private void updateMonitorBW(double logTime, double timeUnit) {
 //		long capacity = (long) (getBw() *timeUnit);
@@ -202,7 +202,7 @@ public class SDNVm extends Vm {
 	public MonitoringValues getMonitoringValuesVmBwUtilization() {
 		return mvBW;
 	}
-	public void increaseProcessedBytes(long processedThisRound) {
+	public void increaseProcessedBytes(double processedThisRound) {
 		this.monitoringProcessedBytesPerUnit += processedThisRound;
 	}
 
