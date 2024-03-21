@@ -4,6 +4,7 @@ import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.LogWriter;
 import org.sim.cloudsimsdn.sdn.main.SimpleExampleInterCloud;
+import org.sim.cloudsimsdn.sdn.physicalcomponents.Link;
 import org.sim.cloudsimsdn.sdn.workload.Workload;
 import org.sim.cloudsimsdn.sdn.workload.WorkloadResultWriter;
 import org.json.JSONArray;
@@ -555,12 +556,14 @@ public class SDNController {
             log.printLine("<Links Timespan=\"" + monitoringTimeInterval + "\">");
             simulator = new SimpleExampleInterCloud();
             wls.clear();
+            linkUtilMap.clear();
+            pure_msgs.clear();
             wls.addAll( simulator.main(args) );
             log = LogWriter.getLogger(bwutil_result);
             log.printLine("</Links>");
             outputdelay(wls);
             System.out.println("绘制图像");
-
+            System.out.println(linkUtilMap.toString());
             paintMultiLatencyGraph(wls, true);
 //            completeLinkUtil();
             paintMultiLinkGraph(linkUtilMap, true);

@@ -4,7 +4,7 @@
         <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="3200" RefreshPeriod="40">
             <A664Message MessageID="-1" Name="po_A664_Messge" Guid="a3be142f6" MessageSize="3200" TransmissionIntervalMinimum="40">
                 <A653SamplingPort Name="msg1->2" Guid="a96ef0521" Direction="Destination" MessageSize="1500" SamplePeriod="5" AppName="RGW1_A664_In" PartitionName="" Hardware="" PartitionId="" IpAddress="10.31.40.2" />
-                <A653SamplingPort Name="msg1->3" Guid="a96ef0521" Direction="Destination" MessageSize="500" SamplePeriod="5" AppName="RGW1_A664_In" PartitionName="" Hardware="" PartitionId="" IpAddress="10.31.40.3" />
+                <A653SamplingPort Name="msg1->3" Guid="a96ef0521" Direction="Destination" MessageSize="1500" SamplePeriod="5" AppName="RGW1_A664_In" PartitionName="" Hardware="" PartitionId="" IpAddress="10.31.40.3" />
             </A664Message>
         </A653SamplingPort>
     </application>
