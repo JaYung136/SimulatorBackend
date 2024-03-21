@@ -23,7 +23,7 @@ public class Packet {
 	private final long id;
 	private int origin;			// origin VM adress (vm.getId())
 	private int destination;	// destination VM adress (vm.getId())
-	private final long size;
+	private final double size;
 	private final int flowId;
 	private Request payload;
 
@@ -32,7 +32,7 @@ public class Packet {
 
 	private Packet pktEncapsulated = null;
 
-	public Packet(int origin, int destination, long size, int flowId, Request payload) {
+	public Packet(int origin, int destination, double size, int flowId, Request payload) {
 		this.origin = origin;
 		this.destination = destination;
 		this.size = size;
@@ -66,7 +66,7 @@ public class Packet {
 		destination = vmId;
 	}
 
-	public long getSize() {
+	public double getSize() {
 		return size;
 	}
 

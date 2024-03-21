@@ -238,9 +238,9 @@ public class Link {
 			lu= new LinkUtil(timeUnit, this.linkname,
 					this.lowOrder.toString(),this.highOrder.toString(), this.totalBW);
 		}
-
+		// TODO:打印链路利用率xml
 		long capacity = (long) (this.totalBW * timeUnit);
-		double utilization1 = (double)monitoringProcessedBytesPerUnitUp / capacity * 100;
+		double utilization1 = (double)monitoringProcessedBytesPerUnitUp * 100.0 / capacity;
 		mvUp.add(utilization1, logTime);
 		if(this.lowOrder instanceof IntercloudSwitch != true
 				&& this.highOrder instanceof IntercloudSwitch != true
@@ -259,7 +259,7 @@ public class Link {
 			lu.printable = true;
 		}
 
-		double utilization2 = (double)monitoringProcessedBytesPerUnitDown / capacity * 100;
+		double utilization2 = (double)monitoringProcessedBytesPerUnitDown * 100.0 / capacity;
 		mvDown.add(utilization2, logTime);
 		if(this.lowOrder instanceof IntercloudSwitch != true
 				&& this.highOrder instanceof IntercloudSwitch != true
@@ -287,7 +287,7 @@ public class Link {
 		return mvUp;
 	}
 
-	public void increaseProcessedBytes(Node from, long processedBytes) {
+	public void increaseProcessedBytes(Node from, double processedBytes) {
 		if(isUplink(from))
 			this.monitoringProcessedBytesPerUnitUp += processedBytes;
 		else

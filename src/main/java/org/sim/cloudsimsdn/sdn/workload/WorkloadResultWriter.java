@@ -268,7 +268,7 @@ public class WorkloadResultWriter {
 				printDetailFloat(serveTime); // Network processing time
 
 				if(Configuration.DEBUG_PRINT_DETAIL_SIZE_TIME) {
-					printDetailInt(tr.getPacket().getSize()); // Size
+					printDetailFloat(tr.getPacket().getSize()); // Size
 					printDetailInt(tr.getPacket().getFlowId()); // Channel #
 				}
 				printRequest(tr.getPacket().getPayload(), includeStatistics);

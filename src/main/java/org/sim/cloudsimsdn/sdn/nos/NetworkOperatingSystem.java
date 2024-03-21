@@ -29,6 +29,7 @@ import org.sim.cloudsimsdn.sdn.virtualcomponents.SDNVm;
 import org.sim.cloudsimsdn.sdn.virtualcomponents.VirtualNetworkMapper;
 import org.sim.cloudsimsdn.sdn.workload.Transmission;
 
+import java.security.cert.TrustAnchor;
 import java.util.*;
 
 /**
@@ -150,41 +151,31 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 				excludetags.add(CloudSimTagsSDN.MONITOR_BW_UTILIZATION);
 				excludetags.add(CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION);
 				if(CloudSimEx.hasMoreEvent(excludetags)){
-					double nextEventDelay = CloudSimEx.getNextEventTime() - CloudSim.clock();
-					double nextMonitorDelay = Configuration.monitoringTimeInterval;
-					if(nextEventDelay > Configuration.monitoringTimeInterval) {
-						nextMonitorDelay = nextEventDelay+Configuration.monitoringTimeInterval;
-					}
-					send(this.getId(), nextMonitorDelay, CloudSimTagsSDN.MONITOR_BW_UTILIZATION);
-//					send(this.getId(), nextMonitorDelay+Configuration.monitoringTimeInterval, CloudSimTagsSDN.MONITOR_BW_UTILIZATION);
+//					double nextEventDelay = CloudSimEx.getNextEventTime() - CloudSim.clock();
+//					double nextMonitorDelay = Configuration.monitoringTimeInterval;
+//					if(nextEventDelay > Configuration.monitoringTimeInterval) {
+//						nextMonitorDelay = nextEventDelay+Configuration.monitoringTimeInterval;
+//					}
+					send(this.getId(), Configuration.monitoringTimeInterval, CloudSimTagsSDN.MONITOR_BW_UTILIZATION);
 				}
 
 			case CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION:
-				if(this.datacenter != null)
-					this.datacenter.processUpdateProcessing();
-				channelManager.updatePacketProcessing();
-//				this.updateHostMonitor(Configuration.monitoringTimeInterval);
-//				this.updateSwitchMonitor(Configuration.monitoringTimeInterval);
-
-//				this.updateVmMonitor(CloudSim.clock());
-
-				excludetags = new HashSet<Integer>() ;
-				excludetags.add(CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION);
-				if(CloudSimEx.hasMoreEvent(excludetags)){
-					double nextMonitorDelay = Configuration.monitoringTimeInterval;
-					double nextEventDelay = CloudSimEx.getNextEventTime() - CloudSim.clock();
-
-					// If there's no event between now and the next monitoring time, skip monitoring until the next event time.
-					if(nextEventDelay > nextMonitorDelay) {
-						nextMonitorDelay = nextEventDelay;
-					}
-
-					long numPackets = channelManager.getTotalNumPackets();
-
-//					System.err.println(CloudSim.clock() + ": Elasped time="+ CloudSimEx.getElapsedTimeString()+", "
-//					+CloudSimEx.getNumFutureEvents()+" more events,"+" # packets="+numPackets+", next monitoring in "+nextMonitorDelay);
-					send(this.getId(), nextMonitorDelay, CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION);
-				}
+				//TODO: 尝试删除MONITOR_UPDATE_UTILIZATION?
+//				if(this.datacenter != null)
+//					this.datacenter.processUpdateProcessing();
+//				channelManager.updatePacketProcessing();
+//				excludetags = new HashSet<Integer>() ;
+//				excludetags.add(CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION);
+//				if(CloudSimEx.hasMoreEvent(excludetags)){
+//					double nextMonitorDelay = Configuration.monitoringTimeInterval;
+//					double nextEventDelay = CloudSimEx.getNextEventTime() - CloudSim.clock();
+//
+//					// If there's no event between now and the next monitoring time, skip monitoring until the next event time.
+//					if(nextEventDelay > nextMonitorDelay) {
+//						nextMonitorDelay = nextEventDelay;
+//					}
+//					send(this.getId(), nextMonitorDelay, CloudSimTagsSDN.MONITOR_UPDATE_UTILIZATION);
+//				}
 				break;
 			default: System.out.println("Unknown event received by "+super.getName()+". Tag:"+ev.getTag());
 		}
@@ -226,7 +217,9 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		Packet pkt = orgPkt;
 //		channelManager.updatePacketProcessing(); //TODO(尝试):???注释此行，添加包前不更新channel
 		int src = pkt.getOrigin();
+		String srchostname = ((SDNVm) NetworkOperatingSystem.findVmGlobal(src)).getHostName();
 		int dst = pkt.getDestination();
+		String dsthostname = ((SDNVm) NetworkOperatingSystem.findVmGlobal(dst)).getHostName();
 		int flowId = pkt.getFlowId();
 //		System.out.println("消息【id:"+pkt.getPacketId()+"】【src:"+findHost(src)+"】->【dst:"+findHost(dst)+"】");
 
@@ -268,7 +261,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
 				if(ch.isWireless && ch.wirelessLevel == 1){ // 包即将抵达intercloud(wirelessnet)，给netDC发消息，新建wirelessDownChan(intercloud->gateway)并addTransmission
-//					double delay = ch.getTotalLatency(); // gateway->intercloud的延迟
+					double delay = ch.getTotalLatency(); // gateway->intercloud的延迟
 					send(CloudSim.getEntityId("net"),0 , CloudSimTagsSDN.SDN_ARRIVED_INTERCLOUD, new ChanAndTrans(ch, tr));
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
@@ -355,11 +348,11 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 				return;
 			}
 /* ********************************************************************************************/
-			//TODO:channel完成时间（sendInternalEvent）取消MinTimeBetweenEvents()
-//			if (delay < CloudSim.getMinTimeBetweenEvents()) {
-//				//Log.printLine(CloudSim.clock() + ":Channel: delay is too short: "+ delay);
-//				delay = CloudSim.getMinTimeBetweenEvents();
-//			}
+			//TODO:处理delay==0。同个netOS内，有其他包的到达顺带通知netOS自己也到达了。不必重复通知？
+			if (delay < CloudSim.getMinTimeBetweenEvents()) {
+				//Log.printLine(CloudSim.clock() + ":Channel: delay is too short: "+ delay);
+				delay = CloudSim.getMinTimeBetweenEvents();
+			}
 
 			//Log.printLine(CloudSim.clock() + ": " + getName() + ".sendInternalEvent(): delay for next event="+ delay);
 
@@ -375,7 +368,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 	}
 
 	public void sendWirelessTimeSlide(int destNOSID, String chankey) {
-		send(destNOSID, 0.0001, CloudSimTagsSDN.SDN_WIRELESS_TIMESLIDE, chankey);//TODO:TDMA时间片，10K
+		send(destNOSID, 0.000001, CloudSimTagsSDN.SDN_WIRELESS_TIMESLIDE, chankey);// TODO:TDMA时间片 1 微妙
 	}
 
 	public long getBandwidthBackup(int flowId) {

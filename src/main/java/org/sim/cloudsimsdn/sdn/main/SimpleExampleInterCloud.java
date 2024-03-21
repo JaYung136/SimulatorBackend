@@ -116,8 +116,6 @@ public class SimpleExampleInterCloud {
 //			Configuration.monitoringTimeInterval = Configuration.migrationTimeInterval = 5;
 
 			// Create multiple Datacenters
-//			xml2Json(physicalTopologyFile);
-//			Map<NetworkOperatingSystem, SDNDatacenter> dcs = createPhysicalTopology("example-intercloud/hmz_convert.json", ls, vmAllocationFac);
 			Map<NetworkOperatingSystem, SDNDatacenter> dcs = createPhysicalTopology(physicalTopologyFile, ls, vmAllocationFac);
 			// Broker
 			SDNBroker broker = createBroker();
@@ -227,6 +225,7 @@ public class SimpleExampleInterCloud {
 	public static Map<NetworkOperatingSystem, SDNDatacenter> createPhysicalTopology(String physicalTopologyFile, LinkSelectionPolicy ls, VmAllocationPolicyFactory vmAllocationFac) {
 		HashMap<NetworkOperatingSystem, SDNDatacenter> dcs = new HashMap<NetworkOperatingSystem, SDNDatacenter>();
 		// This funciton creates Datacenters and NOS inside the data cetner.
+		// TODO:在此创建dc、netos、hostnode
 		Map<String, NetworkOperatingSystem> dcNameNOS = PhysicalTopologyParser.loadPhysicalTopologyMultiDC(physicalTopologyFile);
 		Map<String, Node> dcAndWirelessGateway = PhysicalTopologyParser.getDcAndWirelessGateway(physicalTopologyFile);
 		for(String dcName:dcNameNOS.keySet()) {

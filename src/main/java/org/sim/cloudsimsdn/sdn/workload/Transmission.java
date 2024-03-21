@@ -10,6 +10,8 @@ package org.sim.cloudsimsdn.sdn.workload;
 
 import org.sim.cloudsimsdn.sdn.Packet;
 
+import java.math.BigDecimal;
+
 /**
  * This class represents transmission of a package. It controls
  * amount of data transmitted in a shared data medium. Relation between
@@ -24,7 +26,7 @@ import org.sim.cloudsimsdn.sdn.Packet;
  */
 public class Transmission implements Activity {
 	private Packet pkt = null;
-	private long amountToBeProcessed;
+	private double amountToBeProcessed;
 
 	private double requestedBw =0;
 
@@ -33,7 +35,7 @@ public class Transmission implements Activity {
 		this.amountToBeProcessed=pkt.getSize();
 	}
 
-	public Transmission(int origin, int destination, long size, int flowId, Request payload) {
+	public Transmission(int origin, int destination, double size, int flowId, Request payload) {
 		this(new Packet(origin, destination, size, flowId, payload));
 	}
 
@@ -41,7 +43,7 @@ public class Transmission implements Activity {
 		this(new Packet(origin, destination, size, flowId, payload, encapsulatedPkt));
 	}
 
-	public long getSize(){
+	public double getSize(){
 		return amountToBeProcessed;
 	}
 
@@ -53,9 +55,9 @@ public class Transmission implements Activity {
 	 * Sums some amount of data to the already transmitted data
 	 * @param completed amount of data completed since last update
 	 */
-	public void addCompletedLength(long completed){
+	public void addCompletedLength(double completed){
 		amountToBeProcessed-=completed;
-		if (amountToBeProcessed<=0) amountToBeProcessed = 0;
+//		System.out.println("amountToBeProcessed:"+amountToBeProcessed);
 	}
 
 	/**
@@ -63,7 +65,9 @@ public class Transmission implements Activity {
 	 * @return true if transmission finished; false otherwise
 	 */
 	public boolean isCompleted(){
-		return amountToBeProcessed==0;
+		boolean res = (new BigDecimal(amountToBeProcessed).compareTo(new BigDecimal(0.010))) <= 0;
+//		System.out.println("isCompletedCheck:"+amountToBeProcessed+" "+0.01+Boolean.toString(res));
+		return res;
 	}
 
 	public String toString() {

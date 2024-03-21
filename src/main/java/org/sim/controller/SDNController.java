@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
+import static org.sim.cloudsimsdn.sdn.Configuration.monitoringTimeInterval;
 import static org.sim.controller.MyPainter.*;
 
 @RestController
@@ -36,8 +37,8 @@ public class SDNController {
     public static String input_app = "./InputFiles/Input_AppInfo.xml";
     private String physicalf = "./Intermediate/physical.json";
     private String virtualf = "./Intermediate/virtual.json";
-    private String workloadf = "./Intermediate/messages.csv";
-    private String workload_result = "./Intermediate/result_messages.csv";
+    public static String workloadf = "./Intermediate/messages.json";
+    public static String workload_result = "./Intermediate/result_messages.csv";
     private String latency_result = "./OutputFiles/latency/output_latency.xml";
     private String bwutil_result = "./OutputFiles/bandwidthUtil/link_utilization.xml";
     private Map<String, Long> wirelessChan_bw = new HashMap<>();
@@ -45,7 +46,10 @@ public class SDNController {
     private boolean halfDuplex = false;
     public int containerPeriodCount = 3;
     public double latencyScore = 0;
+    public static long ethernetSpeed = 10000000; //10G
     public static double simulationStopTime = 1000.0; //仿真持续时间，微秒
+    public static double contractRate = 0.000001; // 容器调度的单位为 1 微秒。
+    public static JSONArray pure_msgs = new JSONArray();
     List<Workload> wls = new ArrayList<>();
     @RequestMapping("/hello")
     public String hello(){
@@ -59,19 +63,6 @@ public class SDNController {
         int time = content.getInt("time");
         simulationStopTime = time;
         System.out.println("设置仿真持续时间："+simulationStopTime+"微秒");
-        return ResultDTO.success("ok");
-    }
-
-    @RequestMapping("specifiedmsg")
-    public ResultDTO specifySingleMsg(@RequestBody String req) {
-        JSONObject content = new JSONObject(req);
-        String name = content.getString("msgname");
-        System.out.println("查看单条消息："+name);
-        try {
-            paintSingleMsgGraph(wls, name);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return ResultDTO.success("ok");
     }
 
@@ -89,6 +80,67 @@ public class SDNController {
         return ResultDTO.success("ok");
     }
 
+    @RequestMapping("specifiedmsg")
+    public ResultDTO specifySingleMsg(@RequestBody String req) {
+        JSONObject content = new JSONObject(req);
+        String name = content.getString("msgname");
+        System.out.println("查看单条消息："+name);
+        try {
+            paintSingleMsgGraph(wls, name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResultDTO.success("ok");
+    }
+
+    /**
+     * 将离散的数据补全为等间隔数据点
+     */
+    private void completeLinkUtil() {
+        Set<String> keys = linkUtilMap.keySet();
+        for (String key : keys) {
+            LinkUtil lu = linkUtilMap.get(key);
+            if(!lu.printable)
+                continue;
+            // 补全 recordTimes
+            ListIterator<Double> Times_it = lu.recordTimes.listIterator();
+            ListIterator<Double> Forward_it = lu.UnitUtilForward.listIterator();
+            ListIterator<Double> Backward_it = lu.UnitUtilBackward.listIterator();
+            double pre_time = Times_it.next(); //0*12345...
+            Forward_it.next();
+            Backward_it.next();
+            while (Times_it.hasNext()){
+                double next_time = Times_it.next(); //01*2345...
+                Forward_it.next();
+                Backward_it.next();
+                if(next_time - pre_time > monitoringTimeInterval){
+                    Times_it.previous(); //0*12345...
+                    Forward_it.previous();
+                    Backward_it.previous();
+                    Times_it.add(pre_time + monitoringTimeInterval); //0(Added)*12345...
+                    Forward_it.add(0.0); //新利用率0
+                    Backward_it.add(0.0); //新利用率0
+                    pre_time = pre_time + monitoringTimeInterval;
+                    continue;
+                }
+                pre_time = next_time;
+            }
+
+        }
+    }
+
+    @RequestMapping("specifiedlink")
+    public ResultDTO specifySingleLink(@RequestBody String req) {
+        JSONObject content = new JSONObject(req);
+        String name = content.getString("linkname");
+        System.out.println("查看单条链路："+name);
+        try {
+            paintSingleLinkGraph(linkUtilMap, name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResultDTO.success("ok");
+    }
     @RequestMapping("/uploadtopo")
     public ResultDTO uploadtopo(MultipartFile file, HttpServletRequest req) throws IOException {
         System.out.println("上传topo.xml文件");
@@ -102,20 +154,6 @@ public class SDNController {
         }catch (IOException e){
             System.out.print(e.getMessage());
         }
-        // 做数据关联性检查
-        try{
-            String xml = Files.readString(Path.of(input_topo));
-            JSONObject topojson = XML.toJSONObject(xml).getJSONObject("NetworkTopo");
-            JSONArray links = topojson.getJSONObject("Links").getJSONArray("Link");
-            for(Object obj : links){
-                JSONObject link = (JSONObject) obj;
-//                link.getString("Src");
-//                link.getString("Dst");
-//                在host.xml里，注意记录位置
-            }
-        }catch (Exception e){
-        }
-
         return ResultDTO.success("上传成功");
     }
 
@@ -125,7 +163,6 @@ public class SDNController {
         JSONArray array = new JSONArray(content);
         return ResultDTO.success(array.toString());
     }
-
     @RequestMapping("/modifyassign")
     public ResultDTO modifyassign(@RequestBody String req) throws IOException {
         JSONArray array = new JSONArray(req);
@@ -142,7 +179,6 @@ public class SDNController {
         writer.close();
         return ResultDTO.success(array.toString());
     }
-
     public void convertphytopo() throws IOException {
         String xml = Files.readString(Path.of(input_topo));
         JSONObject topojson = XML.toJSONObject(xml).getJSONObject("NetworkTopo");
@@ -159,6 +195,19 @@ public class SDNController {
         for(Object obj : swches){
             JSONObject swch = (JSONObject) obj;
             String dcname = swch.getString("Network");
+//            (long) swch.getDouble("Speed")*1000000)
+            if(swch.getDouble("Speed") >= 100) {
+                ethernetSpeed = 100000000; //100G
+                monitoringTimeInterval = 0.000002; //2微秒
+            }
+            else if(swch.getDouble("Speed") >= 40) {
+                ethernetSpeed = 40000000;
+                monitoringTimeInterval = 0.000005; //5微秒
+            }
+            else {
+                ethernetSpeed = 10000000;
+                monitoringTimeInterval = 0.000010; //10微秒
+            }
             dcnames.add(dcname);
         }
 
@@ -339,8 +388,6 @@ public class SDNController {
         writer.write(jsonPrettyPrintString);
         writer.close();
     }
-    public static double contractRate = 0.000001; // 容器调度的单位为 1 微秒。
-    public static JSONArray pure_msgs = new JSONArray();
     public void convertworkload() throws IOException{
         //读result1制作ip->starttime/endtime的字典
         String content = Files.readString(Path.of(input_container));
@@ -370,112 +417,7 @@ public class SDNController {
             );
             assignInfoMap.put(host.getString("name"), ai);
         }
-
-        //读appinfo.xml 写workload.csv
-        String xml = Files.readString(Path.of(input_app));
-        JSONArray apps = XML.toJSONObject(xml).getJSONObject("AppInfo").getJSONArray("application");
-        String filePath = workloadf;
-        // TODO: 拓展Workload表格。新建colonm，记录每条workload的目标容器的 “name"(第8列，name.2)、(单个周期开始结束时间、周期间隔、暂停时间)/自行读 assign JsonObject
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            writer.write("count,period,atime,name.1,zeros,w.1.1,link.1.2,name.2,p.1.2,w.2.1,link.2.3,name.3,p.2.3,w.3\n");
-            for(Object obj : apps){
-                JSONObject app = (JSONObject) obj;
-                String src = app.getString("IpAddress");
-//                containerPeriodCount
-                int periodInterval = app.getInt("Period");
-                JSONObject tem = new JSONObject();
-                try {
-                    tem = app.getJSONObject("A653SamplingPort").getJSONObject("A664Message");
-                }catch (Exception e){
-                    continue;
-                }
-
-                Object dataField = tem.opt("A653SamplingPort");
-
-                //case1:向>1个主机发送数据包
-                if (dataField instanceof JSONArray) {
-                    JSONArray msgs = (JSONArray) dataField;
-                    for (Object obj2 : msgs) {
-                        JSONObject msg = (JSONObject) obj2;
-                        String dst = msg.getString("IpAddress");
-                        double period = msg.getDouble("SamplePeriod");
-                        int pktsize = msg.getInt("MessageSize");
-                        // 暂停前
-                        int count = 0;
-                        double starttime = startmap.get(src);
-                        double endtime = startmap.get(src) + pausestartmap.get(src);
-                        if(endtime > endmap.get(src)){
-                            endtime = endmap.get(src);
-                        }
-                        for (double t = starttime; t < endtime; t += period) {
-                            count++;
-                        }
-                        if(count>0)
-                            for(int pnum = 0; pnum < containerPeriodCount; ++pnum) {
-                                writer.write(count + "," + period + "," + (starttime + periodInterval * pnum) + "," + src + ",0,0,default," + dst + "," + pktsize + ",0,,,,\n");
-                            }
-                        // 恢复后
-                        count = 0;
-                        starttime = startmap.get(src) + pausestartmap.get(src) + pauseendmap.get(src);
-                        endtime = endmap.get(src);
-                        if(starttime < endtime){
-                            for (double t = starttime; t < endtime; t += period) {
-                                count++;
-                            }
-                            if(count>0)
-                                for(int pnum = 0; pnum < containerPeriodCount; ++pnum){
-                                    writer.write(count + "," + period + "," + (starttime+periodInterval*pnum) + "," + src + ",0,0,default," + dst + "," + pktsize + ",0,,,,\n");
-                                }
-                        }
-
-
-                    }
-                }
-                //case2:仅向1个主机发送数据包
-                else {
-                    JSONObject msg = (JSONObject) dataField;
-                    String dst = msg.getString("IpAddress");
-                    double period = msg.getDouble("SamplePeriod");
-                    int pktsize = msg.getInt("MessageSize");
-                    // 暂停前
-                    int count = 0;
-                    double starttime = startmap.get(src);
-                    double endtime = startmap.get(src) + pausestartmap.get(src);
-                    if(endtime > endmap.get(src)){
-                        endtime = endmap.get(src);
-                    }
-                    if(starttime < endtime){
-                        System.out.println("NO");
-                    }
-                    for (double t = starttime; t < endtime; t += period) {
-                        count++;
-                    }
-                    if(count>0)
-                        for(int pnum = 0; pnum < containerPeriodCount; ++pnum){
-                            writer.write(count + "," + period + "," + (starttime+periodInterval*pnum) + "," + src + ",0,0,default," + dst + "," + pktsize + ",0,,,,\n");
-                        }
-                    // 恢复后
-                    count = 0;
-                    starttime = startmap.get(src) + pausestartmap.get(src) + pauseendmap.get(src);
-                    endtime = endmap.get(src);
-                    if(starttime < endtime){
-                        for (double t = starttime; t < endtime; t += period) {
-                            count++;
-                        }
-                        if(count>0)
-                            for(int pnum = 0; pnum < containerPeriodCount; ++pnum){
-                                writer.write(count + "," + period + "," + (starttime+periodInterval*pnum) + "," + src + ",0,0,default," + dst + "," + pktsize + ",0,,,,\n");
-                            }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("转换messages.csv时出现问题: " + e.getMessage());
-            throw e;
-        }
-        return;
     }
-
     public ResultDTO outputdelay(List<Workload> wls) throws IOException{
         //创建xml
         File file = new File(latency_result);
@@ -513,7 +455,6 @@ public class SDNController {
         bw.close();
         return ResultDTO.success("ok");
     }
-
     public void PrintInvalidName(String indexstr, String filepath) {
         try{
             File file = new File(filepath);
@@ -603,20 +544,21 @@ public class SDNController {
             convertphytopo();
             convertvirtopo();
             convertworkload();
-            String args[] = {"", physicalf, virtualf, workloadf};
+            String args[] = {"", physicalf, virtualf, ""};
             LogWriter.resetLogger(bwutil_result);
             LogWriter log = LogWriter.getLogger(bwutil_result);
             log.printLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            log.printLine("<Links Timespan=\"" + Configuration.monitoringTimeInterval + "\">");
+            log.printLine("<Links Timespan=\"" + monitoringTimeInterval + "\">");
             simulator = new SimpleExampleInterCloud();
             wls.clear();
             wls.addAll( simulator.main(args) );
             log = LogWriter.getLogger(bwutil_result);
             log.printLine("</Links>");
             outputdelay(wls);
-            System.out.println("绘制延迟图像");
+            System.out.println("绘制图像");
 
             paintMultiLatencyGraph(wls, true);
+//            completeLinkUtil();
             paintMultiLinkGraph(linkUtilMap, true);
             List<WorkloadResult> wrlist = new ArrayList<>();
             for (Workload workload : wls) {

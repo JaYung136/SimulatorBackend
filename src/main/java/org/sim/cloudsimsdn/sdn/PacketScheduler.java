@@ -14,11 +14,11 @@ import java.util.LinkedList;
  */
 public interface PacketScheduler {
 	/**
-	 * Calculate and update network transmission for the past time period
-	 *
-	 * @return true if any transmission is completed in this round, false if no transmission is completed in this round.
-	 */
-	public long updatePacketProcessing();
+     * Calculate and update network transmission for the past time period
+     *
+     * @return true if any transmission is completed in this round, false if no transmission is completed in this round.
+     */
+	public double updatePacketProcessing();
 
 	/**
 	 * Calculate the next finish time of any transmissions.

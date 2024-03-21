@@ -3,6 +3,7 @@ package org.sim.cloudsimsdn.sdn;
 import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.virtualcomponents.Channel;
 import org.sim.cloudsimsdn.sdn.workload.Transmission;
+import org.springframework.boot.ExitCodeEvent;
 
 import java.util.List;
 /**
@@ -20,15 +21,17 @@ public class PacketSchedulerTimeShared extends PacketSchedulerSpaceShared {
 	}
 
 	@Override
-	public long updatePacketProcessing() {
+	public double updatePacketProcessing() {
 		double currentTime = CloudSim.clock();
 		double timeSpent = currentTime - this.previousTime;//NetworkOperatingSystem.round(currentTime - this.previousTime);
 
-		if(timeSpent <= 0 || this.getInTransmissionNum() == 0)
-			return 0;	// Nothing changed
+		if(timeSpent <= 0 || this.getInTransmissionNum() == 0) {
+//			System.out.println("Error不应到此处");
+			return 0;    // Nothing changed
+		}
 
 		//update the amount of transmission
-		long processedThisRound =  Math.round(timeSpent * channel.getAllocatedBandwidth());
+		double processedThisRound =  (timeSpent * channel.getAllocatedBandwidth());
 
 		//update transmission table; remove finished transmission
 		Transmission transmission = inTransmission.get(0);
@@ -37,6 +40,7 @@ public class PacketSchedulerTimeShared extends PacketSchedulerSpaceShared {
 		if (transmission.isCompleted()){
 			this.completed.add(transmission);
 			this.inTransmission.remove(transmission);
+			System.out.println("DEBUG:"+transmission.toString()+"completed");
 		}
 
 

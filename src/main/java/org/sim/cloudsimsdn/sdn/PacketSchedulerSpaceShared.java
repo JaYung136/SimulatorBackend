@@ -38,7 +38,7 @@ public class PacketSchedulerSpaceShared implements PacketScheduler {
 	 *         False if no transmission is completed in this round.
 	 */
 	@Override
-	public long updatePacketProcessing() {
+	public double updatePacketProcessing() {
 		double currentTime = CloudSim.clock();
 		double timeSpent = currentTime - this.previousTime;//NetworkOperatingSystem.round(currentTime - this.previousTime);
 
@@ -46,8 +46,8 @@ public class PacketSchedulerSpaceShared implements PacketScheduler {
 			return 0;	// Nothing changed
 
 		//update the amount of transmission
-		long processedThisRound =  Math.round(timeSpent * getAllocatedBandwidthPerTransmission());
-		long processedTotal = processedThisRound * inTransmission.size();
+		double processedThisRound =  (timeSpent * getAllocatedBandwidthPerTransmission());
+		double processedTotal = processedThisRound * inTransmission.size();
 
 		//update transmission table; remove finished transmission
 		List<Transmission> completedTransmissions = new ArrayList<Transmission>();
