@@ -1,7 +1,7 @@
 [{
     "AppPeriod": 9.999999999999999E-5,
     "MsgPeriod": 4.9999999999999996E-5,
-    "MessageSize": 0.8,
+    "MessageSize": 12,
     "DstIP": "10.31.40.2",
     "DstName": "RGW1_A664_In",
     "SrcIP": "10.31.40.1",

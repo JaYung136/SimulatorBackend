@@ -3,7 +3,7 @@
     <application Name="HF_SM_1" Guid="a96ef0520" IpAddress="10.31.40.1" Hardware="" ComputeTime="1" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="100" RequiredMemorySize="10000" Key="True" Priority="1" UpBandwidth="40" DownBandwidth="10" Parent="HF_SM_2,HF_SM_3">
         <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="3200" RefreshPeriod="40">
             <A664Message MessageID="-1" Name="po_A664_Messge" Guid="a3be142f6" MessageSize="3200" TransmissionIntervalMinimum="40">
-                <A653SamplingPort Name="msg01" Guid="a96ef0521" Direction="Destination" MessageSize="100" SamplePeriod="50" AppName="RGW1_A664_In" PartitionName="" Hardware="" PartitionId="" IpAddress="10.31.40.2" />
+                <A653SamplingPort Name="msg01" Guid="a96ef0521" Direction="Destination" MessageSize="1000" SamplePeriod="50" AppName="RGW1_A664_In" PartitionName="" Hardware="" PartitionId="" IpAddress="10.31.40.2" />
             </A664Message>
         </A653SamplingPort>
     </application>
