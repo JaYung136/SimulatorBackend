@@ -7,18 +7,6 @@
         {
             "name": "A",
             "type": "cloud"
-        },
-        {
-            "name": "B",
-            "type": "cloud"
-        },
-        {
-            "name": "C",
-            "type": "cloud"
-        },
-        {
-            "name": "D",
-            "type": "cloud"
         }
     ],
     "nodes": [
@@ -51,97 +39,13 @@
         },
         {
             "upports": 0,
-            "bw": 100000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "gwB",
-            "datacenter": "net",
-            "type": "gateway"
-        },
-        {
-            "upports": 0,
-            "bw": 100000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "gwB",
-            "datacenter": "B",
-            "type": "gateway"
-        },
-        {
-            "upports": 0,
-            "bw": 100000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "gwC",
-            "datacenter": "net",
-            "type": "gateway"
-        },
-        {
-            "upports": 0,
-            "bw": 100000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "gwC",
-            "datacenter": "C",
-            "type": "gateway"
-        },
-        {
-            "upports": 0,
-            "bw": 100000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "gwD",
-            "datacenter": "net",
-            "type": "gateway"
-        },
-        {
-            "upports": 0,
-            "bw": 100000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "gwD",
-            "datacenter": "D",
-            "type": "gateway"
-        },
-        {
-            "upports": 0,
             "bw": 10000000,
             "downports": 0,
             "iops": 1000000000,
-            "name": "core1",
+            "name": "edge1",
             "datacenter": "A",
-            "type": "core",
-            "ports": 2
-        },
-        {
-            "upports": 0,
-            "bw": 10000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "core2",
-            "datacenter": "B",
-            "type": "core",
-            "ports": 2
-        },
-        {
-            "upports": 0,
-            "bw": 10000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "core3",
-            "datacenter": "C",
-            "type": "core",
-            "ports": 2
-        },
-        {
-            "upports": 0,
-            "bw": 10000000,
-            "downports": 0,
-            "iops": 1000000000,
-            "name": "core4",
-            "datacenter": "D",
-            "type": "core",
-            "ports": 2
+            "type": "edge",
+            "ports": 4
         },
         {
             "bw": 45000000000,
@@ -149,9 +53,9 @@
             "datacenter": "A",
             "storage": 1363148800,
             "type": "host",
-            "mips": 30000,
-            "pes": 2,
-            "ram": 2096000
+            "mips": 35000,
+            "pes": 8,
+            "ram": 16384000
         },
         {
             "bw": 25000000000,
@@ -160,166 +64,44 @@
             "storage": 1363148800,
             "type": "host",
             "mips": 20000,
-            "pes": 2,
-            "ram": 2096000
+            "pes": 8,
+            "ram": 16384000
         },
         {
             "bw": 35000000000,
             "name": "host3",
-            "datacenter": "B",
-            "storage": 1363148800,
-            "type": "host",
-            "mips": 25000,
-            "pes": 2,
-            "ram": 2096000
-        },
-        {
-            "bw": 45000000000,
-            "name": "host4",
-            "datacenter": "B",
+            "datacenter": "A",
             "storage": 1363148800,
             "type": "host",
             "mips": 30000,
-            "pes": 2,
-            "ram": 2096000
-        },
-        {
-            "bw": 25000000000,
-            "name": "host5",
-            "datacenter": "C",
-            "storage": 1363148800,
-            "type": "host",
-            "mips": 20000,
-            "pes": 2,
-            "ram": 2096000
-        },
-        {
-            "bw": 35000000000,
-            "name": "host6",
-            "datacenter": "C",
-            "storage": 1363148800,
-            "type": "host",
-            "mips": 25000,
-            "pes": 2,
-            "ram": 2096000
-        },
-        {
-            "bw": 45000000000,
-            "name": "host7",
-            "datacenter": "D",
-            "storage": 1363148800,
-            "type": "host",
-            "mips": 30000,
-            "pes": 2,
-            "ram": 2096000
-        },
-        {
-            "bw": 25000000000,
-            "name": "host8",
-            "datacenter": "D",
-            "storage": 1363148800,
-            "type": "host",
-            "mips": 20000,
-            "pes": 2,
-            "ram": 2096000
+            "pes": 8,
+            "ram": 16384000
         }
     ],
     "links": [
         {
             "latency": "0.001",
             "destination": "host1",
-            "name": "LINK11",
-            "source": "core1"
+            "name": "LINK1",
+            "source": "edge1"
         },
         {
             "latency": "0.001",
             "destination": "host2",
-            "name": "LINK12",
-            "source": "core1"
+            "name": "LINK2",
+            "source": "edge1"
         },
         {
             "latency": "0.001",
             "destination": "host3",
-            "name": "LINK21",
-            "source": "core2"
-        },
-        {
-            "latency": "0.001",
-            "destination": "host4",
-            "name": "LINK22",
-            "source": "core2"
-        },
-        {
-            "latency": "0.001",
-            "destination": "host5",
-            "name": "LINK31",
-            "source": "core3"
-        },
-        {
-            "latency": "0.001",
-            "destination": "host6",
-            "name": "LINK32",
-            "source": "core3"
-        },
-        {
-            "latency": "0.001",
-            "destination": "host7",
-            "name": "LINK41",
-            "source": "core4"
-        },
-        {
-            "latency": "0.001",
-            "destination": "host8",
-            "name": "LINK42",
-            "source": "core4"
+            "name": "LINK3",
+            "source": "edge1"
         },
         {
             "latency": "0",
             "destination": "gwA",
             "name": "gwA-inter",
             "source": "inter"
-        },
-        {
-            "latency": "0",
-            "destination": "gwB",
-            "name": "gwB-inter",
-            "source": "inter"
-        },
-        {
-            "latency": "0",
-            "destination": "gwC",
-            "name": "gwC-inter",
-            "source": "inter"
-        },
-        {
-            "latency": "0",
-            "destination": "gwD",
-            "name": "gwD-inter",
-            "source": "inter"
-        },
-        {
-            "latency": "0",
-            "destination": "gwA",
-            "name": "gwA-core",
-            "source": "core1"
-        },
-        {
-            "latency": "0",
-            "destination": "gwB",
-            "name": "gwB-core",
-            "source": "core2"
-        },
-        {
-            "latency": "0",
-            "destination": "gwC",
-            "name": "gwC-core",
-            "source": "core3"
-        },
-        {
-            "latency": "0",
-            "destination": "gwD",
-            "name": "gwD-core",
-            "source": "core4"
         }
     ]
 }
