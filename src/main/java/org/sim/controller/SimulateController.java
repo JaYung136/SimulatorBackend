@@ -512,6 +512,7 @@ public class SimulateController {
         JSONObject content = new JSONObject(req);
         String hostName = content.getString("hostname");
         Integer cpuId = content.getInt("cpuid");
+        Log.print("find host " + hostName);
         Host h = null;
         for(Host host: Constants.hosts) {
             if(host.getName().equals(hostName)) {

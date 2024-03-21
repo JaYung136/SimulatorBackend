@@ -1,6 +1,7 @@
 package org.sim.controller;
 
 
+import jdk.dynalink.beans.BeansLinker;
 import org.jdom2.Element;
 import org.jfree.chart.*;
 import org.jfree.chart.axis.ValueAxis;
@@ -139,7 +140,7 @@ public class MyPainter extends JFrame {
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
         setVisualUI(chart);
-        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+"cpu_utilization.png", 1200, 800);
+        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+"cpu利用率图像.png", 1200, 800);
     }
 
     public void paintHost(Host host) throws Exception{
@@ -166,7 +167,7 @@ public class MyPainter extends JFrame {
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
         setVisualUI(chart);
-        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+ host.getName() +"cpu_utilization.png", 1200, 800);
+//        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+ host.getName() +"cpu利用率图像.png", 1200, 800);
     }
     public void setVisualUI(JFreeChart chart){
         ChartFrame frame = new ChartFrame("图像", chart, true);

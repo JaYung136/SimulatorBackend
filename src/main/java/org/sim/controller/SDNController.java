@@ -537,10 +537,14 @@ public class SDNController {
             System.out.println(e.getMessage());
         }
         try {
-            Helper h = new Helper();
-            h.simForCpu(simulationStopTime);
-            MyPainter p = new MyPainter("as");
-            p.paintCPU();
+            try{
+                Helper h = new Helper();
+                h.simForCpu(simulationStopTime);
+                MyPainter p = new MyPainter("as");
+                p.paintCPU();
+            }catch (Exception e){
+                //Do nothing
+            }
             convertphytopo();
             convertvirtopo();
             convertworkload();
