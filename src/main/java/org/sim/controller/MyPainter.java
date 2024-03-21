@@ -7,6 +7,8 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
+import org.sim.cloudbus.cloudsim.Host;
 import org.sim.cloudsimsdn.Log;
 import org.sim.cloudsimsdn.sdn.workload.Workload;
 import org.sim.service.Constants;
@@ -138,6 +140,33 @@ public class MyPainter extends JFrame {
         matter.format(new Date()).toString();
         setVisualUI(chart);
         saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+"cpu_utilization.png", 1200, 800);
+    }
+
+    public void paintHost(Host host) throws Exception{
+        XYSeries[] xySeries = new XYSeries[1];
+        xySeries[0] = new XYSeries(host.getName());
+        for(int i = 0; i < Constants.logs.size(); i++) {
+            if(i % Constants.hosts.size() == 0) {
+                if(Double.parseDouble(Constants.logs.get(i).time) >= Constants.finishTime) {
+                    break;
+                }
+            }
+            if(i % Constants.hosts.size() == host.getId())
+                xySeries[0].add(Double.parseDouble(Constants.logs.get(i).time), Double.parseDouble(Constants.logs.get(i).cpuUtilization));
+        }
+        XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
+        for(XYSeries xy: xySeries) {
+            xySeriesCollection.addSeries(xy);
+        }
+        JFreeChart chart = ChartFactory.createXYLineChart("CPU利用率图像", "时刻(微秒)", "利用率(%)", xySeriesCollection);
+        ChartPanel chartPanel = new ChartPanel(chart);
+        //chartPanel.setPreferredSize(new Dimension(100 ,100));
+        setContentPane(chartPanel);
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
+        SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
+        matter.format(new Date()).toString();
+        setVisualUI(chart);
+        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+ host.getName() +"cpu_utilization.png", 1200, 800);
     }
     public void setVisualUI(JFreeChart chart){
         ChartFrame frame = new ChartFrame("图像", chart, true);

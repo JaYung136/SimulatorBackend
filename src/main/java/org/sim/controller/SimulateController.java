@@ -45,7 +45,7 @@ public class SimulateController {
      * @return 如果通过检验，返回Message.Code == CODE.SUC 否则 Message.Code == CODE.FAIL
      *
      * */
-    private Message schemaValid(File schemaFile, File targetFile) {
+    private ResultDTO schemaValid(File schemaFile, File targetFile) {
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(schemaFile);
@@ -53,9 +53,10 @@ public class SimulateController {
             StreamSource source = new StreamSource(targetFile);
             validator.validate(source);
             System.out.println("校验成功");
-            return Message.Success(null);
+            return ResultDTO.success(null);
         } catch (Exception e) {
-            return Message.Fail(e.getMessage());
+            Log.printLine(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
     }
 
@@ -109,21 +110,18 @@ public class SimulateController {
      * 进行调度，调度结果<application.Name, host.Id> 存于Constants.schedulerResult中
      *
      * */
-    public Message schedule(Integer a) {
-        Message m = new Message();
+    public ResultDTO schedule(Integer a) {
         resetAllForScheduler();
         Constants.ifSimulate = false;
         try {
             service.simulate(a);
             if (!Constants.nodeEnough) {
-                m.code = CODE.FAILED;
-                m.message = "集群中节点资源不足";
                 Log.printLine("节点资源不足");
-                return m;
+                return ResultDTO.error("节点资源不足");
             }
-            return Message.Success(null);
+            return ResultDTO.success(null);
         } catch (Exception e) {
-            return Message.Fail(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
     }
 
@@ -132,7 +130,7 @@ public class SimulateController {
      * 进行仿真，repeatTime表示每个任务运行多少个周期
      *
      * */
-    public Message simulate(Integer a, Integer repeatTime, Double lastTime) {
+    public ResultDTO simulate(Integer a, Integer repeatTime, Double lastTime) {
         resetForSimulator();
         Constants.repeatTime  = repeatTime;
         Constants.ifSimulate = true;
@@ -141,15 +139,15 @@ public class SimulateController {
             service.simulate(a);
             if(!Constants.nodeEnough) {
                 Log.printLine("节点资源不足");
-                return Message.Fail("集群中节点资源不足");
+                return ResultDTO.error("集群中节点资源不足");
             }
-            return Message.Success(null);
+            return ResultDTO.success(null);
         } catch (Exception e) {
-            return Message.Fail(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
     }
 
-    public Message simForCpu(Double lastTime) {
+    public ResultDTO simForCpu(Double lastTime) {
         return simulate(8, 3, lastTime);
     }
 
@@ -158,7 +156,7 @@ public class SimulateController {
      * 写中间文件assign.json
      *
      * */
-    private Message writeJson() {
+    private ResultDTO writeJson() {
         JSONArray array = new JSONArray();
         Log.printLine("result:" + Constants.results.size());
         for(Result result: Constants.results) {
@@ -176,9 +174,9 @@ public class SimulateController {
             osw.close();//关闭输出流*/
         } catch (Exception e) {
             e.printStackTrace();
-            return Message.Fail(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
-        return Message.Success(null);
+        return ResultDTO.success(null);
     }
 
     /**
@@ -188,7 +186,7 @@ public class SimulateController {
      * @return 只有种情况下返回Message.Success: 输入的ContainerInfo文件中包含了每一个application的容器信息
      *
      */
-    private Message writeYaml() {
+    private ResultDTO writeYaml() {
         YamlWriter writer = new YamlWriter();
         try {
             String path = System.getProperty("user.dir")+"\\OutputFiles\\yaml";
@@ -196,10 +194,10 @@ public class SimulateController {
             deleteDir(dir);
             dir.mkdirs();
             writer.writeYaml(path);
-            return Message.Success("generate successfully");
+            return ResultDTO.success("generate successfully");
         } catch (Exception e) {
             e.printStackTrace();
-            return Message.Fail(e.getMessage());
+            return ResultDTO.success(e.getMessage());
         }
     }
 
@@ -223,7 +221,7 @@ public class SimulateController {
 
 
     @RequestMapping("/uploadhost")
-    public Message uploadhost(MultipartFile file, HttpServletRequest req) throws IOException {
+    public ResultDTO uploadhost(MultipartFile file, HttpServletRequest req) throws IOException {
         System.out.println("上传host.xml文件");
         Message r = new Message();
         try {
@@ -232,8 +230,8 @@ public class SimulateController {
             File hostfile = new File(InputDir,"Input_Hosts.xml");
             boolean dr = hostfile.getParentFile().mkdirs(); //创建目录
             file.transferTo(hostfile);
-            Message m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\Host.xsd"), hostfile);
-            if(m.code == CODE.FAILED) {
+            ResultDTO m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\Host.xsd"), hostfile);
+            if(m.code == ResultDTO.ERROR_CODE) {
                 return m;
             }
             Constants.hostFile = hostfile;
@@ -241,17 +239,14 @@ public class SimulateController {
             util.parseHostXml(hostfile);
             Constants.hosts = util.getHostList();
         }catch (IOException e){
-            r.message = e.getMessage();
-            r.code = CODE.FAILED;
             System.out.print(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
-        r.message = "上传Host成功";
-        r.code = CODE.SUCCESS;
-        return r;
+        return ResultDTO.success("上传成功");
     }
 
     @RequestMapping("/uploadApp")
-    public Message uploadApp(MultipartFile file, HttpServletRequest req) throws IOException {
+    public ResultDTO uploadApp(MultipartFile file, HttpServletRequest req) throws IOException {
         System.out.println("上传AppInfo.xml文件");
         Message r = new Message();
         try {
@@ -264,17 +259,14 @@ public class SimulateController {
             XmlUtil util = new XmlUtil(1);
             util.parseHostXml(appfile);
         }catch (IOException e){
-            r.message = e.getMessage();
-            r.code = CODE.FAILED;
             System.out.print(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
-        r.message = "上传AppInfo成功";
-        r.code = CODE.SUCCESS;
-        return r;
+        return ResultDTO.success("上传成功");
     }
 
     @RequestMapping("/uploadContainer")
-    public Message uploadContainer(MultipartFile file, HttpServletRequest req) throws IOException {
+    public ResultDTO uploadContainer(MultipartFile file, HttpServletRequest req) throws IOException {
         System.out.println("上传ContainerInfo.xml文件");
         Message r = new Message();
         try {
@@ -301,32 +293,32 @@ public class SimulateController {
                     Map<String, Object> data = yaml.load(resource);
                     ContainerInfo info = new ContainerInfo();
                     if(data.get("kind") == null) {
-                        return Message.Fail("yaml文件缺少kind字段");
+                        return ResultDTO.error("yaml文件缺少kind字段");
                     }else{
                         info.kind = (String) data.get("kind");
                     }
                     if(data.get("apiVersion") == null) {
-                        return Message.Fail("yaml文件缺少apiVersion字段");
+                        return ResultDTO.error("yaml文件缺少apiVersion字段");
                     }else{
                         info.apiVersion = (String) data.get("apiVersion");
                     }
                     if(data.get("metadata") == null) {
-                        return Message.Fail("yaml文件缺少metadata字段");
+                        return ResultDTO.error("yaml文件缺少metadata字段");
                     }else{
                         info.metadata = (Map<String, Object>) data.get("metadata");
                         if(info.metadata.get("name") == null) {
-                            return Message.Fail("yaml文件的metadata字段中缺少name字段");
+                            return ResultDTO.error("yaml文件的metadata字段中缺少name字段");
                         }
                     }
                     if(data.get("spec") == null) {
-                        return Message.Fail("yaml文件缺少spec字段");
+                        return ResultDTO.error("yaml文件缺少spec字段");
                     }else{
                         info.spec = (Map<String, Object>) data.get("spec");
                         if(info.spec.get("containers") == null || ((List<Map<String, Object>>)(info.spec.get("containers"))).isEmpty()) {
-                            return Message.Fail("yaml文件的spec字段中缺少containers字段");
+                            return ResultDTO.error("yaml文件的spec字段中缺少containers字段");
                         }
                         if(((List<Map<String, Object>>)(info.spec.get("containers"))).get(0).get("image") == null) {
-                            return Message.Fail("yaml文件未指定容器镜像");
+                            return ResultDTO.error("yaml文件未指定容器镜像");
                         }
                     }
                     Log.printLine("解析容器信息: ");
@@ -344,79 +336,71 @@ public class SimulateController {
                 }
             }
         }catch (IOException e){
-            r.message = e.getMessage();
-            r.code = CODE.FAILED;
             System.out.print(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         } catch (Exception e) {
-            r.message = e.getMessage();
-            r.code = CODE.FAILED;
             e.printStackTrace();
+            return ResultDTO.error(e.getMessage());
         }
-        r.message = "上传ContainerInfo成功";
-        r.code = CODE.SUCCESS;
-        return r;
+        return ResultDTO.success("上传成功");
     }
 
     @RequestMapping("/uploadFault")
-    public Message uploadFault(MultipartFile file, HttpServletRequest req) throws IOException {
+    public ResultDTO uploadFault(MultipartFile file, HttpServletRequest req) throws IOException {
         System.out.println("上传FaultInject.xml文件");
-        Message r = new Message();
         try {
             String InputDir = System.getProperty("user.dir")+"\\InputFiles";
             System.out.println(InputDir);
             File faultfile = new File(InputDir,"Input_Fault.xml");
             boolean dr = faultfile.getParentFile().mkdirs(); //创建目录
             file.transferTo(faultfile);
-            Message m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\FaultInject.xsd"), faultfile);
-            if(m.code == CODE.FAILED) {
+            ResultDTO m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\FaultInject.xsd"), faultfile);
+            if(m.code == ResultDTO.ERROR_CODE) {
                 return m;
             }
             Constants.faultFile = faultfile;
             XmlUtil util = new XmlUtil(1);
             util.parseHostXml(faultfile);
         }catch (IOException e){
-            r.message = e.getMessage();
-            r.code = CODE.FAILED;
             System.out.print(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
-        r.message = "上传FaultInject失败";
-        r.code = CODE.SUCCESS;
-        return r;
+        return ResultDTO.success("上传成功");
     }
 
 
 
     @RequestMapping(value = "/startSimulate")
-    public Message startScheduleAndSimulate(@RequestBody Map<String, Integer> req) {
+    public ResultDTO startScheduleAndSimulate(@RequestBody Map<String, Integer> req) {
         try{
-            Message m = new Message();
+            ResultDTO m = new ResultDTO();
             if(Constants.hostFile == null)  {
-                return Message.Fail("host输入文件不存在");
+                return ResultDTO.error("host输入文件不存在");
             }
             if(Constants.appFile == null)  {
-                return Message.Fail("appInfo输入文件不存在");
+                return ResultDTO.error("appInfo输入文件不存在");
             }
             Integer arithmetic = req.get("arithmetic");
             Log.printLine("============================== 开始调度 ==============================");
             m = schedule(arithmetic);
-            if(m.code == CODE.FAILED) {
+            if(m.code == ResultDTO.ERROR_CODE) {
                 return m;
             }
             Log.printLine("============================== 开始仿真 ==============================");
             m = simulate(arithmetic, 3, 0.0);
-            if(m.code == CODE.FAILED) {
+            if(m.code == ResultDTO.ERROR_CODE) {
                 return m;
             }
             Log.printLine("============================== 开始输出中间文件 ==============================");
             m = writeJson();
-            if(m.code == CODE.FAILED) {
+            if(m.code == ResultDTO.ERROR_CODE) {
                 return m;
             }
             Log.printLine("============================== 开始输出YAML文件 ==============================");
             m = writeYaml();
             return m;
         }catch (Exception e) {
-            return Message.Fail(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
     }
 
@@ -493,6 +477,7 @@ public class SimulateController {
             }
         }catch (Exception e) {
             e.printStackTrace();
+            return ResultDTO.error(e.getMessage());
         }
         return ResultDTO.success("generate successfully");
     }
@@ -520,5 +505,30 @@ public class SimulateController {
             Constants.pause.remove(containerId);
         }
         return ResultDTO.success("delete pause");
+    }
+
+    @RequestMapping("/specifiedCpu")
+    public ResultDTO specifiedCpu(@RequestBody String req)  {
+        JSONObject content = new JSONObject(req);
+        String hostName = content.getString("hostname");
+        Integer cpuId = content.getInt("cpuid");
+        Host h = null;
+        for(Host host: Constants.hosts) {
+            if(host.getName().equals(hostName)) {
+                h = host;
+                break;
+            }
+        }
+        if(h == null || h.getNumberOfPes() < cpuId + 1) {
+            return ResultDTO.error("未找到符合要求的物理节点");
+        }
+        try {
+            MyPainter p = new MyPainter("");
+            p.paintHost(h);
+            return ResultDTO.success(null);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return ResultDTO.error(e.getMessage());
+        }
     }
 }
