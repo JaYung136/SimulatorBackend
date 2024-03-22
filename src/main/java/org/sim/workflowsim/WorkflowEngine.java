@@ -346,7 +346,7 @@ public final class WorkflowEngine extends SimEntity {
                 computeTime.put(job.getTaskList().get(0).name, time);
                 // schedule(getId(), job.getTaskList().get(0).getPeriodTime(), WorkflowSimTags.JOB_NEED_REPEAT, job);
                 if(time < Constants.repeatTime || Constants.lastTime != 0.0)
-                    startTime.put(job, CloudSim.clock() + job.getTaskList().get(0).getPeriodTime());
+                    startTime.put(job, job.getExecStartTime() + job.getTaskList().get(0).getPeriodTime());
             }
         }
 
