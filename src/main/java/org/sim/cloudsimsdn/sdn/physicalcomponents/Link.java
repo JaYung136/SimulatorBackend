@@ -229,8 +229,8 @@ public class Link {
 	// For monitor
 	private MonitoringValues mvUp = new MonitoringValues(MonitoringValues.ValueType.Utilization_Percentage);
 	private MonitoringValues mvDown = new MonitoringValues(MonitoringValues.ValueType.Utilization_Percentage);
-	private long monitoringProcessedBytesPerUnitUp = 0;
-	private long monitoringProcessedBytesPerUnitDown = 0;
+	private double monitoringProcessedBytesPerUnitUp = 0;
+	private double monitoringProcessedBytesPerUnitDown = 0;
 
 	public double updateMonitor(double logTime, double timeUnit) {
 		LinkUtil lu = linkUtilMap.get(this.linkname);
@@ -240,7 +240,7 @@ public class Link {
 		}
 		// TODO:打印链路利用率xml
 		long capacity = (long) (this.totalBW * timeUnit);
-		double utilization1 = (double)monitoringProcessedBytesPerUnitUp * 100.0 / capacity;
+		double utilization1 = monitoringProcessedBytesPerUnitUp * 100.0 / capacity;
 		mvUp.add(utilization1, logTime);
 		if(this.lowOrder instanceof IntercloudSwitch != true
 				&& this.highOrder instanceof IntercloudSwitch != true
