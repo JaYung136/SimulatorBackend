@@ -435,12 +435,12 @@ public class SDNController {
             Workload msg = wls.get(i);
             try {
                 bw.write("\t<Message MessageName=\"" + msg.msgName + "\" Src=\"" + msg.submitVmName + "\" Dst=\"" + msg.destVmName + "\" StartTime=\"" + msg.time + "\" EndTime=\"" + msg.end2endfinishtime
-                        + "\" NetworkTime=\"" + (msg.networkfinishtime-msg.time)
-                        + "\" WaitingTime=\"" + (msg.end2endfinishtime-msg.networkfinishtime)
+                        + "\" NetworkTime=\"" + (msg.networktransmissiontime)
+                        + "\" WaitingTime=\"" + (msg.dagschedulingtime)
                         + "\" EndtoEndTime=\"" + (msg.end2endfinishtime-msg.time)
                         + "\" PkgSizeKB=\"" + msg.submitPktSize + "\">\n\t</Message>\n");
                 ++count;
-                totaltime += msg.networkfinishtime-msg.time;
+                totaltime += msg.networktransmissiontime;
             }
             catch (Exception e) {
                 bw.write("\t<Message MessageName=\"" + msg.msgName + "\" Src=\"" + msg.submitVmName + "\" Dst=\"" + msg.destVmName + "\" StartTime=\"" + msg.time + "\" EndTime=\"TimeOut\" " +

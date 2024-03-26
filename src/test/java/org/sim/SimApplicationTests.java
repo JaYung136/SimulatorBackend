@@ -1,4 +1,4 @@
-package sim;
+package org.sim;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

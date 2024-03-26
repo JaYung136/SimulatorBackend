@@ -22,6 +22,7 @@ public class  Workload implements Comparable<Workload> {
 	public double networkfinishtime; //网络传输结束时刻
 	public double end2endfinishtime; //端到端传输结束结束时刻
 	public double dagschedulingtime; //DAG调度的等待时间
+	public double networktransmissiontime; //网络传输时间
 	public int submitVmId;
 	public String submitVmName;
 	public String destVmName;

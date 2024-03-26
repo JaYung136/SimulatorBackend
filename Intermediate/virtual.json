@@ -83,7 +83,7 @@
         {
             "app": "HF_SM_1",
             "pausestart": 0,
-            "start": "87.1",
+            "start": "164.1",
             "datacenter": "A",
             "mips": 500,
             "type": "cn",
@@ -91,7 +91,7 @@
             "size": 1000,
             "name": "10.31.40.1",
             "host": "host3",
-            "end": "104.1",
+            "end": "181.1",
             "containerperiod": 20,
             "pes": 1,
             "ram": 10000
@@ -99,7 +99,7 @@
         {
             "app": "HF_SM_7",
             "pausestart": 0,
-            "start": "86.1",
+            "start": "164.1",
             "datacenter": "A",
             "mips": 500,
             "type": "cn",
@@ -107,7 +107,7 @@
             "size": 1000,
             "name": "10.31.40.7",
             "host": "host3",
-            "end": "121.99",
+            "end": "199.99",
             "containerperiod": 40,
             "pes": 1,
             "ram": 60000
@@ -115,7 +115,7 @@
         {
             "app": "HF_SM_8",
             "pausestart": 0,
-            "start": "123.1",
+            "start": "202.1",
             "datacenter": "A",
             "mips": 500,
             "type": "cn",
@@ -123,7 +123,7 @@
             "size": 1000,
             "name": "10.31.40.8",
             "host": "host1",
-            "end": "153.86",
+            "end": "232.86",
             "containerperiod": 40,
             "pes": 1,
             "ram": 60000

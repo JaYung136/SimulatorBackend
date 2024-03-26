@@ -40,7 +40,7 @@ public class PacketSchedulerTimeShared extends PacketSchedulerSpaceShared {
 		if (transmission.isCompleted()){
 			this.completed.add(transmission);
 			this.inTransmission.remove(transmission);
-			System.out.println("DEBUG:"+transmission.toString()+"completed");
+//			System.out.println("DEBUG:"+transmission.toString()+"completed");
 		}
 
 

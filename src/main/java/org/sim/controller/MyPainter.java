@@ -194,7 +194,7 @@ public class MyPainter extends JFrame {
             if (line ==null) {
                 line = new XYSeries(key);
             }
-            line.add(wl.time*1000000, (wl.networkfinishtime-wl.time)*1000000);
+            line.add(wl.time*1000000, (wl.networktransmissiontime)*1000000);
             xySerieMap.put(key, line);
         }
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"网络延迟图像", false);
@@ -231,7 +231,7 @@ public class MyPainter extends JFrame {
             if (line ==null) {
                 line = new XYSeries(key);
             }
-            line.add(wl.time*1000000, (wl.end2endfinishtime-wl.networkfinishtime)*1000000);
+            line.add(wl.time*1000000, (wl.dagschedulingtime)*1000000);
             xySerieMap.put(key, line);
         }
         Thread.sleep(1000);
@@ -249,7 +249,7 @@ public class MyPainter extends JFrame {
             if (line ==null) {
                 line = new XYSeries(key);
             }
-            line.add(wl.time*1000000, (wl.networkfinishtime-wl.time)*1000000);
+            line.add(wl.time*1000000, (wl.networktransmissiontime)*1000000);
             xySerieMap.put(key, line);
         }
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "网络延迟图像", save);
@@ -282,7 +282,7 @@ public class MyPainter extends JFrame {
             if (line ==null) {
                 line = new XYSeries(key);
             }
-            line.add(wl.time*1000000, (wl.end2endfinishtime-wl.networkfinishtime)*1000000);
+            line.add(wl.time*1000000, (wl.dagschedulingtime)*1000000);
             xySerieMap.put(key, line);
         }
         Thread.sleep(1000);

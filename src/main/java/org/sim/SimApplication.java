@@ -31,6 +31,9 @@ public class SimApplication {
 		deleteDir(new File(path));
 		File dir = new File(path);
 		dir.mkdirs();
+		path = System.getProperty("user.dir")+"\\Intermediate";
+		dir = new File(path);
+		dir.mkdirs();
 		path = System.getProperty("user.dir")+"\\OutputFiles\\jobResult";
 		dir = new File(path);
 		dir.mkdirs();

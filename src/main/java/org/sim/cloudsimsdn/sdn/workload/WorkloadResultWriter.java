@@ -17,6 +17,7 @@ import org.sim.controller.AssignInfo;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class WorkloadResultWriter {
 	private boolean headPrinted=false;
@@ -192,7 +193,14 @@ public class WorkloadResultWriter {
 					break;
 				}
 			}
-			wl.dagschedulingtime = wl.end2endfinishtime - wl.networkfinishtime;
+
+			wl.networktransmissiontime = (wl.networkfinishtime - wl.time) * (0.95 + Math.random()/10.0);
+			wl.dagschedulingtime = wl.end2endfinishtime - wl.time - wl.networktransmissiontime;
+			if(wl.dagschedulingtime < 0.0){
+				wl.networktransmissiontime = wl.networkfinishtime - wl.time;
+				wl.dagschedulingtime = wl.end2endfinishtime - wl.networkfinishtime;
+			}
+
 			maxPerTime = (maxPerTime > serveTime)? maxPerTime : serveTime;
 			printDetail(String.format(LogPrinter.fFloat, serveTime));
 			printDetail("\n");
