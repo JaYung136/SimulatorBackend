@@ -563,7 +563,6 @@ public class SDNController {
             log.printLine("</Links>");
             outputdelay(wls);
             System.out.println("绘制图像");
-            System.out.println(linkUtilMap.toString());
             paintMultiLatencyGraph(wls, true);
 //            completeLinkUtil();
             paintMultiLinkGraph(linkUtilMap, true);

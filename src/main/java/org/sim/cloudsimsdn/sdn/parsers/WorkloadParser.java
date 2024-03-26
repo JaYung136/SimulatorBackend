@@ -264,7 +264,7 @@ public class WorkloadParser {
 											generateCloudlet(req.getRequestId(), wl.destVmId, 0)
 									)
 							);
-							req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, (long) wl.submitPktSize, this.flowNames.get("default"), endreq));
+							req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
 							wl.request = req;
 							parsedWorkloads.add(wl);
 							++jobid;

@@ -193,7 +193,7 @@ public class WorkloadResultWriter {
 					break;
 				}
 			}
-
+			// TODO:消息时延增加随机化
 			wl.networktransmissiontime = (wl.networkfinishtime - wl.time) * (0.95 + Math.random()/10.0);
 			wl.dagschedulingtime = wl.end2endfinishtime - wl.time - wl.networktransmissiontime;
 			if(wl.dagschedulingtime < 0.0){
