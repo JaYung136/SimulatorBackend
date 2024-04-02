@@ -145,7 +145,7 @@ public class WorkloadResultWriter {
 
 			double totalnettime = getWorkloadFinishTime(wl) - wl.time + wl.switchTime; //总网络传输时间
 			// TODO:消息时延增加随机化
-			totalnettime = totalnettime * (0.95 + Math.random()/10.0);
+			totalnettime = totalnettime * (1 + Math.random()/20);
 			wl.networktransmissiontime = totalnettime;
 			wl.networkfinishtime = wl.time + totalnettime;
 			AssignInfo destinfo = CloudSim.assignInfoMap.get(wl.destVmName);
