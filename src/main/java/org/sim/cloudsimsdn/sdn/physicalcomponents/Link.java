@@ -239,7 +239,8 @@ public class Link {
 					this.lowOrder.toString(),this.highOrder.toString(), this.totalBW);
 		}
 		// TODO:打印链路利用率xml
-		long capacity = (long) (this.totalBW * timeUnit);
+		double capacity = this.totalBW * timeUnit;
+		monitoringProcessedBytesPerUnitUp = (monitoringProcessedBytesPerUnitUp>this.getBw()*timeUnit)? this.getBw()*timeUnit : monitoringProcessedBytesPerUnitUp;
 		double utilization1 = monitoringProcessedBytesPerUnitUp * 100.0 / capacity;
 		mvUp.add(utilization1, logTime);
 		if(this.lowOrder instanceof IntercloudSwitch != true
@@ -259,7 +260,8 @@ public class Link {
 			lu.printable = true;
 		}
 
-		double utilization2 = (double)monitoringProcessedBytesPerUnitDown * 100.0 / capacity;
+		monitoringProcessedBytesPerUnitDown = (monitoringProcessedBytesPerUnitDown>this.getBw()*timeUnit)? this.getBw()*timeUnit : monitoringProcessedBytesPerUnitDown;
+		double utilization2 = monitoringProcessedBytesPerUnitDown * 100.0 / capacity;
 		mvDown.add(utilization2, logTime);
 		if(this.lowOrder instanceof IntercloudSwitch != true
 				&& this.highOrder instanceof IntercloudSwitch != true

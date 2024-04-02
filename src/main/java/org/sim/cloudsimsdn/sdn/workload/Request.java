@@ -30,6 +30,7 @@ public class Request {
 	private LinkedList<Activity> removedActivites;	//Logging purpose only
 
 	private static long numRequests = 0;
+	public double switchTime = 0.0;
 
 	public Request(int userId){
 		this.requestId = numRequests++;

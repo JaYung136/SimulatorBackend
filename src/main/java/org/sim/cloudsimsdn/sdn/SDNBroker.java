@@ -170,6 +170,7 @@ public class SDNBroker extends SimEntity {
 	private void requestCompleted(SimEvent ev) {
 		Request req = (Request) ev.getData();
 		Workload wl = requestMap.remove(req.getRequestId());
+		wl.switchTime = req.switchTime;
 		wl.writeResult();
 	}
 

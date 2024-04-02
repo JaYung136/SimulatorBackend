@@ -164,8 +164,11 @@ public class WorkloadParser {
 			e.printStackTrace();
 		}
 	}
+	static double random_factor = 0.0;
 	private List<Double> calMsgStarttimes(Double starttime, Double pausestart, Double pauseend, Double endtime, Double containerperiod, Double msgperiod, Double simulationend) {
 		ArrayList<Double> stimes = new ArrayList<>();
+		if(random_factor >= msgperiod)
+			random_factor = 0.0;
 		// 迭代多个容器生命周期
 		while(endtime < simulationend*0.000001){
 			/**
@@ -183,12 +186,13 @@ public class WorkloadParser {
 			}
 			msgtime = starttime+pausestart+pauseend;
 			while(starttime+pausestart+pauseend <= msgtime && msgtime < endtime){
-				stimes.add(msgtime);
+				stimes.add(msgtime+random_factor+(msgperiod-random_factor)*Math.random()*0.5); //TODO: 消息起始时间随机化 msgtime+msgperiod*Math.random();
 				msgtime += msgperiod;
 			}
 			starttime += containerperiod;
 			endtime += containerperiod;
 		}
+		random_factor += 1.2;
 		return stimes;
 	}
 	private void parseNext(int numRequests) {
@@ -231,7 +235,7 @@ public class WorkloadParser {
 								.put("DstIP",msg.getString("IpAddress"))
 								.put("DstName",msg.getString("AppName"))
 								.put("AppPeriod",appPeriod)
-								.put("MsgPeriod", (msg.getInt("SamplePeriod"))*contractRate)
+								.put("MsgPeriod", (msg.getDouble("SamplePeriod"))*contractRate)
 								.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位b
 						;
 						pure_msgs.put(puremsg);
@@ -240,7 +244,7 @@ public class WorkloadParser {
 						 * 得到若干的消息起始时间
 						 */
 						AssignInfo ai = assignInfoMap.get(src);
-						double MsgPeriod = msg.getInt("SamplePeriod") * contractRate;
+						double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
 						List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
 								ai.containerperiod, MsgPeriod, simulationStopTime);
 						for(Double msgstart : msgStarttimes){
@@ -281,7 +285,7 @@ public class WorkloadParser {
 							.put("DstIP",msg.getString("IpAddress"))
 							.put("DstName",msg.getString("AppName"))
 							.put("AppPeriod",appPeriod)
-							.put("MsgPeriod", msg.getInt("SamplePeriod")*contractRate)
+							.put("MsgPeriod", msg.getDouble("SamplePeriod")*contractRate)
 							.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位Kb?
 					;
 					pure_msgs.put(puremsg);
@@ -290,7 +294,7 @@ public class WorkloadParser {
 					 * 得到若干的消息起始时间
 					 */
 					AssignInfo ai = assignInfoMap.get(src);
-					double MsgPeriod = msg.getInt("SamplePeriod") * contractRate;
+					double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
 					List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
 							ai.containerperiod, MsgPeriod, simulationStopTime);
 					for(Double msgstart : msgStarttimes){

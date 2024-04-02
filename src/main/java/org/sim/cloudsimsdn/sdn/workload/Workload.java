@@ -20,6 +20,7 @@ public class  Workload implements Comparable<Workload> {
 	public int appId;
 	public double time; //开始时刻
 	public double networkfinishtime; //网络传输结束时刻
+	public double switchTime; //交换时延
 	public double end2endfinishtime; //端到端传输结束结束时刻
 	public double dagschedulingtime; //DAG调度的等待时间
 	public double networktransmissiontime; //网络传输时间

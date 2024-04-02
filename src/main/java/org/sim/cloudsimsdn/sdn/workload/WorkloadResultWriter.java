@@ -142,7 +142,12 @@ public class WorkloadResultWriter {
 
 			// TODO:Workload类新建 DAG调度时间 和 总端到端时间，在此计算
 			serveTime= getWorkloadFinishTime(wl) - getWorkloadStartTime(wl);//temServeTime.doubleValue();
-			wl.networkfinishtime = getWorkloadFinishTime(wl);
+
+			double totalnettime = getWorkloadFinishTime(wl) - wl.time + wl.switchTime; //总网络传输时间
+			// TODO:消息时延增加随机化
+			totalnettime = totalnettime * (0.95 + Math.random()/10.0);
+			wl.networktransmissiontime = totalnettime;
+			wl.networkfinishtime = wl.time + totalnettime;
 			AssignInfo destinfo = CloudSim.assignInfoMap.get(wl.destVmName);
 			Double loopstart = destinfo.starttime;
 			Double loopend = destinfo.endtime;
@@ -193,21 +198,15 @@ public class WorkloadResultWriter {
 					break;
 				}
 			}
-			// TODO:消息时延增加随机化
-			wl.networktransmissiontime = (wl.networkfinishtime - wl.time) * (0.95 + Math.random()/10.0);
-			wl.dagschedulingtime = wl.end2endfinishtime - wl.time - wl.networktransmissiontime;
-			if(wl.dagschedulingtime < 0.0){
-				wl.networktransmissiontime = wl.networkfinishtime - wl.time;
-				wl.dagschedulingtime = wl.end2endfinishtime - wl.networkfinishtime;
-			}
+			wl.dagschedulingtime = wl.end2endfinishtime - wl.networkfinishtime;
 
-			maxPerTime = (maxPerTime > serveTime)? maxPerTime : serveTime;
-			printDetail(String.format(LogPrinter.fFloat, serveTime));
+			maxPerTime = (maxPerTime > wl.networktransmissiontime)? maxPerTime : wl.networktransmissiontime;
+			printDetail(String.format(LogPrinter.fFloat, wl.networktransmissiontime));
 			printDetail("\n");
 
-			this.totalServeTime += serveTime;
+			this.totalServeTime += wl.networktransmissiontime;
 
-			if(isOverTime(wl, serveTime)) {
+			if(isOverTime(wl, wl.networktransmissiontime)) {
 				overNum++;
 			}
 			printedWorkloadNum++;

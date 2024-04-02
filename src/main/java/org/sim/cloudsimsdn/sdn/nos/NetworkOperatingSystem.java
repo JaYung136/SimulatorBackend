@@ -279,19 +279,20 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 				Packet pkt = tr.getPacket();
 				int vmId = pkt.getDestination();
 				Datacenter dc = SDNDatacenter.findDatacenterGlobal(vmId);
-				//Log.printLine(CloudSim.clock() + ": " + getName() + ": Packet completed: "+pkt +". Send to destination:"+ch.getLastNode());
-				double tmplatency = 0;//ch.getTotalLatency();
-				for(Node switch_ :ch.nodesAll){ //TODO:在这里加上所有交换时延
-					if(switch_ instanceof EdgeSwitch || switch_ instanceof CoreSwitch){
-						if(switch_.getBandwidth() >= 100000000) //100G
-							tmplatency += 0.1*0.000001; //0.1微秒
-						else if(switch_.getBandwidth() >= 40000000)
-							tmplatency += 0.2*0.000001;
-						else
-							tmplatency += 0.5*0.000001;
-					}
-				}
-				sendPacketCompleteEvent(dc, pkt, tmplatency);
+//				//Log.printLine(CloudSim.clock() + ": " + getName() + ": Packet completed: "+pkt +". Send to destination:"+ch.getLastNode());
+//				double tmplatency = 0;//ch.getTotalLatency();
+//				for(Node switch_ :ch.nodesAll){ //TODO:在这里加上所有交换时延
+//					if(switch_ instanceof EdgeSwitch || switch_ instanceof CoreSwitch){
+//						if(switch_.getBandwidth() >= 100000000) //100G
+//							tmplatency += 0.1*0.000001; //0.1微秒
+//						else if(switch_.getBandwidth() >= 40000000)
+//							tmplatency += 0.2*0.000001;
+//						else
+//							tmplatency += 0.5*0.000001;
+//					}
+//				}
+				ChanAndTrans ct = new ChanAndTrans(ch, tr);
+				sendPacketCompleteEvent(dc, ct, 0);
 			}
 
 			for (Transmission tr:ch.getFailedPackets()){
@@ -301,8 +302,8 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		}
 	}
 
-	private void sendPacketCompleteEvent(Datacenter dc, Packet pkt, double latency){
-		send(dc.getId(), latency, CloudSimTagsSDN.SDN_PACKET_COMPLETE, pkt);
+	private void sendPacketCompleteEvent(Datacenter dc, ChanAndTrans ct, double latency){
+		send(dc.getId(), latency, CloudSimTagsSDN.SDN_PACKET_COMPLETE, ct);
 	}
 
 	private void sendPacketFailedEvent(Datacenter dc, Packet pkt, double latency){

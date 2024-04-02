@@ -14,6 +14,8 @@ import org.sim.cloudsimsdn.core.SimEvent;
 import org.sim.cloudsimsdn.sdn.*;
 import org.sim.cloudsimsdn.sdn.nos.ChannelManager;
 import org.sim.cloudsimsdn.sdn.nos.NetworkOperatingSystem;
+import org.sim.cloudsimsdn.sdn.physicalcomponents.switches.CoreSwitch;
+import org.sim.cloudsimsdn.sdn.physicalcomponents.switches.EdgeSwitch;
 import org.sim.cloudsimsdn.sdn.policies.vmallocation.VmAllocationPolicyPriorityFirst;
 import org.sim.cloudsimsdn.sdn.virtualcomponents.Channel;
 import org.sim.cloudsimsdn.sdn.virtualcomponents.SDNVm;
@@ -132,7 +134,7 @@ public class SDNDatacenter extends Datacenter {
 //				this.nos.updateBWMonitor(Configuration.monitoringTimeInterval);
 				break;
 			case CloudSimTagsSDN.SDN_PACKET_COMPLETE:
-				processPacketCompleted((Packet)ev.getData());
+				processPacketCompleted((ChanAndTrans)ev.getData());
 				break;
 			case CloudSimTagsSDN.SDN_PACKET_FAILED:
 				processPacketFailed((Packet)ev.getData());
@@ -477,10 +479,28 @@ public class SDNDatacenter extends Datacenter {
 		send(req.getUserId(), CloudSim.getMinTimeBetweenEvents(), CloudSimTagsSDN.REQUEST_FAILED, lastReq);
 	}
 
-	private void processPacketCompleted(Packet pkt) {
+	private void processPacketCompleted(ChanAndTrans ct) {
+		// 以太网内部：包裹即将到达destHost
+		double timenow = CloudSim.clock();
+		Packet pkt = ct.tr.getPacket();
+		int vmId = pkt.getDestination();
+		Datacenter dc = SDNDatacenter.findDatacenterGlobal(vmId);
+		//Log.printLine(CloudSim.clock() + ": " + getName() + ": Packet completed: "+pkt +". Send to destination:"+ch.getLastNode());
+		double tmplatency = 0;//ch.getTotalLatency();
+		for(Node switch_ :ct.chan.nodesAll){ //TODO:在这里加上所有交换时延
+			if(switch_ instanceof EdgeSwitch || switch_ instanceof CoreSwitch){
+				if(switch_.getBandwidth() >= 100000000) //100G
+					tmplatency += 0.1*0.000001; //0.1微秒
+				else if(switch_.getBandwidth() >= 40000000)
+					tmplatency += 0.2*0.000001;
+				else
+					tmplatency += 0.5*0.000001;
+			}
+		}
+
 		pkt.setPacketFinishTime(CloudSim.clock());
 		Request req = pkt.getPayload();
-
+		req.switchTime = tmplatency;
 		processNextActivity(req);
 	}
 
