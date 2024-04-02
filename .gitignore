@@ -5,6 +5,9 @@ target/
 !**/src/test/**/target/
 
 /测试文档/文档集合
+/OutputFiles/Graphs
+/Intermediate
+/OutputFiles
 *.zip
 *.7z
 

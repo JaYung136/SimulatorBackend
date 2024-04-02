@@ -199,11 +199,11 @@ public class SDNController {
 //            (long) swch.getDouble("Speed")*1000000)
             if(swch.getDouble("Speed") >= 100) {
                 ethernetSpeed = 100000000; //100G
-                monitoringTimeInterval = 0.000002; //2微秒
+                monitoringTimeInterval = 0.000010; //10微秒
             }
             else if(swch.getDouble("Speed") >= 40) {
                 ethernetSpeed = 40000000;
-                monitoringTimeInterval = 0.000005; //5微秒
+                monitoringTimeInterval = 0.000010; //10微秒
             }
             else {
                 ethernetSpeed = 10000000;

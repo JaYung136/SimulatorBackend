@@ -169,6 +169,7 @@ public class WorkloadParser {
 		ArrayList<Double> stimes = new ArrayList<>();
 		if(random_factor >= msgperiod)
 			random_factor = 0.0;
+		starttime += msgperiod*Math.random(); //TODO: 消息起始时间随机化 msgtime+msgperiod*Math.random();
 		// 迭代多个容器生命周期
 		while(endtime < simulationend*0.000001){
 			/**
@@ -186,7 +187,7 @@ public class WorkloadParser {
 			}
 			msgtime = starttime+pausestart+pauseend;
 			while(starttime+pausestart+pauseend <= msgtime && msgtime < endtime){
-				stimes.add(msgtime+random_factor+(msgperiod-random_factor)*Math.random()*0.5); //TODO: 消息起始时间随机化 msgtime+msgperiod*Math.random();
+				stimes.add(msgtime);
 				msgtime += msgperiod;
 			}
 			starttime += containerperiod;
