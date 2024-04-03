@@ -15,7 +15,7 @@
         "DstIP": "10.31.40.2",
         "DstName": "RGW3_A664_In",
         "SrcIP": "10.31.40.3",
-        "Name": "msg03"
+        "Name": "msg02"
     },
     {
         "AppPeriod": 2.9999999999999997E-5,
@@ -24,7 +24,7 @@
         "DstIP": "10.31.40.3",
         "DstName": "RGW3_A664_In",
         "SrcIP": "10.31.40.4",
-        "Name": "msg04"
+        "Name": "msg03"
     },
     {
         "AppPeriod": 4.9999999999999996E-5,
@@ -33,24 +33,24 @@
         "DstIP": "10.31.40.7",
         "DstName": "RGW1_A664_In",
         "SrcIP": "10.31.40.5",
+        "Name": "msg04"
+    },
+    {
+        "AppPeriod": 3.9999999999999996E-5,
+        "MsgPeriod": 9.999999999999999E-6,
+        "MessageSize": 8.8,
+        "DstIP": "10.31.40.1",
+        "DstName": "RGW1_A664_In",
+        "SrcIP": "10.31.40.6",
         "Name": "msg05"
     },
     {
         "AppPeriod": 3.9999999999999996E-5,
         "MsgPeriod": 9.999999999999999E-6,
-        "MessageSize": 9.6,
-        "DstIP": "10.31.40.1",
-        "DstName": "RGW1_A664_In",
-        "SrcIP": "10.31.40.6",
-        "Name": "msg11"
-    },
-    {
-        "AppPeriod": 3.9999999999999996E-5,
-        "MsgPeriod": 9.999999999999999E-6,
-        "MessageSize": 6.4,
+        "MessageSize": 8,
         "DstIP": "10.31.40.4",
         "DstName": "RGW1_A664_In",
         "SrcIP": "10.31.40.8",
-        "Name": "msg14"
+        "Name": "msg06"
     }
 ]
