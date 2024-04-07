@@ -99,13 +99,13 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		String containers = "";
 		//Log.printLine(getCloudletExecList().size());
 		for (ResCloudlet rcl : getCloudletExecList()) {
-			if(((Job)rcl.getCloudlet()).getTaskList().size() >= 1) {
+			if(!((Job) rcl.getCloudlet()).getTaskList().isEmpty()) {
 				containers += ((Job)rcl.getCloudlet()).getTaskList().get(0).name + " ";
 				//Log.printLine("Remain length :"  + rcl.getRemainingCloudletLength());
 			}
 
 			rcl.updateCloudletFinishedSoFar((long) (getCapacity(mipsShare) * timeSpam * rcl.getNumberOfPes() * Consts.MILLION));
-			/*if(((Job)rcl.getCloudlet()).getTaskList().size() >= 1) {
+			/*if(!((Job) rcl.getCloudlet()).getTaskList().isEmpty()) {
 				Log.printLine("Container " + ((Job) rcl.getCloudlet()).getTaskList().get(0).name + " remain: " + rcl.getRemainingCloudletLength());
 			}*/
 		}
@@ -142,7 +142,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 				Double start = Constants.pause.get(rcl.getCloudlet().getCloudletId()).getKey();
 				Double last = Constants.pause.get(rcl.getCloudlet().getCloudletId()).getValue();
 				if(currentTime - rcl.getExecStartTime() >= start) {
-					Log.printLine(CloudSim.clock() + " : Container " + rcl.getCloudletId() + " is paused");
+					//Log.printLine(CloudSim.clock() + " : Container " + rcl.getCloudletId() + " is paused");
 					//cloudletPause(rcl.getCloudletId());
 					rcls.add(rcl);
 					estimatedFinishTime = Math.min(estimatedFinishTime, rcl.getExecStartTime() + start + last);
@@ -400,7 +400,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 	@Override
 	public double cloudletSubmit(Cloudlet cloudlet, double fileTransferTime) {
 		Double pauseTime = 0.0;
-		if(((Job)cloudlet).getTaskList().size() >= 1) {
+		if(!((Job) cloudlet).getTaskList().isEmpty()) {
 			//Log.printLine("Container " + ((Job)cloudlet).getTaskList().get(0).name + " is submitted with length " + ((Job)cloudlet).getTaskList().get(0).getCloudletLength());
 			for(Task t: ((Job)cloudlet).getTaskList()) {
 				if(Constants.pause.containsKey(t.getCloudletId()) && t.ifFirstComputeTurn()) {
@@ -423,10 +423,12 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		for (int i = 0; i < cpus; i++) {
 			rcl.setMachineAndPeId(0, i);
 		}
+		/*
 		if((usedRam + rams) / currentRam  > Constants.ramUp || (double)(usedPes + cpus) / (double)currentCPUs > Constants.cpuUp) {
+			Log.printLine("cpu: " + us);
 			return Double.MAX_VALUE;
 		}
-
+		*/
 		getCloudletExecList().add(rcl);
 
 		// use the current capacity to estimate the extra amount of
