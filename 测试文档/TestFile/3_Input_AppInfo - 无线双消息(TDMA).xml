@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AppInfo RleaseDate="27/01/2021 21:52:29" ICDVerison="BP2.3.1">
+    <!-- application中， Name为必填项，表示应用名； IpAddress为必填项，表示给容器赋的ip； ComputeTime为必填项，表示应用运行一个周期的平均时间； RequiredMemorySize为必填项，表示应用需求的内存； CpuRequest为选填项，单位为m, 1000表示需要占有一个cpu核，默认为1000； Period为必填项，表示应用周期间隔时长-->
     <application Name="HF_SM_1" Guid="a96ef0520" IpAddress="10.31.40.1" Hardware="" ComputeTime="90" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="100" RequiredMemorySize="10000" Key="True" Priority="1" UpBandwidth="40" DownBandwidth="10" Parent="HF_SM_2,HF_SM_3">
         <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="3200" RefreshPeriod="40">
             <A664Message MessageID="-1" Name="po_A664_Messge" Guid="a3be142f6" MessageSize="3200" TransmissionIntervalMinimum="40">
@@ -45,6 +46,7 @@
 
         </A653SamplingPort>
     </application>
+    <!--Name为child.ref的应用必须在Name为parent.ref的应用运行完成后再运行-->
     <child ref = "HF_SM_1">
         <parent ref = "HF_SM_2"/>
         <parent ref = "HF_SM_3"/>
