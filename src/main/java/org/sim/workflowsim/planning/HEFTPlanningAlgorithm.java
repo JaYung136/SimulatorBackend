@@ -197,6 +197,8 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         }*/
         double acc = 0.0;
         List<Pair<String, String>> ipAndSizes = Constants.name2Ips.get(child.name);
+        if(ipAndSizes == null)
+            return 0;
         for(Pair<String, String> ias: ipAndSizes) {
             String ip = ias.getKey();
             String mSize = ias.getValue();
@@ -294,14 +296,16 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                     readyTime += transferCosts.get(parent).get(task);
                 }*/
                 List<Pair<String, String>> ipAndSizes = Constants.name2Ips.get(task.name);
-                for(Pair<String, String> ias: ipAndSizes) {
-                    String ip = ias.getKey();
-                    String mSize = ias.getValue();
-                    String destName = Constants.ip2taskName.get(ip);
-                   // Log.printLine("need to send to " + destName);
-                    if(sched.containsKey(destName) && sched.get(destName).getId() != host.getId()) {
-                        //Log.printLine("need to send to " + destName);
-                        readyTime += Double.parseDouble(mSize) * 8/ (host.getBw() * Consts.MILLION);
+                if(ipAndSizes != null) {
+                    for (Pair<String, String> ias : ipAndSizes) {
+                        String ip = ias.getKey();
+                        String mSize = ias.getValue();
+                        String destName = Constants.ip2taskName.get(ip);
+                        // Log.printLine("need to send to " + destName);
+                        if (sched.containsKey(destName) && sched.get(destName).getId() != host.getId()) {
+                            //Log.printLine("need to send to " + destName);
+                            readyTime += Double.parseDouble(mSize) * 8 / (host.getBw() * Consts.MILLION);
+                        }
                     }
                 }
                 minReadyTime = Math.max(minReadyTime, readyTime);
