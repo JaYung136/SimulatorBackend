@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<AppInfo RleaseDate="27/01/2021 21:52:29" ICDVerison="BP2.3.1">
-    <application Name="HF_SM_1" Guid="a96ef0520" IpAddress="10.31.40.1" Hardware="" ComputeTime="10" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="20" RequiredMemorySize="10000" Key="True" Priority="1" UpBandwidth="40" DownBandwidth="10" Parent="HF_SM_2,HF_SM_3">
-    </application>
-</AppInfo>

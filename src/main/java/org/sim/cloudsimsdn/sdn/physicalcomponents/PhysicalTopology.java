@@ -154,6 +154,12 @@ public abstract class PhysicalTopology {
 		// TODO: link的bw在这里计算
 		// HOST的bw？
 		long bw = (fromNode.getBandwidth()<toNode.getBandwidth())? fromNode.getBandwidth():toNode.getBandwidth();
+		if(fromNode instanceof EdgeSwitch || fromNode instanceof CoreSwitch){
+			bw = fromNode.getBandwidth();
+		}
+		if(toNode instanceof EdgeSwitch || toNode instanceof CoreSwitch){
+			bw = toNode.getBandwidth();
+		}
 		if(fromNode instanceof IntercloudSwitch || toNode instanceof IntercloudSwitch){
 			bw = Long.MAX_VALUE;
 		}

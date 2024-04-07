@@ -218,6 +218,9 @@ public class Link {
 		return "Link:"+this.highOrder.toString() + " <-> "+this.lowOrder.toString();
 	}
 
+	public String shortNameInverse() {
+		return "Link:"+this.lowOrder.toString() + " <-> "+this.highOrder.toString();
+	}
 	public boolean isActive() {
 		if(this.upChannels.size() >0 || this.downChannels.size() >0)
 			return true;
@@ -231,6 +234,9 @@ public class Link {
 	private MonitoringValues mvDown = new MonitoringValues(MonitoringValues.ValueType.Utilization_Percentage);
 	private double monitoringProcessedBytesPerUnitUp = 0;
 	private double monitoringProcessedBytesPerUnitDown = 0;
+
+	public double monitoringUpTotal = 0.0;
+	public double monitoringDownTotal = 0.0;
 
 	public double updateMonitor(double logTime, double timeUnit) {
 		LinkUtil lu = linkUtilMap.get(this.linkname);
@@ -290,10 +296,14 @@ public class Link {
 	}
 
 	public void increaseProcessedBytes(Node from, double processedBytes) {
-		if(isUplink(from))
+		if(isUplink(from)) {
 			this.monitoringProcessedBytesPerUnitUp += processedBytes;
-		else
+			this.monitoringUpTotal += processedBytes;
+		}
+		else {
 			this.monitoringProcessedBytesPerUnitDown += processedBytes;
+			this.monitoringDownTotal += processedBytes;
+		}
 
 	}
 }
