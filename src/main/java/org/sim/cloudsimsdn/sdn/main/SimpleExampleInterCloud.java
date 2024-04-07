@@ -144,8 +144,9 @@ public class SimpleExampleInterCloud {
 							&& link.highOrder instanceof IntercloudSwitch != true
 							&& link.lowOrder instanceof GatewaySwitch != true
 							&& link.highOrder instanceof GatewaySwitch != true) {
-						System.out.println(link.shortName() + "\t单链路负载: " + link.accumuUtil);
-						linkAccumuUtils.add(link.accumuUtil);
+						System.out.println(link.shortName() + "\t单链路负载(Kb): " + link.monitoringUpTotal);
+						System.out.println(link.shortNameInverse() + "\t单链路负载(Kb): " + link.monitoringDownTotal);
+//						linkAccumuUtils.add(link);
 					}
 				}
 			}
@@ -154,7 +155,7 @@ public class SimpleExampleInterCloud {
 			CloudSim.bwTotalutil = 0.0;
 			CloudSim.bwUtilnum = 0;
 			CloudSim.bwMaxutil= 0.0;
-			System.out.println("网络负载方差: "+Cal_Variance(linkAccumuUtils));
+//			System.out.println("网络负载方差: "+Cal_Variance(linkAccumuUtils));
 
 			Log.printLine("========== Simulation finished ===========");
 			TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题

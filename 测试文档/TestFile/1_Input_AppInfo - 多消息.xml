@@ -33,7 +33,6 @@
             </A664Message>
         </A653SamplingPort>
     </application>
-
     <application Name="HF_SM_6" Guid="a96ef0525" IpAddress="10.31.40.6" Hardware="" ComputeTime="18" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="40" RequiredMemorySize="60000" Key="False" Priority="5" UpBandwidth="120" DownBandwidth="80" Parent="">
         <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="800" RefreshPeriod="40">
             <A664Message MessageID="-1" Name="po_A664_Messge" Guid="a3be142f6" MessageSize="800" TransmissionIntervalMinimum="40">
