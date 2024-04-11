@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInfo RleaseDate="27/01/2021 21:52:29" ICDVerison="BP2.3.1">
+    <!-- application中， Name为必填项，表示应用名； IpAddress为必填项，表示ip地址； ComputeTime为必填项，表示应用运行一个周期的平均时间； RequiredMemorySize为必填项，表示应用需求的内存； CpuRequest为选填项，单位为m, 1000表示需要占有一个cpu核，默认为1000； Period为必填项，表示应用周期间隔时长-->
+    <application Name="HF_SM_1" Guid="a96ef0520" IpAddress="10.31.40.1" Hardware="" ComputeTime="10" CpuRequest="1000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="10000" Key="True" Priority="1" UpBandwidth="40" DownBandwidth="10" Parent="">
+        <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="3200" RefreshPeriod="40">
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_2" Guid="a96ef0521" IpAddress="10.31.40.2" Hardware="" ComputeTime="10" CpuRequest="1000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="10000" Key="True" Priority="2" UpBandwidth="50" DownBandwidth="30" Parent="">
+        <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="3200" RefreshPeriod="40">
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_3" Guid="a96ef0522" IpAddress="10.31.40.3" Hardware="" ComputeTime="10" CpuRequest="1000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="20000" Key="True" Priority="3" UpBandwidth="60" DownBandwidth="40" Parent="">
+        <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="1600" RefreshPeriod="40">
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_4" Guid="a96ef0523" IpAddress="10.31.40.4" Hardware="" ComputeTime="10" CpuRequest="1000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="30000" Key="True" Priority="4" UpBandwidth="80" DownBandwidth="80" Parent="">
+        <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="6400" RefreshPeriod="40">
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_5" Guid="a96ef0524" IpAddress="10.31.40.5" Hardware="" ComputeTime="10" CpuRequest="2000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="60000" Key="False" Priority="5" UpBandwidth="120" DownBandwidth="80" Parent="">
+        <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="800" RefreshPeriod="40">
+        </A653SamplingPort>
+    </application>
+</AppInfo>
