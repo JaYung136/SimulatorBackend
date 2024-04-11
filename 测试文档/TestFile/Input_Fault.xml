@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<adag xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.1">
+<adag xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <FaultGenerator type="Normal"> <!-- 错误的分布函数： 可选项： Weibull ， Gamma， Normal， LogNormal!-->
         <scale>1</scale> <!-- 形状参数 !-->
         <shape>1</shape>  <!-- 尺度参数 !-->
