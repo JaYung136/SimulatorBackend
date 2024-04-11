@@ -238,7 +238,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		}
 		//Log.printLine("peInUse: " + usedPes);
 		if (pesInUse > currentCPUs) {
-			Constants.nodeEnough = false;
+			//Constants.nodeEnough = false;
 			capacity /= pesInUse;
 		} else {
 			capacity /= currentCPUs;
