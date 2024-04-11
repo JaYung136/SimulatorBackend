@@ -58,25 +58,25 @@ public class MyPainter extends JFrame {
     }
 
     public void saveAsFile(JFreeChart chart, String outputPath, int weight, int height)throws Exception {
-        FileOutputStream out = null;
-        File outFile = new File(outputPath);
-        if (!outFile.getParentFile().exists()) {
-            outFile.getParentFile().mkdirs();
-        }
-        out = new FileOutputStream(outputPath);
-        if (out != null) {
-            try {
-                // 保存为PNG
-                ChartUtils.writeChartAsPNG(out, chart, weight, height);
-                // 保存为JPEG
-                // ChartUtils.writeChartAsJPEG(out, chart, weight, height);
-                out.flush();
-                out.close();
-            } catch (IOException e) {
-//                e.printStackTrace();
-            }
-
-        }
+//        FileOutputStream out = null;
+//        File outFile = new File(outputPath);
+//        if (!outFile.getParentFile().exists()) {
+//            outFile.getParentFile().mkdirs();
+//        }
+//        out = new FileOutputStream(outputPath);
+//        if (out != null) {
+//            try {
+//                // 保存为PNG
+//                ChartUtils.writeChartAsPNG(out, chart, weight, height);
+//                // 保存为JPEG
+//                // ChartUtils.writeChartAsJPEG(out, chart, weight, height);
+//                out.flush();
+//                out.close();
+//            } catch (IOException e) {
+////                e.printStackTrace();
+//            }
+//
+//        }
     }
 
     public void paint(XYSeries[] xys, String pngName, boolean save) throws Exception {
