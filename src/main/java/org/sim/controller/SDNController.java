@@ -153,10 +153,10 @@ public class SDNController {
             File topofile = new File(InputDir,"Input_TopoInfo.xml");
             boolean dr = topofile.getParentFile().mkdirs(); //创建目录
             file.transferTo(topofile);
-            ResultDTO m = simulateController.schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\TopoInfo.xsd"), topofile);
-            if(m.code == ResultDTO.ERROR_CODE) {
-                return m;
-            }
+//            ResultDTO m = simulateController.schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\TopoInfo.xsd"), topofile);
+//            if(m.code == ResultDTO.ERROR_CODE) {
+//                return m;
+//            }
             Constants.topoFile = topofile;
         }catch (IOException e){
             System.out.print(e.getMessage());
