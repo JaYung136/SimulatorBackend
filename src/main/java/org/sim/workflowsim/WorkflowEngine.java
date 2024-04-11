@@ -226,7 +226,7 @@ public final class WorkflowEngine extends SimEntity {
             if(CloudSim.clock() >= start) {
                 ifRepeat = true;
                 iterator.remove();
-                if(job.getTaskList().size() >= 1 && job.getTaskList().get(0).needWait) {
+                if(!job.getTaskList().isEmpty() && job.getTaskList().get(0).needWait) {
                     job.getTaskList().get(0).needWait = false;
                     List l = new ArrayList();
                     l.add(job);
@@ -297,7 +297,20 @@ public final class WorkflowEngine extends SimEntity {
                 continue;
             }
             Task task = job.getTaskList().get(0);
+            Host h = null;
+            if(!Objects.equals(task.hardware, "")) {
+                Log.printLine(task.hardware);
+                for(Host host: hostList) {
+                    if(host.getName().equals(task.hardware)) {
+                        h = host;
+                        break;
+                    }
+                }
+            }
             CondorVM containerTmp = new CondorVM(task.getCloudletId(), 1, 0, task.getNumberOfPes(), (int) task.getRam(), 0, 0, "Xen", new CloudletSchedulerTimeShared());
+            if(h != null) {
+                containerTmp.setHost(h);
+            }
             boolean result = this.vmAllocationPolicy.allocateHostForVm(containerTmp);
             if(!result) {
                 this.shouldStop = true;
@@ -392,22 +405,25 @@ public final class WorkflowEngine extends SimEntity {
      * Checks whether a job list contains a id
      *
      * @param jobList the job list
-     * @param id the job id
+     * @param name the job name
      * @return
      */
     private boolean hasJobListContainsName(List jobList, String name) {
-        for (Iterator it = jobList.iterator(); it.hasNext();) {
-            Job job = (Job) it.next();
-            if (!job.getTaskList().isEmpty() && job.getTaskList().get(0).name.equals(name)) {
-                return true;
+        for (Object o : jobList) {
+            Job job = (Job) o;
+            if(job.getTaskList() == null)
+                continue;
+            for (Task t : job.getTaskList()) {
+                if (t.name.equals(name))
+                    return true;
             }
         }
         return false;
     }
 
     private boolean hasJobListContainsID(List jobList, int id) {
-        for (Iterator it = jobList.iterator(); it.hasNext();) {
-            Job job = (Job) it.next();
+        for (Object o : jobList) {
+            Job job = (Job) o;
             if (job.getCloudletId() == id) {
                 return true;
             }

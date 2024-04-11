@@ -136,20 +136,30 @@ public class SimpleExampleInterCloud {
 //			Log.printLine("================ bandwidth ===============");
 			Log.printLine("================ 网络负载 =================");
 			//TODO:打印带宽负载的方差
+			int link_num = 0;
 			List<Double> linkAccumuUtils = new ArrayList<>();
-			for (NetworkOperatingSystem netos : dcs.keySet()) {
+			for (NetworkOperatingSystem netos : dcs.keySet()){
 				Collection<Link> links = netos.getPhysicalTopology().getAllLinks();
-				for (Link link : links){
-					if(link.lowOrder instanceof IntercloudSwitch != true
-							&& link.highOrder instanceof IntercloudSwitch != true
-							&& link.lowOrder instanceof GatewaySwitch != true
-							&& link.highOrder instanceof GatewaySwitch != true) {
-						System.out.println(link.shortName() + "\t单链路负载(Kb): " + link.monitoringUpTotal);
-						System.out.println(link.shortNameInverse() + "\t单链路负载(Kb): " + link.monitoringDownTotal);
+				link_num += links.size();
+			}
+			if (link_num > 10){
+				System.out.println("链路较多，此处不展开，相关信息请见输出目录下的bandwidthUtil");
+			} else {
+				for (NetworkOperatingSystem netos : dcs.keySet()) {
+					Collection<Link> links = netos.getPhysicalTopology().getAllLinks();
+					for (Link link : links){
+						if(link.lowOrder instanceof IntercloudSwitch != true
+								&& link.highOrder instanceof IntercloudSwitch != true
+								&& link.lowOrder instanceof GatewaySwitch != true
+								&& link.highOrder instanceof GatewaySwitch != true) {
+							System.out.println(link.shortName() + "\t单链路负载(Kb): " + link.monitoringUpTotal);
+							System.out.println(link.shortNameInverse() + "\t单链路负载(Kb): " + link.monitoringDownTotal);
 //						linkAccumuUtils.add(link);
+						}
 					}
 				}
 			}
+
 			Log.printLine("网络总负载: "+ CloudSim.bwTotalutil);
 //			Log.printLine("带宽最大利用率: "+ CloudSim.bwMaxutil);
 			CloudSim.bwTotalutil = 0.0;

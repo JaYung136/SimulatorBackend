@@ -39,6 +39,8 @@ public class Task extends Cloudlet {
     /*
      * The list of parent tasks.
      */
+
+    public String hardware = "";
     private List<Task> parentList;
     /*
      * The list of child tasks.

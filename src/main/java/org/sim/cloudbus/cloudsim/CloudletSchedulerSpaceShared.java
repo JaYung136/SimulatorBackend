@@ -28,6 +28,8 @@ import java.util.List;
 public class CloudletSchedulerSpaceShared extends CloudletScheduler {
 
 	/** The cloudlet waiting list. */
+	@Override
+	public void setInMigrate(Integer cloudletId) {}
 	private List<? extends ResCloudlet> cloudletWaitingList;
 
 	/** The cloudlet exec list. */

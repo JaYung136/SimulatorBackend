@@ -187,6 +187,7 @@ public class ResCloudlet {
 		return true;
 	}
 
+
 	/**
 	 * Initialises all local attributes.
 	 * 

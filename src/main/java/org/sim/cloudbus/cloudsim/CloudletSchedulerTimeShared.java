@@ -187,6 +187,18 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		return cloudletExecList.size();
 	}
 
+	@Override
+	public void setInMigrate(Integer cloudletId) {
+		List<ResCloudlet> toRemove = new ArrayList<ResCloudlet>();
+		for (ResCloudlet rcl : getCloudletExecList()) {
+			if(rcl.getCloudletId() == cloudletId) {
+				if(rcl.getCloudletStatus() == Cloudlet.INEXEC)
+					rcl.setCloudletStatus(Cloudlet.PAUSED);
+				break;
+			}
+		}
+	}
+
 	/**
 	 * Gets the capacity.
 	 * 
@@ -206,11 +218,15 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 
 		int pesInUse = 0;
 		double ramInUse = 0;
+		double rate = 1.0;
 		for (ResCloudlet rcl : getCloudletExecList()) {
-			if(((Job)rcl.getCloudlet()).getTaskList().size() >= 1) {
+			if(rcl.getCloudletStatus() != Cloudlet.INEXEC) {
+				rate = 0.1;
+			}
+			if(!((Job) rcl.getCloudlet()).getTaskList().isEmpty()) {
 				for(Task t: ((Job)rcl.getCloudlet()).getTaskList()) {
-					pesInUse += t.getNumberOfPes();
-					ramInUse += t.getRam();
+					pesInUse += t.getNumberOfPes() * rate;
+					ramInUse += t.getRam() * rate;
 				}
 			}
 		}
@@ -274,7 +290,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 			if (rcl.getRemainingCloudletLength() == 0) {
 				cloudletFinish(rcl);
 			} else {
-				rcl.setCloudletStatus(Cloudlet.CANCELED);
+				//rcl.setCloudletStatus(Cloudlet.CANCELED);
 				rcl.updateCloudlet();
 			}
 			return rcl.getCloudlet();
@@ -414,6 +430,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		}
 		ResCloudlet rcl = new ResCloudlet(cloudlet);
 		rcl.setCloudletStatus(Cloudlet.INEXEC);
+		//Log.printLine("任务" + cloudlet.getCloudletId() + "进入执行队列，长度：" + rcl.getCloudletLength() + " 剩余长度： " + rcl.getRemainingCloudletLength());
 		int cpus = 0;
 		double rams = 0;
 		for(Task t: ((Job)cloudlet).getTaskList()) {
@@ -423,12 +440,12 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		for (int i = 0; i < cpus; i++) {
 			rcl.setMachineAndPeId(0, i);
 		}
-		/*
-		if((usedRam + rams) / currentRam  > Constants.ramUp || (double)(usedPes + cpus) / (double)currentCPUs > Constants.cpuUp) {
-			Log.printLine("cpu: " + us);
-			return Double.MAX_VALUE;
+		if(fileTransferTime == -1) {
+			if ((usedRam + rams) / currentRam > Constants.ramUp || (double) (usedPes + cpus) / (double) currentCPUs > Constants.cpuUp) {
+				//Log.printLine("cpu: " + us);
+				return Double.MAX_VALUE;
+			}
 		}
-		*/
 		getCloudletExecList().add(rcl);
 
 		// use the current capacity to estimate the extra amount of
