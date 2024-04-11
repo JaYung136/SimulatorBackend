@@ -45,7 +45,7 @@ public class SimulateController {
      * @return 如果通过检验，返回Message.Code == CODE.SUC 否则 Message.Code == CODE.FAIL
      *
      * */
-    private ResultDTO schemaValid(File schemaFile, File targetFile) {
+    public ResultDTO schemaValid(File schemaFile, File targetFile) {
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(schemaFile);
@@ -255,6 +255,10 @@ public class SimulateController {
             File appfile = new File(InputDir,"Input_AppInfo.xml");
             boolean dr = appfile.getParentFile().mkdirs(); //创建目录
             file.transferTo(appfile);
+            ResultDTO m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\AppInfo.xsd"), appfile);
+            if(m.code == ResultDTO.ERROR_CODE) {
+                return m;
+            }
             Constants.appFile = appfile;
             XmlUtil util = new XmlUtil(1);
             util.parseHostXml(appfile);
