@@ -25,6 +25,8 @@ public class CloudletSchedulerDynamicWorkload extends CloudletSchedulerTimeShare
 
 	/** The mips. */
 	private double mips;
+	@Override
+	public void setInMigrate(Integer cloudletId) {}
 
 	/** The number of PEs. */
 	private int numberOfPes;

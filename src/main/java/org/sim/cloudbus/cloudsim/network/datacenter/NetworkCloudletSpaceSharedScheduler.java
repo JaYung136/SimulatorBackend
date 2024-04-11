@@ -30,6 +30,7 @@ import java.util.*;
 public class NetworkCloudletSpaceSharedScheduler extends CloudletScheduler {
 
 	/** The cloudlet waiting list. */
+	public void setInMigrate(Integer cloudletId) {}
 	private List<? extends ResCloudlet> cloudletWaitingList;
 
 	/** The cloudlet exec list. */

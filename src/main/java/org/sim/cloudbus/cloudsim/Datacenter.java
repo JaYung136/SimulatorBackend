@@ -668,6 +668,7 @@ public class Datacenter extends SimEntity {
 		boolean failed = false;
 		if (cl == null) {// cloudlet doesn't exist
 			failed = true;
+			//Log.printLine("fail");
 		} else {
 			// has the cloudlet already finished?
 			if (cl.getCloudletStatus() == Cloudlet.SUCCESS) {// if yes, send it back to user
@@ -675,33 +676,33 @@ public class Datacenter extends SimEntity {
 				data[0] = getId();
 				data[1] = cloudletId;
 				data[2] = 0;
+				Log.printLine("finish");
 				sendNow(cl.getUserId(), CloudSimTags.CLOUDLET_SUBMIT_ACK, data);
 				sendNow(cl.getUserId(), CloudSimTags.CLOUDLET_RETURN, cl);
 			}
 
 			// prepare cloudlet for migration
-			cl.setVmId(vmDestId);
+			//cl.setVmId(vmDestId);
 			// the cloudlet will migrate from one vm to another does the destination VM exist?
-			if (destId == getId()) {
-				Host vm = this.getHostList().get(vmDestId);
+			//Log.printLine("as");
 
+				cl.setVmId(vmDestId);
+				Host vm = this.getHostList().get(vmDestId);
+				Host old = this.getHostList().get(vmId);
+				Log.printLine("尝试将容器" + cl.getCloudletId() + "从" + old.getName() + "迁往" + vm.getName());
 				if (vm == null) {
 					failed = true;
 				} else {
 					// time to transfer the files
-					double fileTransferTime = predictFileTransferTime(cl.getRequiredFiles());
-					if(vm.getCloudletScheduler().cloudletSubmit(cl, fileTransferTime) == Double.MAX_VALUE) {
+					//double fileTransferTime = predictFileTransferTime(cl.getRequiredFiles());
+					if(vm.getCloudletScheduler().cloudletSubmit(cl, -1) == Double.MAX_VALUE) {
 						//迁移失败
+						Log.printLine("迁移失败");
 						cl.setVmId(vmId);
-						cl.lastVmId = vmDestId;
-						getHostList().get(vmId).getCloudletScheduler().cloudletSubmit(cl, 0);
+						cl.lastVmId = vmId;
+						old.getCloudletScheduler().cloudletSubmit(cl, 10000 / Math.min(vm.getBw(), old.getBw()));
 					}
 				}
-			} else {// the cloudlet will migrate from one resource to another
-				int tag = ((type == CloudSimTags.CLOUDLET_MOVE_ACK) ? CloudSimTags.CLOUDLET_SUBMIT_ACK
-						: CloudSimTags.CLOUDLET_SUBMIT);
-				sendNow(destId, tag, cl);
-			}
 		}
 
 		if (type == CloudSimTags.CLOUDLET_MOVE_ACK) {// send ACK if requested

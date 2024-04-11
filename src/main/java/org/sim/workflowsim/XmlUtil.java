@@ -606,6 +606,7 @@ public final class XmlUtil {
                         String aMemText = node.getAttributeValue("MemoryTextSize");
                         String requiredMem = node.getAttributeValue("RequiredMemorySize");
                         String periodTime = node.getAttributeValue("Period");
+                        String hardware = node.getAttributeValue("Hardware");
                        // Log.printLine(requiredMem);
                         String upBandwidth = node.getAttributeValue("UpBandwidth");
                         String downBandwidth = node.getAttributeValue("DownBandwidth");
@@ -668,6 +669,7 @@ public final class XmlUtil {
                         taskT.setUserId(userId);
                         taskT.setRam(reqMem);
                         taskT.name = aName;
+                        taskT.hardware = hardware;
                         Constants.ip2taskName.put(ip, aName);
                         mName2Task.put(aName, taskT);
                         Constants.id2Name.put(taskT.getCloudletId(), aName);

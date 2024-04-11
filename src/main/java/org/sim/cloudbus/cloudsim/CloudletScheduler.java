@@ -24,6 +24,8 @@ public abstract class CloudletScheduler {
 	/** The previous time. */
 	private double previousTime;
 
+	public abstract void setInMigrate(Integer cloudletId);
+
 	/** The current mips share. */
 	private List<Double> currentMipsShare;
 
