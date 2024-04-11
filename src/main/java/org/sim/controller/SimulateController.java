@@ -255,10 +255,10 @@ public class SimulateController {
             File appfile = new File(InputDir,"Input_AppInfo.xml");
             boolean dr = appfile.getParentFile().mkdirs(); //创建目录
             file.transferTo(appfile);
-            ResultDTO m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\AppInfo.xsd"), appfile);
-            if(m.code == ResultDTO.ERROR_CODE) {
-                return m;
-            }
+//            ResultDTO m = schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\AppInfo.xsd"), appfile);
+//            if(m.code == ResultDTO.ERROR_CODE) {
+//                return m;
+//            }
             Constants.appFile = appfile;
             XmlUtil util = new XmlUtil(1);
             util.parseHostXml(appfile);
