@@ -7,6 +7,7 @@ import org.sim.cloudsimsdn.sdn.main.SimpleExampleInterCloud;
 import org.sim.cloudsimsdn.sdn.physicalcomponents.Link;
 import org.sim.cloudsimsdn.sdn.workload.Workload;
 import org.sim.cloudsimsdn.sdn.workload.WorkloadResultWriter;
+import org.sim.controller.SimulateController;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
@@ -32,6 +33,7 @@ import static org.sim.controller.MyPainter.*;
 @CrossOrigin
 public class SDNController {
     private SimpleExampleInterCloud simulator;
+    private SimulateController simulateController;
     private String input_topo = "./InputFiles/Input_TopoInfo.xml";
     private String input_host = "./InputFiles/Input_Hosts.xml";
     private String input_container = "./Intermediate/assign.json";
@@ -151,9 +153,14 @@ public class SDNController {
             File topofile = new File(InputDir,"Input_TopoInfo.xml");
             boolean dr = topofile.getParentFile().mkdirs(); //创建目录
             file.transferTo(topofile);
+            ResultDTO m = simulateController.schemaValid(new File(System.getProperty("user.dir") + "\\Schema\\TopoInfo.xsd"), topofile);
+            if(m.code == ResultDTO.ERROR_CODE) {
+                return m;
+            }
             Constants.topoFile = topofile;
         }catch (IOException e){
             System.out.print(e.getMessage());
+            return ResultDTO.error(e.getMessage());
         }
         return ResultDTO.success("上传成功");
     }

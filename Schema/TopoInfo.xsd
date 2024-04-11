@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Define complex types for Switch and Link -->
+  <xs:complexType name="SwitchType">
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="Network" type="xs:string" use="required"/>
+    <xs:attribute name="PortNum" type="xs:positiveInteger" use="required"/>
+    <xs:attribute name="Type" type="xs:string" use="required"/>
+    <xs:attribute name="Speed" type="xs:positiveInteger" use="required"/>
+    <xs:attribute name="IpAddress" type="xs:string" use="required"/>
+    <xs:attribute name="Guid" type="xs:string" use="?"/>
+    <xs:attribute name="ExtGuid" type="xs:integer" use="?"/>
+  </xs:complexType>
+
+  <xs:complexType name="LinkType">
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="Src" type="xs:string" use="required"/>
+    <xs:attribute name="Dst" type="xs:string" use="required"/>
+    <xs:attribute name="BW" type="xs:positiveInteger" use="required"/>
+    <xs:attribute name="Latency" type="xs:decimal" use="required"/>
+  </xs:complexType>
+
+  <!-- Define the NetworkTopo element -->
+  <xs:element name="NetworkTopo">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- Define the Switches and Links elements -->
+        <xs:element name="Switches">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Switch" type="SwitchType" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Links">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Link" type="LinkType" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
