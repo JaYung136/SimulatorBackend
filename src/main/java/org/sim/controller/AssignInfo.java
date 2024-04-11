@@ -10,7 +10,7 @@ public class AssignInfo {
     public String type="cn";
     public String datacenter="A";
     public Double containerperiod;
-    AssignInfo(String app, String ip, Double starttime, Double endtime,Double pausestart, Double pauseend, Double containerperiod){
+    AssignInfo(String app, String ip, Double starttime, Double endtime,Double pausestart, Double pauseend, Double containerperiod, String platform){
         this.app = app;
         this.ip = ip;
         this.starttime = starttime;
@@ -18,5 +18,6 @@ public class AssignInfo {
         this.pausestart = pausestart;
         this.pauseend = pauseend;
         this.containerperiod = containerperiod;
+        this.datacenter = platform;
     }
 }

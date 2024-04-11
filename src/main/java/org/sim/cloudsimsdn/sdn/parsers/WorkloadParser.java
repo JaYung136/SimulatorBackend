@@ -11,7 +11,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
 import org.sim.cloudsimsdn.Cloudlet;
+import org.sim.cloudsimsdn.Datacenter;
 import org.sim.cloudsimsdn.UtilizationModel;
+import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.physicalcomponents.SDNDatacenter;
 import org.sim.cloudsimsdn.sdn.workload.*;
@@ -23,6 +25,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
+import static org.sim.cloudsimsdn.core.CloudSim.getEntityId;
 import static org.sim.controller.SDNController.*;
 
 public class WorkloadParser {
@@ -165,11 +168,12 @@ public class WorkloadParser {
 		}
 	}
 	static double random_factor = 0.0;
-	private List<Double> calMsgStarttimes(Double starttime, Double pausestart, Double pauseend, Double endtime, Double containerperiod, Double msgperiod, Double simulationend) {
+	private List<Double> calMsgStarttimes(Double starttime, Double pausestart, Double pauseend, Double endtime, Double containerperiod, Double msgperiod, Double simulationend, Boolean inplatfrom) {
 		ArrayList<Double> stimes = new ArrayList<>();
 		if(random_factor >= msgperiod)
 			random_factor = 0.0;
-		starttime += msgperiod*Math.random(); //TODO: 消息起始时间随机化 msgtime+msgperiod*Math.random();
+		if(inplatfrom)
+			starttime += msgperiod*Math.random(); //TODO: 消息起始时间随机化 msgtime+msgperiod*Math.random();
 		// 迭代多个容器生命周期
 		while(endtime < simulationend*0.000001){
 			/**
@@ -246,8 +250,10 @@ public class WorkloadParser {
 						 */
 						AssignInfo ai = assignInfoMap.get(src);
 						double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
+						//TODO: 无线取消随机化
+						AssignInfo dstai = assignInfoMap.get(msg.getString("IpAddress"));
 						List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
-								ai.containerperiod, MsgPeriod, simulationStopTime);
+								ai.containerperiod, MsgPeriod, simulationStopTime, ai.equals(dstai));
 						for(Double msgstart : msgStarttimes){
 							Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
 							wl.msgName = msg.getString("Name");
@@ -296,8 +302,10 @@ public class WorkloadParser {
 					 */
 					AssignInfo ai = assignInfoMap.get(src);
 					double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
+					//TODO: 无线取消随机化
+					AssignInfo dstai = assignInfoMap.get(msg.getString("IpAddress"));
 					List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
-							ai.containerperiod, MsgPeriod, simulationStopTime);
+							ai.containerperiod, MsgPeriod, simulationStopTime, ai.equals(dstai));
 					for(Double msgstart : msgStarttimes){
 						Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
 						wl.msgName = msg.getString("Name");

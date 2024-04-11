@@ -408,22 +408,23 @@ public class SDNController {
         assignInfoMap = new HashMap<>();
 
         for(Object obj : json) {
-            JSONObject host = (JSONObject) obj;
-            startmap.put(host.getString("name"), Double.parseDouble(host.getString("start")));
-            endmap.put(host.getString("name"), Double.parseDouble(host.getString("end")));
-            pausestartmap.put(host.getString("name"), host.getDouble("pausestart"));
-            pauseendmap.put(host.getString("name"), host.getDouble("pauseend"));
+            JSONObject appinfo = (JSONObject) obj;
+            startmap.put(appinfo.getString("name"), Double.parseDouble(appinfo.getString("start")));
+            endmap.put(appinfo.getString("name"), Double.parseDouble(appinfo.getString("end")));
+            pausestartmap.put(appinfo.getString("name"), appinfo.getDouble("pausestart"));
+            pauseendmap.put(appinfo.getString("name"), appinfo.getDouble("pauseend"));
 
             AssignInfo ai = new AssignInfo(
-                    host.getString("app"),
-                    host.getString("name"), //ip
-                    Double.parseDouble(host.getString("start"))*contractRate,
-                    Double.parseDouble(host.getString("end"))*contractRate,
-                    host.getDouble("pausestart")*contractRate,
-                    host.getDouble("pauseend")*contractRate,
-                    host.getDouble("containerperiod")*contractRate
+                    appinfo.getString("app"),
+                    appinfo.getString("name"), //ip
+                    Double.parseDouble(appinfo.getString("start"))*contractRate,
+                    Double.parseDouble(appinfo.getString("end"))*contractRate,
+                    appinfo.getDouble("pausestart")*contractRate,
+                    appinfo.getDouble("pauseend")*contractRate,
+                    appinfo.getDouble("containerperiod")*contractRate,
+                    appinfo.getString("datacenter")
             );
-            assignInfoMap.put(host.getString("name"), ai);
+            assignInfoMap.put(appinfo.getString("name"), ai);
         }
     }
     public ResultDTO outputdelay(List<Workload> wls) throws IOException{
