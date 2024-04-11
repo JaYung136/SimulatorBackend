@@ -81,7 +81,7 @@ public class WorkloadResultWriter {
 	}
 	*/
 
-	private static final int workloadBufferSize = 1000;
+	private static final int workloadBufferSize = 15000;
 	private List<Workload> workloadBuffer = new ArrayList<Workload>(workloadBufferSize);
 
 	private void printWorkloadBuffer(Workload wl) {
@@ -97,6 +97,7 @@ public class WorkloadResultWriter {
 			Workload wlupdated = printWorkload(wl);
 			res.add(wlupdated);
 		}
+		workloadBuffer.clear();
 		workloadBuffer = new ArrayList<Workload>(workloadBufferSize);
 		return res;
 	}

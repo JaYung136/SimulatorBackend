@@ -186,6 +186,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 	}
 
 	private void processInternalPacketProcessing() {
+		double timenow = CloudSim.clock();
 		if(channelManager.updatePacketProcessing()) {
 			sendInternalEvent();
 		}
