@@ -430,11 +430,11 @@ public class WorkflowDatacenter extends Datacenter {
                     data[2] = oldHost.getId();
                     data[3] = targetHost.getId();
                     data[4] = getId();
-                    Log.printLine(oldHost.getName() + "cpu资源占用 " + oldHost.getUtilizationOfCpu() + " ; 内存占用 " + targetHost.getUtilizationOfRam());
-                    Log.printLine(targetHost.getName() + " cpu资源占用 " + targetHost.getUtilizationOfCpu() + " ; 内存占用 " + targetHost.getUtilizationOfRam());
                     oldHost.getCloudletScheduler().setInMigrate(data[0]);
                     send(getId(), (1000 / Math.min(oldHost.getBw(), targetHost.getBw())), CloudSimTags.CLOUDLET_MOVE, data);
                     super.addMigrateNum();
+                    Log.printLine(oldHost.getName() + "cpu资源占用 " + oldHost.getUtilizationOfCpu() + " ; 内存占用 " + targetHost.getUtilizationOfRam());
+                    Log.printLine(targetHost.getName() + " cpu资源占用 " + targetHost.getUtilizationOfCpu() + " ; 内存占用 " + targetHost.getUtilizationOfRam());
                     Log.printLine("时间" + CloudSim.clock() + ": 迁移 " + ((Job)rcl.getCloudlet()).getTaskList().get(0).name +"(正运行在" + oldHost.getName() + ") 至" + "节点 " + targetHost.getName());
                     //break;
                 }
@@ -456,15 +456,15 @@ public class WorkflowDatacenter extends Datacenter {
             lastLogTime = currentTime;
             ifLog = true;
         }
-        Log.printLine("\n\n---------------------------集群资源占用情况 "+ currentTime + "------------------------------------------\n\n");
-        Log.printLine("节点" + indent + "cpu使用" + indent + "内存使用" + indent + "运行容器" );
+        //Log.printLine("\n\n---------------------------集群资源占用情况 "+ currentTime + "------------------------------------------\n\n");
+        //Log.printLine("节点" + indent + "cpu使用" + indent + "内存使用" + indent + "运行容器" );
         DecimalFormat dft = new DecimalFormat("###.##");
         for (Host host : this.getHostList()) {
-            Log.printLine();
-            Log.printLine(host.getName());
-            System.out.print(String.format("%-8s", host.getName()));
-            System.out.print(String.format("%-8s", (host.getNumberOfPes() * host.getUtilizationOfCpu() / 1000) + "/" + (host.getNumberOfPes() / 1000)));
-            System.out.print(String.format("%-8s", host.getRam() * host.getUtilizationOfRam() + "/" + host.getRam()));
+            //Log.printLine();
+            //Log.printLine(host.getName());
+            //System.out.print(String.format("%-8s", host.getName()));
+            //System.out.print(String.format("%-8s", (host.getNumberOfPes() * host.getUtilizationOfCpu() / 1000) + "/" + (host.getNumberOfPes() / 1000)));
+            //System.out.print(String.format("%-8s", host.getRam() * host.getUtilizationOfRam() + "/" + host.getRam()));
             if(ifLog) {
                 Constants.logs.add(new LogEntity(dft.format(currentTime), dft.format(host.getUtilizationOfCpu()), dft.format(host.getUtilizationOfRam()), host.getId()));
             }

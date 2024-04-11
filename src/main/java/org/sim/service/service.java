@@ -390,8 +390,8 @@ public class service {
         }
         if(Constants.ifSimulate)
             Log.printLine(Constants.repeatTime + "周期下，任务群总完成时间为：" + lastTime);
-        if(Constants.lastTime == 0.0)
-            return;
+        /*if(Constants.lastTime == 0.0)
+            return;*/
         try {
             int size_T = 0;
             File file = new File(Constants.LOG_PATH);

@@ -109,8 +109,8 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 				Log.printLine("Container " + ((Job) rcl.getCloudlet()).getTaskList().get(0).name + " remain: " + rcl.getRemainingCloudletLength());
 			}*/
 		}
-		System.out.print(String.format("%-8s", " " + containers));
-		System.out.print("\n");
+		//System.out.print(String.format("%-8s", " " + containers));
+		//System.out.print("\n");
 		if (getCloudletExecList().size() == 0 && getCloudletPausedList().size() == 0) {
 			setPreviousTime(currentTime);
 			return 0.0;
