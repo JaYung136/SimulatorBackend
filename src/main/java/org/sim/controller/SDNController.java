@@ -160,7 +160,7 @@ public class SDNController {
             Constants.topoFile = topofile;
         }catch (IOException e){
             System.out.print(e.getMessage());
-            return ResultDTO.error(e.getMessage());
+//            return ResultDTO.error(e.getMessage());
         }
         return ResultDTO.success("上传成功");
     }
