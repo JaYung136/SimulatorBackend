@@ -160,7 +160,10 @@ public class WorkflowDatacenter extends Datacenter {
                 Log.printLine("asaas::::::::::::::: " + job.getTaskList().get(0).getRam());
             }*/
             //Log.printLine("Host " + host.getName());
+            /*if(!job.getTaskList().isEmpty())
+                Log.printLine(host.getName() + "收到" + job.getTaskList().get(0).name);*/
             double estimatedFinishTime = scheduler.cloudletSubmit(job, fileTransferTime);
+            //Log.printLine(estimatedFinishTime);
            // Log.printLine("est: " + estimatedFinishTime);
            /* if(estimatedFinishTime == 0.0) {
                 //host.setState(WorkflowSimTags.VM_STATUS_BUSY);
@@ -453,8 +456,9 @@ public class WorkflowDatacenter extends Datacenter {
         //Log.printLine("节点" + indent + "cpu使用" + indent + "内存使用" + indent + "运行容器" );
         DecimalFormat dft = new DecimalFormat("###.##");
         for (Host host : this.getHostList()) {
-            //Log.printLine();
-            //System.out.print(String.format("%-8s", host.getName()));
+          //  Log.printLine();
+           // Log.printLine(host.getName());
+           // System.out.print(String.format("%-8s", host.getName()));
             //System.out.print(String.format("%-8s", (host.getNumberOfPes() * host.getUtilizationOfCpu() / 1000) + "/" + (host.getNumberOfPes() / 1000)));
             //System.out.print(String.format("%-8s", host.getRam() * host.getUtilizationOfRam() + "/" + host.getRam()));
             if(ifLog) {
@@ -491,7 +495,7 @@ public class WorkflowDatacenter extends Datacenter {
                         //Log.printLine("is not null");
                     }
                     if (cl != null) {
-                        if(((Job)cl).getTaskList().size() >= 1) {
+                        if(!((Job) cl).getTaskList().isEmpty()) {
                             String aName = ((Job)cl).getTaskList().get(0).name;
                             taskName2HostId.put(aName, host.getId());
                         }

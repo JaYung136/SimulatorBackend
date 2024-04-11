@@ -351,7 +351,8 @@ public final class WorkflowEngine extends SimEntity {
         }
 
         getJobsReceivedList().add(job);
-        //Log.printLine(job.getCloudletId() + " 返回");
+        /*if(!job.getTaskList().isEmpty())
+            Log.printLine(job.getTaskList().get(0).name + " 返回");*/
         jobsSubmitted--;
         //Log.printLine("Job submitted: " + jobsSubmitted  + "job received: " + getJobsReceivedList().size());
         if ((getJobsList().isEmpty() && jobsSubmitted == 0 && shouldStop()) || (Constants.lastTime != 0.0 && CloudSim.clock() >= Constants.lastTime)) {
@@ -394,6 +395,16 @@ public final class WorkflowEngine extends SimEntity {
      * @param id the job id
      * @return
      */
+    private boolean hasJobListContainsName(List jobList, String name) {
+        for (Iterator it = jobList.iterator(); it.hasNext();) {
+            Job job = (Job) it.next();
+            if (!job.getTaskList().isEmpty() && job.getTaskList().get(0).name.equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean hasJobListContainsID(List jobList, int id) {
         for (Iterator it = jobList.iterator(); it.hasNext();) {
             Job job = (Job) it.next();
@@ -427,10 +438,12 @@ public final class WorkflowEngine extends SimEntity {
                 List<Job> parentList = job.getParentList();
                 boolean flag = true;
                 for (Job parent : parentList) {
-                    if (!hasJobListContainsID(this.getJobsReceivedList(), parent.getCloudletId())) {
+                    if(parent.getTaskList().isEmpty())
+                        continue;
+                    if (!hasJobListContainsName(this.getJobsReceivedList(), parent.getTaskList().get(0).name)) {
                         flag = false;
-                        //if(parent.getTaskList().size() >= 1)
-                        //    Log.printLine(job.getTaskList().get(0).name + " 还有父任务"+ parent.getTaskList().get(0).name +"没有运行");
+                        /*if(!parent.getTaskList().isEmpty())
+                            Log.printLine(job.getTaskList().get(0).name + " 还有父任务"+ parent.getTaskList().get(0).name +"没有运行");*/
                         break;
                     }
                 }
