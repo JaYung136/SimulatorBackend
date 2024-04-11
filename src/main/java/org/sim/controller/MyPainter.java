@@ -311,24 +311,24 @@ public class MyPainter extends JFrame {
         }
         p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路利用率图像", "利用率", save);
 
-        p = new MyPainter("链路带宽速率图像");
-        p.setSize(50000, 100000);
-        xySerieMap = new HashMap<>();
-        double bw_Gbps = ethernetSpeed / 1000000; //10
-        for (LinkUtil lu : lus.values()) {
-            if(lu.printable == false)
-                continue;
-            String linkname = lu.linkname;
-            XYSeries forwardline = new XYSeries(linkname+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]");
-            XYSeries backwardline = new XYSeries(linkname+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]");
-            for(int i=0; i<lu.recordTimes.size(); ++i) {
-                forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i)*0.01*bw_Gbps);
-                backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i)*0.01*bw_Gbps);
-            }
-            xySerieMap.put(linkname+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]", forwardline);
-            xySerieMap.put(linkname+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]", backwardline);
-        }
-        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路带宽速率图像", "带宽(Gbps)", save);
+//        p = new MyPainter("链路带宽速率图像");
+//        p.setSize(50000, 100000);
+//        xySerieMap = new HashMap<>();
+//        double bw_Gbps = ethernetSpeed / 1000000; //10
+//        for (LinkUtil lu : lus.values()) {
+//            if(lu.printable == false)
+//                continue;
+//            String linkname = lu.linkname;
+//            XYSeries forwardline = new XYSeries(linkname+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]");
+//            XYSeries backwardline = new XYSeries(linkname+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]");
+//            for(int i=0; i<lu.recordTimes.size(); ++i) {
+//                forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i)*0.01*bw_Gbps);
+//                backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i)*0.01*bw_Gbps);
+//            }
+//            xySerieMap.put(linkname+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]", forwardline);
+//            xySerieMap.put(linkname+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]", backwardline);
+//        }
+//        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路带宽速率图像", "带宽(Gbps)", save);
     }
 
     public static void paintSingleLinkGraph(Map<String, LinkUtil> lus, String name) throws Exception {
@@ -349,23 +349,23 @@ public class MyPainter extends JFrame {
         }
         p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"利用率图像", "利用率",false);
 
-        p = new MyPainter(name+"带宽速率图像");
-        p.setSize(50000, 100000);
-        xySerieMap = new HashMap<>();
-        double bw_Gbps = ethernetSpeed / 1000000; //10
-        for (LinkUtil lu : lus.values()) {
-            if(lu.printable == false || !lu.linkname.equals(name))
-                continue;
-            XYSeries forwardline = new XYSeries(name+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]");
-            XYSeries backwardline = new XYSeries(name+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]");
-            for(int i=0; i<lu.recordTimes.size(); ++i) {
-                forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i)*0.01*bw_Gbps);
-                backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i)*0.01*bw_Gbps);
-            }
-            xySerieMap.put(name+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]", forwardline);
-            xySerieMap.put(name+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]", backwardline);
-        }
-        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"带宽速率图像", "带宽(Gbps)",false);
+//        p = new MyPainter(name+"带宽速率图像");
+//        p.setSize(50000, 100000);
+//        xySerieMap = new HashMap<>();
+//        double bw_Gbps = ethernetSpeed / 1000000; //10
+//        for (LinkUtil lu : lus.values()) {
+//            if(lu.printable == false || !lu.linkname.equals(name))
+//                continue;
+//            XYSeries forwardline = new XYSeries(name+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]");
+//            XYSeries backwardline = new XYSeries(name+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]");
+//            for(int i=0; i<lu.recordTimes.size(); ++i) {
+//                forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i)*0.01*bw_Gbps);
+//                backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i)*0.01*bw_Gbps);
+//            }
+//            xySerieMap.put(name+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]", forwardline);
+//            xySerieMap.put(name+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]", backwardline);
+//        }
+//        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"带宽速率图像", "带宽(Gbps)",false);
     }
 
     public static void main(String[] args) throws Exception {
