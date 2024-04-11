@@ -398,6 +398,7 @@ public class SimulateController {
             }
             Log.printLine("============================== 开始输出YAML文件 ==============================");
             m = writeYaml();
+            Constants.faultFile = null;
             return m;
         }catch (Exception e) {
             return ResultDTO.error(e.getMessage());
