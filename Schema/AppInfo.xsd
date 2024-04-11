@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="AppInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="application" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="Name" type="xs:string" use="required"/>
+            <xs:attribute name="Guid" type="xs:string" use="optional"/>
+            <xs:attribute name="IpAddress" type="xs:string" use="required"/>
+            <xs:attribute name="Hardware" type="xs:string" use="optional"/>
+            <xs:attribute name="ComputeTime" type="xs:decimal" use="required"/>
+            <xs:attribute name="MemoryBssSize" type="xs:integer" use="optional"/>
+            <xs:attribute name="MemoryDataSize" type="xs:integer" use="optional"/>
+            <xs:attribute name="MemoryPersistentBssSize" type="xs:integer" use="optional"/>
+            <xs:attribute name="MemoryPersistentDataSize" type="xs:integer" use="optional"/>
+            <xs:attribute name="MemoryRoDataSize" type="xs:integer" use="optional"/>
+            <xs:attribute name="MemoryTextSize" type="xs:integer" use="optional"/>
+            <xs:attribute name="PartitionId" type="xs:integer" use="optional"/>
+            <xs:attribute name="Period" type="xs:integer" use="optional"/>
+            <xs:attribute name="RequiredMemorySize" type="xs:integer" use="optional"/>
+            <xs:attribute name="Key" type="xs:boolean" use="optional"/>
+            <xs:attribute name="Priority" type="xs:integer" use="optional"/>
+            <xs:attribute name="UpBandwidth" type="xs:integer" use="optional"/>
+            <xs:attribute name="DownBandwidth" type="xs:integer" use="optional"/>
+            <xs:attribute name="Parent" type="xs:string" use="optional"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="RleaseDate" type="xs:string" use="optional"/>
+      <xs:attribute name="ICDVerison" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
