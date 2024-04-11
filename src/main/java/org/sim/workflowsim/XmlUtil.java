@@ -599,27 +599,27 @@ public final class XmlUtil {
 
                     case "application":
                         String aName = node.getAttributeValue("Name");
-                        String aMemBss = node.getAttributeValue("MemoryBssSize");
+                        /*String aMemBss = node.getAttributeValue("MemoryBssSize");
                         String aMemeData = node.getAttributeValue("MemoryDataSize");
                         String aMemPersistBss = node.getAttributeValue("MemoryPersistentBssSize");
                         String aMemPersistData = node.getAttributeValue("MemoryPersistentDataSize");
-                        String aMemText = node.getAttributeValue("MemoryTextSize");
+                        String aMemText = node.getAttributeValue("MemoryTextSize");*/
                         String requiredMem = node.getAttributeValue("RequiredMemorySize");
                         String periodTime = node.getAttributeValue("Period");
                         String hardware = node.getAttributeValue("Hardware");
                        // Log.printLine(requiredMem);
-                        String upBandwidth = node.getAttributeValue("UpBandwidth");
-                        String downBandwidth = node.getAttributeValue("DownBandwidth");
+                        //String upBandwidth = node.getAttributeValue("UpBandwidth");
+                        //String downBandwidth = node.getAttributeValue("DownBandwidth");
                         String computeTime = node.getAttributeValue("ComputeTime");
                         String ip = node.getAttributeValue("IpAddress");
-                        Integer memBss = Integer.parseInt(aMemBss);
+                        /*Integer memBss = Integer.parseInt(aMemBss);
                         Integer memData = Integer.parseInt(aMemeData);
                         Integer memPersistBss = Integer.parseInt(aMemPersistBss);
                         Integer memPersistData = Integer.parseInt(aMemPersistData);
-                        Integer memText = Integer.parseInt(aMemText);
+                        Integer memText = Integer.parseInt(aMemText);*/
                         Integer reqMem = Integer.parseInt(requiredMem);
-                        Integer upB = Integer.parseInt(upBandwidth);
-                        Integer downB = Integer.parseInt(downBandwidth);
+                        /*Integer upB = Integer.parseInt(upBandwidth);
+                        Integer downB = Integer.parseInt(downBandwidth);*/
                         Double computeT = Double.parseDouble(computeTime);
                         String cpuRequest = node.getAttributeValue("CpuRequest");
 
