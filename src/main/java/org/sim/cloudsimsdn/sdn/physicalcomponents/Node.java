@@ -23,11 +23,11 @@ public interface Node {
 	public void setRank(int rank);
 	public int getRank();
 
-	public void clearVMRoutingTable();
-	public void addVMRoute(int srcVM, int destVM, int flowId, Node to);
-	public Node getVMRoute(int srcVM, int destVM, int flowId);
-	public void removeVMRoute(int srcVM, int destVM, int flowId);
-	public void printVMRoute();
+	public void clearCnRoutingTable();
+	public void addCnRoute(int srcVM, int destVM, int flowId, Node to);
+	public Node getCnRoute(int srcVM, int destVM, int flowId);
+	public void removeCnRoute(int srcVM, int destVM, int flowId);
+	public void printCnRoute();
 
 	public void addRoute(Node destHost, Link to);
 	public List<Link> getRoute(Node destHost);

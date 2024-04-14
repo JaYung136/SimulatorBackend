@@ -75,20 +75,20 @@ public class Switch implements Node{
 	}
 
 	@Override
-	public void clearVMRoutingTable(){
+	public void clearCnRoutingTable(){
 		this.forwardingTable.clear();
 	}
 
 	@Override
-	public void addVMRoute(int src, int dest, int flowId, Node to){
+	public void addCnRoute(int src, int dest, int flowId, Node to){
 		this.forwardingTable.addRule(src, dest, flowId, to);
 	}
 
 	@Override
-	public Node getVMRoute(int src, int dest, int flowId){
+	public Node getCnRoute(int src, int dest, int flowId){
 		Node route= this.forwardingTable.getRoute(src, dest, flowId);
 		if(route == null) {
-			this.printVMRoute();
+			this.printCnRoute();
 			System.err.println("Switch.getVMRoute() No route (might be due to error, or dynamic route updating..):" +
 					NetworkOperatingSystem.getVmName(src) + "->"+
 					NetworkOperatingSystem.getVmName(dest) + ", flow ="+flowId);
@@ -98,7 +98,7 @@ public class Switch implements Node{
 	}
 
 	@Override
-	public void removeVMRoute(int src, int dest, int flowId){
+	public void removeCnRoute(int src, int dest, int flowId){
 		forwardingTable.removeRule(src, dest, flowId);
 	}
 
@@ -113,7 +113,7 @@ public class Switch implements Node{
 	}
 
 	@Override
-	public void printVMRoute() {
+	public void printCnRoute() {
 		forwardingTable.printForwardingTable(getName());
 	}
 

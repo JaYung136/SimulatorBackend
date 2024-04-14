@@ -32,7 +32,7 @@ public class VirtualNetworkMapper {
 
 		if(srchost.equals(dsthost)) {
 //			Log.printLine(CloudSim.clock() + ": Source SDN Host is same as Destination. Go loopback");
-			srchost.addVMRoute(srcVm, dstVm, flowId, dsthost);
+			srchost.addCnRoute(srcVm, dstVm, flowId, dsthost);
 		}
 		else {
 //			Log.printLine(CloudSim.clock() + ": VMs are in different hosts:"+ srchost+ "("+srcVm+")->"+dsthost+"("+dstVm+")");
@@ -63,7 +63,7 @@ public class VirtualNetworkMapper {
 		Link nextLink = linkSelector.selectLink(nextLinkCandidates, flowId, nos.findHost(srcVm), desthost, node);
 		Node nextHop = nextLink.getOtherNode(node);
 
-		node.addVMRoute(srcVm, dstVm, flowId, nextHop);
+		node.addCnRoute(srcVm, dstVm, flowId, nextHop);
 		buildForwardingTableRec(nextHop, srcVm, dstVm, flowId);
 
 		return true;
@@ -88,11 +88,11 @@ public class VirtualNetworkMapper {
 		Link nextLink = linkSelector.selectLink(nextLinkCandidates, flowId, nos.findHost(srcVm), desthost, node);
 		Node nextHop = nextLink.getOtherNode(node);
 
-		Node oldNextHop = node.getVMRoute(srcVm, dstVm, flowId);
+		Node oldNextHop = node.getCnRoute(srcVm, dstVm, flowId);
 		if(isNewRoute || !nextHop.equals(oldNextHop)) {
 			// Create a new route
 			//node.removeVMRoute(srcVm, dstVm, flowId);
-			node.addVMRoute(srcVm, dstVm, flowId, nextHop);
+			node.addCnRoute(srcVm, dstVm, flowId, nextHop);
 			//Log.printLine(CloudSim.clock() + ": " + getName() + ": Updating VM route for flow:"+srcVm+"->"+dstVm+"("+flowId+") From="+node+", Old="+oldNextHop+", New="+nextHop);
 
 			updateDynamicForwardingTableRec(nextHop, srcVm, dstVm, flowId, true);
@@ -123,7 +123,7 @@ public class VirtualNetworkMapper {
 
 		// Build the list of nodes and links that this channel passes through
 		Node origin = srcNode;
-		Node dest = origin.getVMRoute(src, dst, flowId);
+		Node dest = origin.getCnRoute(src, dst, flowId);
 
 		if(dest==null) {
 			System.err.println("buildNodesLinks() Cannot find dest!");
@@ -144,7 +144,7 @@ public class VirtualNetworkMapper {
 				break;
 
 			origin = dest;
-			dest = origin.getVMRoute(src, dst, flowId);
+			dest = origin.getCnRoute(src, dst, flowId);
 		}
 	}
 
@@ -157,7 +157,7 @@ public class VirtualNetworkMapper {
 
 		for(Node node:oldNodes) {
 			//System.err.println("Removing routes for: "+node + "("+arc+")");
-			node.removeVMRoute(srcVmId, dstVmId, flowId);
+			node.removeCnRoute(srcVmId, dstVmId, flowId);
 		}
 
 		// Build a forwarding table for the new route.

@@ -213,18 +213,21 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		return result;
 	}
 
+	/**
+	 * 主机将数据包发到端到端虚拟链路（channel）
+	 */
 	public Packet addPacketToChannel(Packet orgPkt) {
 		double timenow = CloudSim.clock();
 		Packet pkt = orgPkt;
-//		channelManager.updatePacketProcessing(); //TODO(尝试):???注释此行，添加包前不更新channel
 		int src = pkt.getOrigin();
 		String srchostname = ((SDNVm) NetworkOperatingSystem.findVmGlobal(src)).getHostName();
 		int dst = pkt.getDestination();
 		String dsthostname = ((SDNVm) NetworkOperatingSystem.findVmGlobal(dst)).getHostName();
 		int flowId = pkt.getFlowId();
-//		System.out.println("消息【id:"+pkt.getPacketId()+"】【src:"+findHost(src)+"】->【dst:"+findHost(dst)+"】");
 
 		Channel channel = channelManager.findChannel(src, dst, flowId);
+		// 终端发包流程step1:创建端到端通道，分配网络带宽等资源
+		// 如果不存在【src->dst】的端到端虚拟链路，就新建。会给新建的端到端虚拟链路分配网络带宽等资源
 		if(channel == null) {
 			//No channel established. Create a new channel.
 			SDNHost sender = findHost(src);
@@ -235,14 +238,12 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 				System.err.println("ERROR!! Cannot create channel!" + pkt);
 				return pkt;
 			}
+			// 将新建好的端到端虚拟链路交给平台内网络管理系统(netOS)管理。比如后面涉及到动态变更带宽，销毁虚拟链路等操作，都是由netOS->channelManager负责
 			channelManager.addChannel(src, dst, flowId, channel);
 		}
-
+		// 终端发包流程step2:拷贝数据包到队列
+		// 将数据包传入端到端虚拟链路
 		channel.addTransmission(new Transmission(pkt));
-//		Log.printLine(CloudSim.clock() + ": " + getName() + ".addPacketToChannel ("+channel
-//				+"): Transmission added:" +
-//				NetworkOperatingSystem.getVmName(src) + "->"+
-//				NetworkOperatingSystem.getVmName(dst) + ", flow ="+flowId + " / eft="+eft);
 
 		sendInternalEvent();
 
@@ -257,17 +258,14 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 			for (Transmission tr:ch.getArrivedPackets()){
 /* **********************************************************************/
 				if(ch.isWireless && ch.wirelessLevel == 0){ // 包即将抵达Gateway，新建wirelessUpChan(gateway->intercloud)并addTransmission
-					double delay = ch.getTotalLatency(); // 有线部分的物理链路延迟(srchost->gateway)
 					send(this.datacenter.getId(), 0, CloudSimTagsSDN.SDN_ARRIVED_GATEWAY, new ChanAndTrans(ch, tr));
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
 				if(ch.isWireless && ch.wirelessLevel == 1){ // 包即将抵达intercloud(wirelessnet)，给netDC发消息，新建wirelessDownChan(intercloud->gateway)并addTransmission
-					double delay = ch.getTotalLatency(); // gateway->intercloud的延迟
 					send(CloudSim.getEntityId("net"),0 , CloudSimTagsSDN.SDN_ARRIVED_INTERCLOUD, new ChanAndTrans(ch, tr));
 					continue; // 在上一层 caller 会删除空闲 channel
 				}
 				if(ch.isWireless && ch.wirelessLevel == 2){ // 包即将跨平台抵达Gateway，新建EthernetChan(gateway->desthost)并addTransmission
-					double delay = ch.getTotalLatency(); // intercloud->gateway的延迟
 					Packet pkt = tr.getPacket();
 					int vmId = pkt.getDestination();
 					Datacenter dc = SDNDatacenter.findDatacenterGlobal(vmId);
@@ -279,20 +277,10 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 				double timenow = CloudSim.clock();
 				Packet pkt = tr.getPacket();
 				int vmId = pkt.getDestination();
+				//目标终端所在平台
 				Datacenter dc = SDNDatacenter.findDatacenterGlobal(vmId);
-//				//Log.printLine(CloudSim.clock() + ": " + getName() + ": Packet completed: "+pkt +". Send to destination:"+ch.getLastNode());
-//				double tmplatency = 0;//ch.getTotalLatency();
-//				for(Node switch_ :ch.nodesAll){ //TODO:在这里加上所有交换时延
-//					if(switch_ instanceof EdgeSwitch || switch_ instanceof CoreSwitch){
-//						if(switch_.getBandwidth() >= 100000000) //100G
-//							tmplatency += 0.1*0.000001; //0.1微秒
-//						else if(switch_.getBandwidth() >= 40000000)
-//							tmplatency += 0.2*0.000001;
-//						else
-//							tmplatency += 0.5*0.000001;
-//					}
-//				}
 				ChanAndTrans ct = new ChanAndTrans(ch, tr);
+				//step4：全部数据包传输到目标终端，通知目标终端接收
 				sendPacketCompleteEvent(dc, ct, 0);
 			}
 
@@ -324,9 +312,6 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 			// 不再继续该chankey对应的 timeslot
 			return;
 		}
-		if (list.size() == 1){
-			int a = 0;
-		}
 		double timenow = CloudSim.clock();
 		CloudSim.wirelessScheduler.PushBackAndDisableOthers(chankey);
 
@@ -342,27 +327,21 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		if(channelManager.getTotalChannelNum() != 0) {
 			if(nextEventTime == CloudSim.clock() + CloudSim.getMinTimeBetweenEvents())
 				return;
-
-			// More to process. Send event again
+			// 预计数据包传达时间
 			double delay = channelManager.nextFinishTime();
-/* ********************************************************************************************/
-			if(delay == Double.POSITIVE_INFINITY) {// channel都被disable了
+
+			if(delay == Double.POSITIVE_INFINITY) {// channel都被disable了，TDMA中会出现此情况
 				return;
 			}
-/* ********************************************************************************************/
-			//TODO:处理delay==0。同个netOS内，有其他包的到达顺带通知netOS自己也到达了。不必重复通知？
+
 			if (delay < CloudSim.getMinTimeBetweenEvents()) {
-				//Log.printLine(CloudSim.clock() + ":Channel: delay is too short: "+ delay);
 				delay = CloudSim.getMinTimeBetweenEvents();
 			}
 
-			//Log.printLine(CloudSim.clock() + ": " + getName() + ".sendInternalEvent(): delay for next event="+ delay);
-
 			if((nextEventTime > CloudSim.clock() + delay) || nextEventTime <= CloudSim.clock() )
 			{
-				//Log.printLine(CloudSim.clock() + ": " + getName() + ".sendInternalEvent(): next event time changed! old="+ nextEventTime+", new="+(CloudSim.clock()+delay));
-
 				CloudSim.cancelAll(getId(), new PredicateType(CloudSimTagsSDN.SDN_INTERNAL_PACKET_PROCESS));
+				// 在预计时间发送event
 				send(this.getId(), delay, CloudSimTagsSDN.SDN_INTERNAL_PACKET_PROCESS);
 				nextEventTime = CloudSim.clock()+delay;
 			}

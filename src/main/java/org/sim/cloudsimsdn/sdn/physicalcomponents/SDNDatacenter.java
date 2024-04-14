@@ -505,11 +505,9 @@ public class SDNDatacenter extends Datacenter {
 	}
 
 	private void processNextActivity(Request req) {
-//		Log.printLine(CloudSim.clock() + ": " + getName() + ": Process next activity: " +req);
-		// 将第一个 activity去除
 		Activity ac = req.removeNextActivity();
 		if(req.activities.size() == 1) {
-			ac = req.removeNextActivity();//TODO:try去除第一个cloudlet的事件
+			ac = req.removeNextActivity();//不涉及cloudlet，仅仿真网络时延
 		}
 		ac.setStartTime(CloudSim.clock());
 
@@ -517,10 +515,8 @@ public class SDNDatacenter extends Datacenter {
 			processNextActivityTransmission((Transmission)ac);
 		}
 		else if(ac instanceof Processing) {
-			sendNow(req.getUserId(), CloudSimTagsSDN.REQUEST_COMPLETED, req);//TODO:取消最后一个cloudlet
-//			processNextActivityProcessing(((Processing) ac), req);
-		} else {
-			Log.printLine(CloudSim.clock() + ": " + getName() + ": Activity is unknown..");
+			//Processing 是结尾符号，表示消息传输已结束，需要被接收方处理
+			sendNow(req.getUserId(), CloudSimTagsSDN.REQUEST_COMPLETED, req);
 		}
 	}
 

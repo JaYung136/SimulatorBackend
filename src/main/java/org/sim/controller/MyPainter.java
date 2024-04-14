@@ -58,25 +58,25 @@ public class MyPainter extends JFrame {
     }
 
     public void saveAsFile(JFreeChart chart, String outputPath, int weight, int height)throws Exception {
-        FileOutputStream out = null;
-        File outFile = new File(outputPath);
-        if (!outFile.getParentFile().exists()) {
-            outFile.getParentFile().mkdirs();
-        }
-        out = new FileOutputStream(outputPath);
-        if (out != null) {
-            try {
-                // 保存为PNG
-                ChartUtils.writeChartAsPNG(out, chart, weight, height);
-                // 保存为JPEG
-                // ChartUtils.writeChartAsJPEG(out, chart, weight, height);
-                out.flush();
-                out.close();
-            } catch (IOException e) {
-//                e.printStackTrace();
-            }
-
-        }
+//        FileOutputStream out = null;
+//        File outFile = new File(outputPath);
+//        if (!outFile.getParentFile().exists()) {
+//            outFile.getParentFile().mkdirs();
+//        }
+//        out = new FileOutputStream(outputPath);
+//        if (out != null) {
+//            try {
+//                // 保存为PNG
+//                ChartUtils.writeChartAsPNG(out, chart, weight, height);
+//                // 保存为JPEG
+//                // ChartUtils.writeChartAsJPEG(out, chart, weight, height);
+//                out.flush();
+//                out.close();
+//            } catch (IOException e) {
+////                e.printStackTrace();
+//            }
+//
+//        }
     }
 
     public void paint(XYSeries[] xys, String pngName, boolean save) throws Exception {
@@ -201,8 +201,8 @@ public class MyPainter extends JFrame {
         }
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"网络延迟图像", false);
 
-        p = new MyPainter(name+"端到端延迟图像");
-        p.setSize(50000, 50000);
+        MyPainter q = new MyPainter(name+"端到端延迟图像");
+        q.setSize(50000, 50000);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -218,10 +218,10 @@ public class MyPainter extends JFrame {
             xySerieMap.put(key, line);
         }
         Thread.sleep(1000);
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"端到端延迟图像", false);
+        q.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"端到端延迟图像", false);
 
-        p = new MyPainter(name+"调度等待延迟图像");
-        p.setSize(50000, 50000);
+        MyPainter m = new MyPainter(name+"调度等待延迟图像");
+        m.setSize(50000, 50000);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -237,7 +237,7 @@ public class MyPainter extends JFrame {
             xySerieMap.put(key, line);
         }
         Thread.sleep(1000);
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"调度等待延迟图像", false);
+        m.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"调度等待延迟图像", false);
     }
     public static void paintMultiLatencyGraph(List<Workload> wls, Boolean save) throws Exception {
         MyPainter p = new MyPainter("网络延迟图像");
@@ -256,8 +256,8 @@ public class MyPainter extends JFrame {
         }
         p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "网络延迟图像", save);
 
-        p = new MyPainter("端到端延迟图像");
-        p.setSize(50000, 50000);
+        MyPainter q = new MyPainter("端到端延迟图像");
+        q.setSize(50000, 50000);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -271,10 +271,10 @@ public class MyPainter extends JFrame {
             xySerieMap.put(key, line);
         }
 
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "端到端延迟图像", save);
+        q.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "端到端延迟图像", save);
         Thread.sleep(1000);
-        p = new MyPainter("调度等待延迟图像");
-        p.setSize(50000, 50000);
+        MyPainter m = new MyPainter("调度等待延迟图像");
+        m.setSize(50000, 50000);
         xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
@@ -288,7 +288,7 @@ public class MyPainter extends JFrame {
             xySerieMap.put(key, line);
         }
         Thread.sleep(1000);
-        p.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "调度等待延迟图像", save);
+        m.paint(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "调度等待延迟图像", save);
     }
 
 

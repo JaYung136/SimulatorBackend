@@ -245,20 +245,20 @@ public class SDNHost extends Host implements Node {
 	}
 
 	@Override
-	public void clearVMRoutingTable(){
+	public void clearCnRoutingTable(){
 		this.forwardingTable.clear();
 	}
 
 	@Override
-	public void addVMRoute(int src, int dest, int flowId, Node to){
+	public void addCnRoute(int src, int dest, int flowId, Node to){
 		forwardingTable.addRule(src, dest, flowId, to);
 	}
 
 	@Override
-	public Node getVMRoute(int src, int dest, int flowId){
+	public Node getCnRoute(int src, int dest, int flowId){
 		Node route= this.forwardingTable.getRoute(src, dest, flowId);
 		if(route == null) {
-			this.printVMRoute();
+			this.printCnRoute();
 			System.err.println(toString()+" getVMRoute(): ERROR: Cannot find route:" + src + "->"+dest + ", flow ="+flowId);
 		}
 
@@ -266,7 +266,7 @@ public class SDNHost extends Host implements Node {
 	}
 
 	@Override
-	public void removeVMRoute(int src, int dest, int flowId){
+	public void removeCnRoute(int src, int dest, int flowId){
 		forwardingTable.removeRule(src, dest, flowId);
 	}
 
@@ -281,7 +281,7 @@ public class SDNHost extends Host implements Node {
 	}
 
 	@Override
-	public void printVMRoute() {
+	public void printCnRoute() {
 		forwardingTable.printForwardingTable(getName());
 	}
 

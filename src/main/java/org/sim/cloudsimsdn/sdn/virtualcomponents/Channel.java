@@ -132,8 +132,6 @@ public class Channel {
 
 		this.nodesAll = nodes;
 		this.linksAll = links;
-//		this.nodes = nodes;
-//		this.links = links;
 		this.allocatedBandwidth = this.BandwidthBackup = bandwidth;
 
 		this.srcVm = srcVm;
@@ -288,14 +286,12 @@ public class Channel {
 		if(chId != -1 && chId != 2999)
 			return false;
 
-		// Get the lowest bandwidth along links in the channel
+		// step4:当有channel被回收或新的channel被创建时，都会动态地调整channel带宽
 		double lowestLinkBw = getLowestSharedBandwidth();
-
 		if(lowestLinkBw <= 0 )
 		{
 			throw new RuntimeException("Allocated bandwidth negative!!" + this + ", lowestLinkBw="+lowestLinkBw);
 		}
-
 		// 该函数仅作用于以太网络
 		if(this.allocatedBandwidth != lowestLinkBw && this.wirelessLevel!=1 && wirelessLevel!=2) {
 			changeBandwidth(lowestLinkBw);

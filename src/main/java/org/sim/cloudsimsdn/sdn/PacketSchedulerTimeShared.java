@@ -23,35 +23,31 @@ public class PacketSchedulerTimeShared extends PacketSchedulerSpaceShared {
 	@Override
 	public double updatePacketProcessing() {
 		double currentTime = CloudSim.clock();
-		double timeSpent = currentTime - this.previousTime;//NetworkOperatingSystem.round(currentTime - this.previousTime);
+		// 距离上一次传输经过的时间
+		double timeSpent = currentTime - this.previousTime;
 
 		if(timeSpent <= 0 || this.getInTransmissionNum() == 0) {
-//			System.out.println("Error不应到此处");
 			return 0;    // Nothing changed
 		}
 
-		//update the amount of transmission
+		// 本次传输的数据量
 		double processedThisRound =  (timeSpent * channel.getAllocatedBandwidth());
 
-		//update transmission table; remove finished transmission
+		// 缓存队列中第一个包，添加已经被传输的长度
 		Transmission transmission = inTransmission.get(0);
 		transmission.addCompletedLength(processedThisRound);
 
+		// 如果传输完成，将数据包放入completed队列等待之后处理（比如发起接收事件）
 		if (transmission.isCompleted()){
 			this.completed.add(transmission);
 			this.inTransmission.remove(transmission);
-//			System.out.println("DEBUG:"+transmission.toString()+"completed");
 		}
 
-
-		if(processedThisRound == 0){
-			previousTime = currentTime; //对于disable的wirelesschannel，可以不更进时间
+		if(processedThisRound == 0){//可以优化，不加判断
+			previousTime = currentTime;
 		} else {
 			previousTime = currentTime;
 		}
-
-		//Log.printLine(CloudSim.clock() + ": Channel.updatePacketProcessing() ("+this.toString()+"):Time spent:"+timeSpent+
-		//		", BW/host:"+channel.getAllocatedBandwidth()+", Processed:"+processedThisRound);
 
 		List<Transmission> timeoutTransmission = getTimeoutTransmissions();
 		this.timeoutTransmission.addAll(timeoutTransmission);
@@ -69,8 +65,9 @@ public class PacketSchedulerTimeShared extends PacketSchedulerSpaceShared {
 	public double nextFinishTime() {
 		//now, predicts delay to next transmission completion
 		double delay = Double.POSITIVE_INFINITY;
-
+		// step3:以FIFO策略发送数据包
 		Transmission transmission = this.inTransmission.get(0);
+		// estimated_finish_time = packetSize / bandwidth of channel
 		double eft = estimateFinishTime(transmission);
 		if (eft<delay)
 			delay = eft;
@@ -78,10 +75,7 @@ public class PacketSchedulerTimeShared extends PacketSchedulerSpaceShared {
 		if(delay == Double.POSITIVE_INFINITY) {
 			return delay;
 		}
-		//TODO:取消packetscheduler的MinTimeBetweenEvents
-//		else if(Math.abs(delay) < CloudSim.getMinTimeBetweenEvents()) {
-//			return CloudSim.getMinTimeBetweenEvents();
-//		}
+
 		if(delay < 0) {
 			throw new RuntimeException("Channel.nextFinishTime: delay: "+delay);
 			//System.err.println("Channel.nextFinishTime: delay is minus: "+delay);

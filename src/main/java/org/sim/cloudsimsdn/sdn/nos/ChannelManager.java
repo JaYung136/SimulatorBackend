@@ -40,7 +40,7 @@ public class ChannelManager {
 		List<Link> links = new ArrayList<Link>();
 
 		Node origin = srcNode;
-		Node dest = origin.getVMRoute(src, dst, flowId);
+		Node dest = origin.getCnRoute(src, dst, flowId);
 
 		if(dest==null) {
 			throw new IllegalArgumentException("createChannel(): dest is null, cannot create channel! " +
@@ -85,7 +85,7 @@ public class ChannelManager {
 				break;
 
 			origin = dest;
-			dest = origin.getVMRoute(src, dst, flowId);
+			dest = origin.getCnRoute(src, dst, flowId);
 		}
 
 		// If currently free bandwidth is less than required one.
@@ -155,16 +155,15 @@ public class ChannelManager {
 	 */
 	private void updateChannel() {
 		//TODO: 更新带宽利用率
-//		this.nos.updateBWMonitor(1);
+		//step5:销毁通道，释放网络资源
 		List<String> removeCh = new ArrayList<String>();
 		for(String key:this.channelTable.keySet()) {
 			Channel ch = this.channelTable.get(key);
 			if(ch.getActiveTransmissionNum() == 0) {
-				// No more job in channel. Delete
+				//普通端到端通道
 				removeCh.add(key);
-/* **************************************************/
+				//无线传输通道
 				CloudSim.wirelessScheduler.RemoveChannel(ch);
-/* **************************************************/
 			}
 		}
 
@@ -209,6 +208,7 @@ public class ChannelManager {
 
 	public double nextFinishTime() {
 		double earliestEft = Double.POSITIVE_INFINITY; // earliest event_finish_time
+		//遍历所有的端到端虚拟链路，计算每一个channel完成传输数据包的时间，取最小值
 		for(Channel ch:channelTable.values()){
 			double timenow = CloudSim.clock();
 			double eft = ch.nextFinishTime();
@@ -218,9 +218,6 @@ public class ChannelManager {
 			}
 		}
 
-//		if(earliestEft == Double.POSITIVE_INFINITY) {
-//			throw new IllegalArgumentException("NOS.nextFinishTime(): next finish time is infinite!");
-//		}
 		return earliestEft;
 
 	}
@@ -255,7 +252,9 @@ public class ChannelManager {
 		}
 
 		if(completeChannels.size() != 0) {
+			//step4:请见此函数
 			nos.processCompletePackets(completeChannels); // 发送SDN-101给发包dc / SDN-1给收包dc
+			//step5:请见此函数
 			updateChannel(); // 删除空闲 channels
 		}
 

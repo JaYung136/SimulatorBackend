@@ -171,6 +171,7 @@ public class SDNBroker extends SimEntity {
 		Request req = (Request) ev.getData();
 		Workload wl = requestMap.remove(req.getRequestId());
 		wl.switchTime = req.switchTime;
+		//step2:容器接收数据。这里实现为打印消息的时延结果。
 		wl.writeResult();
 	}
 

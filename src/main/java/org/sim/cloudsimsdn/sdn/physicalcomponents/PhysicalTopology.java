@@ -193,7 +193,7 @@ public abstract class PhysicalTopology {
 		int nodeId = node.getAddress();
 		long bw = NetworkOperatingSystem.bandwidthWithinSameHost;
 		double latency = NetworkOperatingSystem.latencyWithinSameHost;
-
+		//TODO: 主机内部自循环链路
 		Link l = new Link(node, node, latency, bw, node.toString());
 
 		// Two way links (From -> to, To -> from)
