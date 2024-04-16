@@ -182,14 +182,14 @@ public class MyPainter extends JFrame {
         frame.setVisible(true);
     }
 
-    public static void paintSingleMsgGraph(List<Workload> wls, String name) throws Exception {
+    public static void paintMultiMsgGraph(List<Workload> wls, String name, List<String> namelist) throws Exception {
         MyPainter p = new MyPainter(name+"网络延迟图像");
         p.setSize(50000, 50000);
         Map<String, XYSeries> xySerieMap = new HashMap<>();
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
             String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
-            if(!Objects.equals(key, name))
+            if(!namelist.contains(key))
                 continue;
             XYSeries line = xySerieMap.get(key);
             //如果不存在这条线就新建
@@ -207,7 +207,7 @@ public class MyPainter extends JFrame {
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
             String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
-            if(!Objects.equals(key, name))
+            if(!namelist.contains(key))
                 continue;
             XYSeries line = xySerieMap.get(key);
             //如果不存在这条线就新建
@@ -226,7 +226,7 @@ public class MyPainter extends JFrame {
         for(int i = 0; i < wls.size(); i++) {
             Workload wl = wls.get(i);
             String key = wl.msgName;//"消息[" + wl.submitVmName + "->" + wl.destVmName + "]";
-            if(!Objects.equals(key, name))
+            if(!namelist.contains(key))
                 continue;
             XYSeries line = xySerieMap.get(key);
             //如果不存在这条线就新建
