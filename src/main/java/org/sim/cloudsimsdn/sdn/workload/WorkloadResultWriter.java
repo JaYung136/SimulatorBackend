@@ -150,55 +150,14 @@ public class WorkloadResultWriter {
 			wl.networktransmissiontime = totalnettime;
 			wl.networkfinishtime = wl.time + totalnettime;
 			AssignInfo destinfo = CloudSim.assignInfoMap.get(wl.destVmName);
-			Double loopstart = destinfo.starttime;
-			Double loopend = destinfo.endtime;
-			Double ps = destinfo.pausestart;
-			Double pe = destinfo.pauseend;
-			/**
-			 * 以周期为循环，不断迭代找到最合适的end2end接收时间
-			 * net:网络传输到达时刻
-			 * 一次循环中：
-			 * if net>=下一循环start
-			 * 		到下一循环
-			 * if net>  循环end && net<下一循环start
-			 *		wl.end2endfinishtime = 下一循环start;
-			 * if net<=循环end && net>=循环start+ps+pe
-			 * 		wl.end2endfinishtime = net;
-			 * if net<循环start+ps+pe && net>循环start+ps
-			 * 		wl.end2endfinishtime = 循环start+ps+pe;
-			 * if net<=循环start+ps && net>=循环start
-			 * 		wl.end2endfinishtime = net;
-			 * if net<循环start
-			 * 		wl.end2endfinishtime = 循环start;
-			 */
-			while (true){
-//				System.out.println("networkfinishtime:"+wl.networkfinishtime+" loopstart:"+loopstart+" loopend:"+loopend);
-				if(wl.networkfinishtime >= loopstart + destinfo.containerperiod){
-					loopstart += destinfo.containerperiod;
-					loopend += destinfo.containerperiod;
-					continue;
-				}
-				if(wl.networkfinishtime > loopend && wl.networkfinishtime < loopstart + destinfo.containerperiod){
-					wl.end2endfinishtime = loopstart + destinfo.containerperiod;
-					break;
-				}
-				if(wl.networkfinishtime <= loopend && wl.networkfinishtime >= loopstart+ps+pe){
-					wl.end2endfinishtime = wl.networkfinishtime;
-					break;
-				}
-				if(wl.networkfinishtime<loopstart+ps+pe && wl.networkfinishtime>loopstart+ps){
-					wl.end2endfinishtime = loopstart+ps+pe;
-					break;
-				}
-				if(wl.networkfinishtime<=loopstart+ps && wl.networkfinishtime>=loopstart){
-					wl.end2endfinishtime = wl.networkfinishtime;
-					break;
-				}
-				if (wl.networkfinishtime<loopstart) {
-					wl.end2endfinishtime = loopstart;
-					break;
-				}
+
+			// 消息接收时间为：容器下一个周期的开始时刻
+			double tem = destinfo.starttime;
+			for(; tem <= wl.networkfinishtime; tem += destinfo.containerperiod) {
 			}
+			wl.end2endfinishtime = tem;
+
+
 			wl.dagschedulingtime = wl.end2endfinishtime - wl.networkfinishtime;
 
 			maxPerTime = (maxPerTime > wl.networktransmissiontime)? maxPerTime : wl.networktransmissiontime;
