@@ -300,14 +300,14 @@ public class MyPainter extends JFrame {
             if(lu.printable == false)
                 continue;
             String linkname = lu.linkname;
-            XYSeries forwardline = new XYSeries(linkname+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]");
-            XYSeries backwardline = new XYSeries(linkname+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]");
+            XYSeries forwardline = new XYSeries(lu.lowOrder+"-"+lu.highOrder);
+            XYSeries backwardline = new XYSeries(lu.highOrder+"-"+lu.lowOrder);
             for(int i=0; i<lu.recordTimes.size(); ++i) {
                 forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i));
                 backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i));
             }
-            xySerieMap.put(linkname+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]", forwardline);
-            xySerieMap.put(linkname+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]", backwardline);
+            xySerieMap.put(lu.lowOrder+"-"+lu.highOrder, forwardline);
+            xySerieMap.put(lu.highOrder+"-"+lu.lowOrder, backwardline);
         }
         p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路利用率图像", "利用率", save);
 
@@ -331,21 +331,34 @@ public class MyPainter extends JFrame {
 //        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路带宽速率图像", "带宽(Gbps)", save);
     }
 
-    public static void paintSingleLinkGraph(Map<String, LinkUtil> lus, String name) throws Exception {
+    public static void paintOptionLinkGraph(Map<String, LinkUtil> lus, String name, List<String> namelist) throws Exception {
         MyPainter p = new MyPainter(name+"利用率图像");
         p.setSize(50000, 100000);
         Map<String, XYSeries> xySerieMap = new HashMap<>();
         for (LinkUtil lu : lus.values()) {
-            if(lu.printable == false || !lu.linkname.equals(name))
+            if(!lu.printable) {
                 continue;
-            XYSeries forwardline = new XYSeries(name+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]");
-            XYSeries backwardline = new XYSeries(name+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]");
-            for(int i=0; i<lu.recordTimes.size(); ++i) {
-                forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i));
-                backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i));
             }
-            xySerieMap.put(name+"[方向"+lu.lowOrder+"->"+lu.highOrder+"]", forwardline);
-            xySerieMap.put(name+"[方向"+lu.highOrder+"->"+lu.lowOrder+"]", backwardline);
+
+            String linkname1 = lu.lowOrder+"-"+lu.highOrder;
+            String linkname2 = lu.highOrder+"-"+lu.lowOrder;
+
+            if(namelist.contains(linkname1)) {
+                XYSeries forwardline = new XYSeries(linkname1);
+                for(int i=0; i<lu.recordTimes.size(); ++i) {
+                    forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i));
+                }
+                xySerieMap.put(linkname1, forwardline);
+
+            }
+
+            if(namelist.contains(linkname2)) {
+                XYSeries backwardline = new XYSeries(linkname2);
+                for(int i=0; i<lu.recordTimes.size(); ++i) {
+                    backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i));
+                }
+                xySerieMap.put(linkname2, backwardline);
+            }
         }
         p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"利用率图像", "利用率",false);
 

@@ -140,9 +140,12 @@ public class SDNController {
     public ResultDTO specifySingleLink(@RequestBody String req) {
         JSONObject content = new JSONObject(req);
         String name = content.getString("linkname");
-        System.out.println("查看单条链路："+name);
+        System.out.println("查看多条链路："+name);
+        String[] list = name.split("\\s+"); // 使用正则表达式\\s+表示一个或多个空格字符
+
+        List<String> namelist = Arrays.asList(list);
         try {
-            paintSingleLinkGraph(linkUtilMap, name);
+            paintOptionLinkGraph(linkUtilMap, name, namelist);
         } catch (Exception e) {
             e.printStackTrace();
         }
