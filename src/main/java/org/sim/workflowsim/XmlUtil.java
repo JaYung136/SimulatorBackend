@@ -26,6 +26,7 @@ import org.sim.cloudbus.cloudsim.*;
 import org.sim.service.Constants;
 import org.sim.service.Container;
 import org.sim.service.ContainerInfo;
+import org.sim.service.Message;
 import org.sim.workflowsim.utils.DistributionGenerator;
 import org.sim.workflowsim.utils.Parameters;
 import org.sim.workflowsim.utils.ReplicaCatalog;
@@ -636,6 +637,12 @@ public final class XmlUtil {
                         runtimeT *= Parameters.getRuntimeScale();
                         List<Element> fileListT = node.getChildren();
                         List<FileItem> mFileListT = new ArrayList<>();
+                        Task taskT;
+                        //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent.
+                        synchronized (this) {
+                            taskT = new Task(this.jobIdStartsFrom, runtimeT);
+                            this.jobIdStartsFrom++;
+                        }
                         for (Element file : fileListT) {
                             if (file.getName().equals("A653SamplingPort")) {
                                 List<Pair<String, String>> ipAndSizes = new ArrayList<>();
@@ -647,17 +654,18 @@ public final class XmlUtil {
                                 for (Element port : ports) {
                                     String messageSize = port.getAttributeValue("MessageSize");
                                     String ipS = port.getAttributeValue("IpAddress");
+                                    String period = port.getAttributeValue("SamplePeriod");
                                     ipAndSizes.add(new Pair<>(ipS, messageSize));
                                     //Log.printLine("App " + aName + " --- " + messageSize + " --> " + ipS);
+                                    Message message = new Message();
+                                    message.period = Double.parseDouble(periodTime);
+                                    message.destIP = ipS;
+                                    message.size = Integer.parseInt(messageSize);
+                                    taskT.messages.add(message);
                                 }
                                 Constants.name2Ips.put(aName, ipAndSizes);
+
                             }
-                        }
-                        Task taskT;
-                        //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent.
-                        synchronized (this) {
-                            taskT = new Task(this.jobIdStartsFrom, runtimeT);
-                            this.jobIdStartsFrom++;
                         }
                         if(cpuRequest != null && !cpuRequest.replace(" ","").equals("")) {
                             Double cpus = Double.parseDouble(cpuRequest);

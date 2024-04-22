@@ -19,6 +19,7 @@ import org.sim.cloudbus.cloudsim.Cloudlet;
 import org.sim.cloudbus.cloudsim.Consts;
 import org.sim.cloudbus.cloudsim.UtilizationModelFull;
 import org.sim.service.Constants;
+import org.sim.service.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,8 @@ public class Task extends Cloudlet {
      */
 
     public String hardware = "";
+
+    public List<Message> messages = new ArrayList<>();
     private List<Task> parentList;
     /*
      * The list of child tasks.
