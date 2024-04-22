@@ -26,6 +26,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.util.*;
 
 
@@ -405,7 +406,8 @@ public class SimulateController {
             Log.printLine("============================== 开始输出YAML文件 ==============================");
             m = writeYaml();
             Constants.faultFile = null;
-            m.data = Constants.score;
+            DecimalFormat dft = new DecimalFormat("###.##");
+            m.data = dft.format(Constants.score);
             return m;
         }catch (Exception e) {
             return ResultDTO.error(e.getMessage());
@@ -487,7 +489,8 @@ public class SimulateController {
             e.printStackTrace();
             return ResultDTO.error(e.getMessage());
         }
-        return ResultDTO.success(Constants.score);
+        DecimalFormat dft = new DecimalFormat("###.##");
+        return ResultDTO.success(dft.format(Constants.score));
     }
 
     @RequestMapping("/pauseContainer")

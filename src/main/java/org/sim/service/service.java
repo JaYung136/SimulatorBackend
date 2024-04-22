@@ -398,7 +398,7 @@ public class service {
             if (Constants.repeatTime > 0)
                 Constants.score /= Constants.repeatTime;
             Constants.score = 1 - Constants.score;
-
+            Constants.score *= 100;
         }
         /*if(Constants.lastTime == 0.0)
             return;*/
