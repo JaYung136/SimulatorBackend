@@ -628,6 +628,7 @@ public final class XmlUtil {
                         if (runtimeT < 100) {
                             runtimeT = 100;
                         }
+                        Constants.totalTime += computeT;
                        /* if(Constants.pause.containsKey(this.jobIdStartsFrom)) {
                             Double last = Constants.pause.get(this.jobIdStartsFrom).getValue();
                             computeT += last * 1000 * Parameters.getRuntimeScale();

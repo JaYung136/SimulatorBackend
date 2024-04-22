@@ -312,6 +312,7 @@ public class service {
                     + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
         }
         DecimalFormat dft = new DecimalFormat("###.##");
+        Double totalTime = 0.0;
         for (Job job : list) {
             jobs.put(job.getCloudletId(), true);
             if(job.getTaskList().size() == 0)
@@ -325,6 +326,7 @@ public class service {
             for (Task task : job.getTaskList()) {
                 if(Constants.ifSimulate)
                     Log.print(task.getCloudletId() + ",");
+
             }
             if(Constants.ifSimulate)
                 Log.print(indent);
@@ -332,6 +334,7 @@ public class service {
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
                 if(Constants.ifSimulate) {
                     Log.print("SUCCESS");
+                    totalTime += job.getFinishTime() - job.getExecStartTime();
                     Log.printLine(indent + indent + indent + job.getVmId()
                             + indent + indent + indent + dft.format(job.getActualCPUTime())
                             + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
@@ -341,6 +344,7 @@ public class service {
                 if(job.getTaskList().size() >= 1 && !ifLog.containsKey(job.getTaskList().get(0).name)) {
                     Result r = new Result();
                     double t1 = job.getFinishTime();
+
                     r.finish = dft.format(t1);
                     r.start = dft.format(job.getExecStartTime());
                     r.app = job.getTaskList().get(0).name;
@@ -388,8 +392,14 @@ public class service {
                 }
             }
         }
-        if(Constants.ifSimulate)
+        if(Constants.ifSimulate) {
             Log.printLine(Constants.repeatTime + "周期下，任务群总完成时间为：" + lastTime);
+            Constants.score = Double.valueOf(lastTime) / (Constants.totalTime);
+            if (Constants.repeatTime > 0)
+                Constants.score /= Constants.repeatTime;
+            Constants.score = 1 - Constants.score;
+
+        }
         /*if(Constants.lastTime == 0.0)
             return;*/
         try {

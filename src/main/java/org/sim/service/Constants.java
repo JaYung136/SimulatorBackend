@@ -36,6 +36,10 @@ public class Constants {
     public static File appFile = null;
     public static File hostFile = null;
     public static File topoFile = null;
+
+    public static Double score = 0.0;
+
+    public static Double totalTime = 0.0;
     public static Map<String, ContainerInfo> containerInfoMap = new HashMap<>();
     public static Double cpuUp = 1.1;
     public static Double ramUp = 1.1;

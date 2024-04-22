@@ -82,6 +82,7 @@ public class SimulateController {
         Constants.app2Con = new HashMap<>();
         Constants.repeatTime = 1;
         Constants.finishTime = 0.0;
+        Constants.totalTime = 0.0;
         service = new service();
     }
 
@@ -102,6 +103,7 @@ public class SimulateController {
         Constants.ip2taskName = new HashMap<>();
         Constants.name2Ips = new HashMap<>();
         Constants.finishTime = 0.0;
+        Constants.totalTime = 0.0;
         service = new service();
     }
 
@@ -403,6 +405,7 @@ public class SimulateController {
             Log.printLine("============================== 开始输出YAML文件 ==============================");
             m = writeYaml();
             Constants.faultFile = null;
+            m.data = Constants.score;
             return m;
         }catch (Exception e) {
             return ResultDTO.error(e.getMessage());
@@ -484,7 +487,7 @@ public class SimulateController {
             e.printStackTrace();
             return ResultDTO.error(e.getMessage());
         }
-        return ResultDTO.success("generate successfully");
+        return ResultDTO.success(Constants.score);
     }
 
     @RequestMapping("/pauseContainer")
