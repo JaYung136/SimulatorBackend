@@ -97,6 +97,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		this.currentCPUs = mipsShare.size();
 		getCapacity(mipsShare);
 		String containers = "";
+		int taskNum = getCloudletExecList().size();
 		//Log.printLine(getCloudletExecList().size());
 		for (ResCloudlet rcl : getCloudletExecList()) {
 			if(!((Job) rcl.getCloudlet()).getTaskList().isEmpty()) {
@@ -208,14 +209,9 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 	protected double getCapacity(List<Double> mipsShare) {
 		double capacity = 0.0;
 		int cpus = 0;
-		for (Double mips : mipsShare) {
-			capacity += mips;
-			if (mips > 0.0) {
-				cpus++;
-			}
-		}
+		capacity = mipsShare.size() * mipsShare.get(0);
+		cpus = mipsShare.size();
 		currentCPUs = cpus;
-
 		int pesInUse = 0;
 		double ramInUse = 0;
 		double rate = 1.0;
@@ -237,9 +233,9 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 			Constants.nodeEnough = false;
 		}
 		//Log.printLine("peInUse: " + usedPes);
-		if (pesInUse > currentCPUs) {
+		if (usedPes  > currentCPUs) {
 			//Constants.nodeEnough = false;
-			capacity /= pesInUse;
+			capacity /= usedPes;
 		} else {
 			capacity /= currentCPUs;
 		}

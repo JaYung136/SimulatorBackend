@@ -460,7 +460,7 @@ public class WorkflowDatacenter extends Datacenter {
         //Log.printLine("节点" + indent + "cpu使用" + indent + "内存使用" + indent + "运行容器" );
         DecimalFormat dft = new DecimalFormat("###.##");
         for (Host host : this.getHostList()) {
-            //Log.printLine();
+          //  Log.printLine();
             //Log.printLine(host.getName());
             //System.out.print(String.format("%-8s", host.getName()));
             //System.out.print(String.format("%-8s", (host.getNumberOfPes() * host.getUtilizationOfCpu() / 1000) + "/" + (host.getNumberOfPes() / 1000)));

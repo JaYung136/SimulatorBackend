@@ -39,6 +39,8 @@ public class Constants {
 
     public static Double score = 0.0;
 
+    public static Double balanceScore = 0.0;
+
     public static Double totalTime = 0.0;
     public static Map<String, ContainerInfo> containerInfoMap = new HashMap<>();
     public static Double cpuUp = 1.1;

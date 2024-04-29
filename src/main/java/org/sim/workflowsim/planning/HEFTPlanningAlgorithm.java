@@ -292,18 +292,15 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
 
             for (Task parent : task.getParentList()) {
                 double readyTime = earliestFinishTimes.get(parent);
-                /*if (parent.getVmId() != host.getId()) {
-                    readyTime += transferCosts.get(parent).get(task);
-                }*/
-                List<Pair<String, String>> ipAndSizes = Constants.name2Ips.get(task.name);
+                List<Pair<String, String>> ipAndSizes = Constants.name2Ips.get(parent.name);
                 if(ipAndSizes != null) {
                     for (Pair<String, String> ias : ipAndSizes) {
                         String ip = ias.getKey();
                         String mSize = ias.getValue();
                         String destName = Constants.ip2taskName.get(ip);
-                        // Log.printLine("need to send to " + destName);
-                        if (sched.containsKey(destName) && sched.get(destName).getId() != host.getId()) {
-                            //Log.printLine("need to send to " + destName);
+                        //Log.printLine("need to send to " + destName);
+                        if (destName.equals(host.getName()) && sched.get(parent.name).getId() != host.getId()) {
+                            //Log.printLine(parent.name + " need to send to " + destName);
                             readyTime += Double.parseDouble(mSize) * 8 / (host.getBw() * Consts.MILLION);
                         }
                     }
