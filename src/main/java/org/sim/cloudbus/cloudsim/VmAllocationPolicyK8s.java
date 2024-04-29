@@ -28,8 +28,6 @@ public class VmAllocationPolicyK8s extends VmAllocationPolicySimple{
         //Log.printLine("cpu_: " + cpu_fraction);
         double ram_fraction = 1 - (double) (host.getRamProvisioner().getAvailableRam()) / (double) host.getRamProvisioner().getRam();
         //Log.printLine("ram: " + ram_fraction);
-        //double storage_fraction = (host.getTotal_storage() - host.getStorage()) / host.getTotal_storage();
-        //Log.printLine("storage: " + storage_fraction);
         double mean = (cpu_fraction + ram_fraction) / 2;
         //Log.printLine("mean: " + mean);
         double variance = ((cpu_fraction - mean)*(cpu_fraction - mean)

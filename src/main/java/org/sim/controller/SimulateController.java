@@ -521,26 +521,27 @@ public class SimulateController {
     @RequestMapping("/specifiedCpu")
     public ResultDTO specifiedCpu(@RequestBody String req)  {
         JSONObject content = new JSONObject(req);
-        String hostName = content.getString("hostname");
-        Integer cpuId = content.getInt("cpuid");
-        Log.print("find host " + hostName);
-        Host h = null;
-        for(Host host: Constants.hosts) {
-            if(host.getName().equals(hostName)) {
-                h = host;
-                break;
+        String[] hostNames = content.getString("hostname").split(" ");
+        for(String hostName: hostNames) {
+            //Log.print("find host " + hostName);
+            Host h = null;
+            for (Host host : Constants.hosts) {
+                if (host.getName().equals(hostName)) {
+                    h = host;
+                    break;
+                }
+            }
+            if (h == null) {
+                return ResultDTO.error("未找到符合要求的物理节点");
+            }
+            try {
+                MyPainter p = new MyPainter("");
+                p.paintHost(h);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResultDTO.error(e.getMessage());
             }
         }
-        if(h == null || h.getNumberOfPes() < cpuId + 1) {
-            return ResultDTO.error("未找到符合要求的物理节点");
-        }
-        try {
-            MyPainter p = new MyPainter("");
-            p.paintHost(h);
-            return ResultDTO.success(null);
-        }catch (Exception e) {
-            e.printStackTrace();
-            return ResultDTO.error(e.getMessage());
-        }
+        return ResultDTO.success(null);
     }
 }

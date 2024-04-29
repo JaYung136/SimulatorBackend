@@ -456,15 +456,15 @@ public class WorkflowDatacenter extends Datacenter {
             lastLogTime = currentTime;
             ifLog = true;
         }
-        //Log.printLine("\n\n---------------------------集群资源占用情况 "+ currentTime + "------------------------------------------\n\n");
-        //Log.printLine("节点" + indent + "cpu使用" + indent + "内存使用" + indent + "运行容器" );
+        Log.printLine("\n\n---------------------------集群资源占用情况 "+ currentTime + "------------------------------------------\n\n");
+        Log.printLine("节点" + indent + "cpu使用" + indent + "内存使用" + indent + "运行容器" );
         DecimalFormat dft = new DecimalFormat("###.##");
         for (Host host : this.getHostList()) {
-            //Log.printLine();
-            //Log.printLine(host.getName());
-            //System.out.print(String.format("%-8s", host.getName()));
-            //System.out.print(String.format("%-8s", (host.getNumberOfPes() * host.getUtilizationOfCpu() / 1000) + "/" + (host.getNumberOfPes() / 1000)));
-            //System.out.print(String.format("%-8s", host.getRam() * host.getUtilizationOfRam() + "/" + host.getRam()));
+            Log.printLine();
+            Log.printLine(host.getName());
+            System.out.print(String.format("%-8s", host.getName()));
+            System.out.print(String.format("%-8s", (host.getNumberOfPes() * host.getUtilizationOfCpu() / 1000) + "/" + (host.getNumberOfPes() / 1000)));
+            System.out.print(String.format("%-8s", host.getRam() * host.getUtilizationOfRam() + "/" + host.getRam()));
             if(ifLog) {
                 Constants.logs.add(new LogEntity(dft.format(currentTime), dft.format(host.getUtilizationOfCpu()), dft.format(host.getUtilizationOfRam()), host.getId()));
             }

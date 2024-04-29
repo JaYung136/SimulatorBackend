@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInfo RleaseDate="27/01/2021 21:52:29" ICDVerison="BP2.3.1">
+    <application Name="HF_SM_1" Guid="a96ef0520" IpAddress="10.31.40.1" Hardware="host1" ComputeTime="5" Period="10" RequiredMemorySize="16">
+    </application>
+    <application Name="HF_SM_2" Guid="a96ef0521" IpAddress="10.31.40.2" Hardware="host1" ComputeTime="5" Period="10" RequiredMemorySize="16">
+    </application>
+    <application Name="HF_SM_3" Guid="a96ef0522" IpAddress="10.31.40.3" Hardware="host2" ComputeTime="2" Period="10" RequiredMemorySize="32">
+    </application>
+</AppInfo>

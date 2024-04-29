@@ -307,6 +307,7 @@ public final class WorkflowEngine extends SimEntity {
                     }
                 }
             }
+            Log.printLine(task.getNumOfPes());
             CondorVM containerTmp = new CondorVM(task.getCloudletId(), 1, 0, task.getNumberOfPes(), (int) task.getRam(), 0, 0, "Xen", new CloudletSchedulerTimeShared());
             if(h != null) {
                 containerTmp.setHost(h);

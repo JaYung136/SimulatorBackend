@@ -13,7 +13,7 @@
         <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="1600" RefreshPeriod="40">
         </A653SamplingPort>
     </application>
-    <application Name="HF_SM_4" Guid="a96ef0523" IpAddress="10.31.40.4" Hardware="host2" ComputeTime="10" CpuRequest="1000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="30000" Key="True" Priority="4" UpBandwidth="80" DownBandwidth="80" Parent="">
+    <application Name="HF_SM_4" Guid="a96ef0523" IpAddress="10.31.40.4" Hardware="host1" ComputeTime="10" CpuRequest="1000" MemoryBssSize="13631488" MemoryDataSize="1048576" MemoryPersistentBssSize="0" MemoryPersistentDataSize="0" MemoryRoDataSize="1900544" MemoryTextSize="1048576" PartitionId="1" Period="10" RequiredMemorySize="30000" Key="True" Priority="4" UpBandwidth="80" DownBandwidth="80" Parent="">
         <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="6400" RefreshPeriod="40">
         </A653SamplingPort>
     </application>
@@ -21,4 +21,16 @@
         <A653SamplingPort Name="po_A664_Port" Guid="a60465f1e" Direction="Source" MessageSize="800" RefreshPeriod="40">
         </A653SamplingPort>
     </application>
+    <child ref = "HF_SM_2">
+        <parent ref = "HF_SM_1"/>
+    </child>
+    <child ref = "HF_SM_3">
+        <parent ref = "HF_SM_2"/>
+    </child>
+    <child ref = "HF_SM_4">
+        <parent ref = "HF_SM_2"/>
+    </child>
+    <child ref = "HF_SM_5">
+        <parent ref = "HF_SM_4"/>
+    </child>
 </AppInfo>
