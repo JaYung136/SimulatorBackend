@@ -407,7 +407,8 @@ public class SimulateController {
             m = writeYaml();
             Constants.faultFile = null;
             DecimalFormat dft = new DecimalFormat("###.##");
-            m.data = dft.format(Constants.score);
+            m.data = "运行时间得分："  + dft.format(Constants.score) + "平衡度打分：" + dft.format(Constants.balanceScore);
+            Log.printLine(m.data);
             return m;
         }catch (Exception e) {
             return ResultDTO.error(e.getMessage());

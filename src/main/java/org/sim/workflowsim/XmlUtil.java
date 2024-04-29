@@ -168,10 +168,10 @@ public final class XmlUtil {
                         //String aMemeData = node.getAttributeValue("MemoryDataSize");
                         //String aMemPersistBss = node.getAttributeValue("MemoryPersistentBssSize");
                         //String aMemPersistData = node.getAttributeValue("MemoryPersistentDataSize");
-                        //String aMemText = node.getAttributeValue("MemoryTextSize");
+                       // String aMemText = node.getAttributeValue("MemoryTextSize");
                         String requiredMem = node.getAttributeValue("RequiredMemorySize");
                         String periodTime = node.getAttributeValue("Period");
-                        //String cpuRequest = node.getAttributeValue("CpuRequest");
+                        String cpuRequest = node.getAttributeValue("CpuRequest");
                         // Log.printLine(requiredMem);
                         //String upBandwidth = node.getAttributeValue("UpBandwidth");
                         //String downBandwidth = node.getAttributeValue("DownBandwidth");
@@ -220,9 +220,14 @@ public final class XmlUtil {
                         CondorVM taskT;
                         //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent.
                         synchronized (this) {
-                            Double cpus = 1000 * computeT / Double.parseDouble(periodTime);
-                            Integer cpuInt = cpus.intValue();
-                            taskT = new CondorVM(this.jobIdStartsFrom, userId, 0, cpuInt, reqMem, 0, 0, "Xen", new CloudletSchedulerTimeShared());
+                            if(cpuRequest == null || cpuRequest.replace(" ", "").equals("")) {
+                                taskT = new CondorVM(this.jobIdStartsFrom, userId, 0, 1000, reqMem, 0, 0, "Xen", new CloudletSchedulerTimeShared());
+                            }else{
+                                double mips = 20000;
+                                Double cpus = Double.parseDouble(cpuRequest);
+                                Integer cpuInt = cpus.intValue();
+                                taskT = new CondorVM(this.jobIdStartsFrom, userId, 0, cpuInt, reqMem, 0, 0, "Xen", new CloudletSchedulerTimeShared());
+                            }
                             this.jobIdStartsFrom++;
                         }
                         if(hardware != null && !hardware.equals("")) {
@@ -427,7 +432,7 @@ public final class XmlUtil {
                         Long bandwidth_gbps = Long.parseLong(bandwidth);
                         List<Pe> pes = new ArrayList<>();
                         for(int i = 0; i < pes_size * 1000; i++) {
-                            pes.add(new Pe(i,new PeProvisionerSimple(1000)));
+                            pes.add(new Pe(i,new PeProvisionerSimple(pe_mips)));
                         }
 
                         Host host = new Host(hostId,
@@ -663,10 +668,12 @@ public final class XmlUtil {
 
                             }
                         }
-
-                            Double cpus = 1000 * Double.parseDouble(computeTime) / Double.parseDouble(periodTime);
-                            Log.printLine(cpus);
+                        if(cpuRequest != null && !cpuRequest.replace(" ","").equals("")) {
+                            Double cpus = 1000 * Double.parseDouble(cpuRequest);
                             taskT.setNumberOfPes(cpus.intValue());
+                        }else{
+                            taskT.setNumberOfPes(1000);
+                        }
                         taskT.setType(ip);
                         taskT.setUserId(userId);
                         taskT.setRam(reqMem);
@@ -681,7 +688,7 @@ public final class XmlUtil {
                         taskT.setFileList(mFileListT);
                         taskT.setPeriodTime(Double.parseDouble(periodTime));
                         this.getTaskList().add(taskT);
-                        Log.printLine("Job " + taskT.name + " : || compute time: " + computeTime + " : || cpu request: " + taskT.getNumberOfPes() + "m || period: " + taskT.getPeriodTime() +" || ram: " + taskT.getRam() + " ip: " + taskT.getType() + " ||");
+                        Log.printLine("Job " + taskT.name + " : || compute time: " + computeTime + " : || cpu request: " + taskT.getNumberOfPes() + " || period: " + taskT.getPeriodTime() +" || ram: " + taskT.getRam() + " ip: " + taskT.getType() + " ||");
                     case "":
                 }
             }
