@@ -84,7 +84,8 @@ public class VirtualTopologyParser {
 
 			String nodeType = (String) node.get("type");
 			String nodeName = (String) node.get("name");
-			int pes = new BigDecimal((Long)node.get("pes")).intValueExact();
+			//int pes = new BigDecimal((Long)node.get("pes")).intValueExact();
+			int pes = 0;
 			long mips = (Long) node.get("mips");
 			int ram = new BigDecimal((Long)node.get("ram")).intValueExact();
 			long size = (Long) node.get("size");
