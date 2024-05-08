@@ -348,6 +348,7 @@ public class WorkloadParser {
 		try{
 			for(Workload wl:workloads){
 				wl.resultWriter = this.resultWriter;
+				wl.time = wl.time * contractRate;
 				wl.submitVmId = getVmId(wl.submitVmName);
 				wl.destVmId = getVmId(wl.destVmName);
 				Request req = new Request(userId);
@@ -366,10 +367,12 @@ public class WorkloadParser {
 				wl.request = req;
 				parsedWorkloads.add(wl);
 			}
-			
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
+
+		return;
 
 	}
 

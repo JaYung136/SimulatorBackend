@@ -1,5 +1,6 @@
 package org.sim.controller;
 
+import org.sim.cloudsimsdn.Log;
 import org.sim.cloudsimsdn.core.CloudSim;
 import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.LogWriter;
@@ -542,6 +543,7 @@ public class SDNController {
 
     @RequestMapping("/run")
     public ResultDTO run() throws IOException {
+
         CloudSim.HalfDuplex = false;
         CloudSim.wirelesschan_bw = wirelessChan_bw;
         try {
@@ -562,6 +564,7 @@ public class SDNController {
             }catch (Exception e){
                 //Do nothing
             }
+            Log.printLine("mes size " + Constants.workloads.size());
             convertphytopo();
             convertvirtopo();
             convertworkload();
