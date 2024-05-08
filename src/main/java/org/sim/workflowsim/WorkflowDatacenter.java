@@ -277,8 +277,8 @@ public class WorkflowDatacenter extends Datacenter {
      */
     protected double processDataStageInForComputeJob(List<FileItem> requiredFiles, Job job) throws Exception {
         double time = 0.0;
-        if(((Job)job).getTaskList().size() >= 1){
-            String name = ((Job)job).getTaskList().get(0).name;
+        for(Task t: ((Job)job).getTaskList()){
+            String name = t.name;
             List<Pair<String, String>> ipAnsSizes = Constants.name2Ips.get(name);
             if(ipAnsSizes == null || ipAnsSizes.isEmpty()) {
 
@@ -290,8 +290,6 @@ public class WorkflowDatacenter extends Datacenter {
                     Integer hostId = taskName2HostId.get(destName);
 
                     if(hostId != null) {
-                        //Log.printLine("App " + name + " in Host " + job.getVmId() + " need file from " + destName + " in Host " + hostId);
-                        //Log.printLine("ip: " + ip + " size: " + size);
                         if(job.getVmId() != hostId) {
                             double len = Double.parseDouble(size) * 8;
                             Host h = null;
@@ -302,7 +300,6 @@ public class WorkflowDatacenter extends Datacenter {
                                 }
                             }
                             if(h != null) {
-                                //Log.printLine("BW: " + h.getBw());
                                 time += len * 8 / (h.getBw() * Consts.MILLION);
                             }
                         }
@@ -311,7 +308,6 @@ public class WorkflowDatacenter extends Datacenter {
             }
         }
         for (FileItem file : requiredFiles) {
-            //The input file is not an output File
             if (file.isRealInputFile(requiredFiles)) {
                 double maxBwth = 0.0;
                 List siteList = ReplicaCatalog.getStorageList(file.getName());
@@ -398,13 +394,6 @@ public class WorkflowDatacenter extends Datacenter {
             return;
         }
         double currentTime = CloudSim.clock();
-        /*if(super.isIfInMigrate()) {
-            setLastProcessTime(currentTime);
-            return;
-        }*/
-
-        //Log.printLine("当前时间: " + currentTime);
-
         if(currentTime > getLastProcessTime()) {
             double minTime = updateCloudletProcessingWithoutSchedulingFutureEventsForce();
             if(minTime < CloudSim.clock() + 0.11) {
@@ -452,19 +441,11 @@ public class WorkflowDatacenter extends Datacenter {
         String indent = "\t";
         boolean ifLog = false;
         if(currentTime - lastLogTime >= 0.5) {
-            //Log.printLine("记录在Log文件中");
             lastLogTime = currentTime;
             ifLog = true;
         }
-        //Log.printLine("\n\n---------------------------集群资源占用情况 "+ currentTime + "------------------------------------------\n\n");
-        //Log.printLine("节点" + indent + "cpu使用" + indent + "内存使用" + indent + "运行容器" );
         DecimalFormat dft = new DecimalFormat("###.##");
         for (Host host : this.getHostList()) {
-          //  Log.printLine();
-            //Log.printLine(host.getName());
-            //System.out.print(String.format("%-8s", host.getName()));
-            //System.out.print(String.format("%-8s", (host.getNumberOfPes() * host.getUtilizationOfCpu() / 1000) + "/" + (host.getNumberOfPes() / 1000)));
-            //System.out.print(String.format("%-8s", host.getRam() * host.getUtilizationOfRam() + "/" + host.getRam()));
             if(ifLog) {
                 Constants.logs.add(new LogEntity(dft.format(currentTime), dft.format(host.getUtilizationOfCpu()), dft.format(host.getUtilizationOfRam()), host.getId()));
             }
@@ -499,8 +480,8 @@ public class WorkflowDatacenter extends Datacenter {
                         //Log.printLine("is not null");
                     }
                     if (cl != null) {
-                        if(!((Job) cl).getTaskList().isEmpty()) {
-                            String aName = ((Job)cl).getTaskList().get(0).name;
+                        for(Task t: ((Job) cl).getTaskList()) {
+                            String aName = t.name;
                             taskName2HostId.put(aName, host.getId());
                         }
                         sendNow(cl.getUserId(), CloudSimTags.CLOUDLET_RETURN, cl);

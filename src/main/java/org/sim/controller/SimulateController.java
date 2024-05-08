@@ -67,6 +67,7 @@ public class SimulateController {
      *
      * */
     private void resetAllForScheduler() {
+        Constants.workloads = new ArrayList<>();
         Constants.lastTime = 0.0;
         Constants.scheduleResults = new ArrayList<>();
         Constants.results = new ArrayList<>();
@@ -93,6 +94,7 @@ public class SimulateController {
      *
      * */
     private void resetForSimulator() {
+        Constants.workloads = new ArrayList<>();
         Constants.lastTime = 0.0;
         Constants.results = new ArrayList<>();
         Constants.logs = new ArrayList<>();
@@ -407,8 +409,7 @@ public class SimulateController {
             m = writeYaml();
             Constants.faultFile = null;
             DecimalFormat dft = new DecimalFormat("###.##");
-            m.data = "运行时间得分："  + dft.format(Constants.score) + "平衡度打分：" + dft.format(Constants.balanceScore);
-            Log.printLine(m.data);
+            m.data = dft.format(Constants.score);
             return m;
         }catch (Exception e) {
             return ResultDTO.error(e.getMessage());

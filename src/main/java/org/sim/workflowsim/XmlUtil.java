@@ -168,10 +168,10 @@ public final class XmlUtil {
                         //String aMemeData = node.getAttributeValue("MemoryDataSize");
                         //String aMemPersistBss = node.getAttributeValue("MemoryPersistentBssSize");
                         //String aMemPersistData = node.getAttributeValue("MemoryPersistentDataSize");
-                       // String aMemText = node.getAttributeValue("MemoryTextSize");
+                        //String aMemText = node.getAttributeValue("MemoryTextSize");
                         String requiredMem = node.getAttributeValue("RequiredMemorySize");
                         String periodTime = node.getAttributeValue("Period");
-                        String cpuRequest = node.getAttributeValue("CpuRequest");
+                        //String cpuRequest = node.getAttributeValue("CpuRequest");
                         // Log.printLine(requiredMem);
                         //String upBandwidth = node.getAttributeValue("UpBandwidth");
                         //String downBandwidth = node.getAttributeValue("DownBandwidth");
@@ -220,14 +220,9 @@ public final class XmlUtil {
                         CondorVM taskT;
                         //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent.
                         synchronized (this) {
-                            if(cpuRequest == null || cpuRequest.replace(" ", "").equals("")) {
-                                taskT = new CondorVM(this.jobIdStartsFrom, userId, 0, 1000, reqMem, 0, 0, "Xen", new CloudletSchedulerTimeShared());
-                            }else{
-                                double mips = 20000;
-                                Double cpus = Double.parseDouble(cpuRequest);
-                                Integer cpuInt = cpus.intValue();
-                                taskT = new CondorVM(this.jobIdStartsFrom, userId, 0, cpuInt, reqMem, 0, 0, "Xen", new CloudletSchedulerTimeShared());
-                            }
+                            Double cpus = 1000 * computeT / Double.parseDouble(periodTime);
+                            Integer cpuInt = cpus.intValue();
+                            taskT = new CondorVM(this.jobIdStartsFrom, userId, 0, cpuInt, reqMem, 0, 0, "Xen", new CloudletSchedulerTimeShared());
                             this.jobIdStartsFrom++;
                         }
                         if(hardware != null && !hardware.equals("")) {
@@ -432,7 +427,7 @@ public final class XmlUtil {
                         Long bandwidth_gbps = Long.parseLong(bandwidth);
                         List<Pe> pes = new ArrayList<>();
                         for(int i = 0; i < pes_size * 1000; i++) {
-                            pes.add(new Pe(i,new PeProvisionerSimple(pe_mips)));
+                            pes.add(new Pe(i,new PeProvisionerSimple(Constants.averageMIPS)));
                         }
 
                         Host host = new Host(hostId,
@@ -448,124 +443,6 @@ public final class XmlUtil {
                         Log.printLine("new Host " + hostId + " with pe: " + pes_size + " ram: " + memory_MB + " mips: " + mips + " storage: " + storage + " bandwidth: " + bandwidth);
                         hostId ++;
                         //WFCConstants.hostMips.put(host.getId(), pe_mips);
-                        break;
-                    case "job":
-                        long length = 0;
-                        String nodeName = node.getAttributeValue("id");
-                        String nodeType = node.getAttributeValue("name");
-                        /**
-                         * capture runtime. If not exist, by default the runtime
-                         * is 0.1. Otherwise CloudSim would ignore this task.
-                         * BUG/#11
-                         */
-                        double runtime;
-                        if (node.getAttributeValue("runtime") != null) {
-                            String nodeTime = node.getAttributeValue("runtime");
-                            runtime = 1000 * Double.parseDouble(nodeTime);
-                            if (runtime < 100) {
-                                runtime = 100;
-                            }
-                            length = (long) runtime;
-                        } else {
-                            Log.printLine("Cannot find runtime for " + nodeName + ",set it to be 0");
-                        }   //multiple the scale, by default it is 1.0
-                        length *= Parameters.getRuntimeScale();
-                        List<Element> fileList = node.getChildren();
-                        List<FileItem> mFileList = new ArrayList<>();
-                        for (Element file : fileList) {
-                            if (file.getName().toLowerCase().equals("uses")) {
-                                String fileName = file.getAttributeValue("name");//DAX version 3.3
-                                if (fileName == null) {
-                                    fileName = file.getAttributeValue("file");//DAX version 3.0
-                                }
-                                if (fileName == null) {
-                                    Log.print("Error in parsing xml");
-                                }
-
-                                String inout = file.getAttributeValue("link");
-                                double size = 0.0;
-
-                                String fileSize = file.getAttributeValue("size");
-                                if (fileSize != null) {
-                                    size = Double.parseDouble(fileSize) /*/ 1024*/;
-                                } else {
-                                    Log.printLine("File Size not found for " + fileName);
-                                }
-
-                                /**
-                                 * a bug of cloudsim, size 0 causes a problem. 1
-                                 * is ok.
-                                 */
-                                if (size == 0) {
-                                    size++;
-                                }
-                                /**
-                                 * Sets the file type 1 is input 2 is output
-                                 */
-                                Parameters.FileType type = Parameters.FileType.NONE;
-                                switch (inout) {
-                                    case "input":
-                                        type = Parameters.FileType.INPUT;
-                                        break;
-                                    case "output":
-                                        type = Parameters.FileType.OUTPUT;
-                                        break;
-                                    default:
-                                        Log.printLine("Parsing Error");
-                                        break;
-                                }
-                                FileItem tFile;
-                                /*
-                                 * Already exists an input file (fcom.wfc.cloudsimet output file)
-                                 */
-                                if (size < 0) {
-                                    /*
-                                     * Assuming it is a parsing error
-                                     */
-                                    size = 0 - size;
-                                    Log.printLine("Size is negative, I assume it is a parser error");
-                                }
-                                /*
-                                 * Note that CloudSim use size as MB, in this case we use it as Byte
-                                 */
-                                if (type == Parameters.FileType.OUTPUT) {
-                                    /**
-                                     * It is good that CloudSim does tell
-                                     * whether a size is zero
-                                     */
-                                    tFile = new FileItem(fileName, size);
-                                } else if (ReplicaCatalog.containsFile(fileName)) {
-                                    tFile = ReplicaCatalog.getFile(fileName);
-                                } else {
-
-                                    tFile = new FileItem(fileName, size);
-                                    ReplicaCatalog.setFile(fileName, tFile);
-                                }
-
-                                tFile.setType(type);
-                                mFileList.add(tFile);
-
-                            }
-                        }
-                        Task task;
-                        //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent.
-                        synchronized (this) {
-                            task = new Task(this.jobIdStartsFrom, length);
-                            this.jobIdStartsFrom++;
-                        }
-                        task.setType(nodeType);
-                        task.setUserId(userId);
-                        task.setRam(120000);
-                        mName2Task.put(nodeName, task);
-                        for (FileItem file : mFileList) {
-                            task.addRequiredFile(file.getName());
-                        }
-                        task.setFileList(mFileList);
-                        this.getTaskList().add(task);
-
-                        /**
-                         * Add dependencies info.
-                         */
                         break;
                     case "child":
                         List<Element> pList = node.getChildren();
@@ -600,41 +477,19 @@ public final class XmlUtil {
 
                     case "application":
                         String aName = node.getAttributeValue("Name");
-                        /*String aMemBss = node.getAttributeValue("MemoryBssSize");
-                        String aMemeData = node.getAttributeValue("MemoryDataSize");
-                        String aMemPersistBss = node.getAttributeValue("MemoryPersistentBssSize");
-                        String aMemPersistData = node.getAttributeValue("MemoryPersistentDataSize");
-                        String aMemText = node.getAttributeValue("MemoryTextSize");*/
                         String requiredMem = node.getAttributeValue("RequiredMemorySize");
                         String periodTime = node.getAttributeValue("Period");
                         String hardware = node.getAttributeValue("Hardware");
-                       // Log.printLine(requiredMem);
-                        //String upBandwidth = node.getAttributeValue("UpBandwidth");
-                        //String downBandwidth = node.getAttributeValue("DownBandwidth");
                         String computeTime = node.getAttributeValue("ComputeTime");
                         String ip = node.getAttributeValue("IpAddress");
-                        /*Integer memBss = Integer.parseInt(aMemBss);
-                        Integer memData = Integer.parseInt(aMemeData);
-                        Integer memPersistBss = Integer.parseInt(aMemPersistBss);
-                        Integer memPersistData = Integer.parseInt(aMemPersistData);
-                        Integer memText = Integer.parseInt(aMemText);*/
                         Integer reqMem = Integer.parseInt(requiredMem);
-                        /*Integer upB = Integer.parseInt(upBandwidth);
-                        Integer downB = Integer.parseInt(downBandwidth);*/
                         Double computeT = Double.parseDouble(computeTime);
-                        String cpuRequest = node.getAttributeValue("CpuRequest");
 
                         long runtimeT = (long) (Constants.averageMIPS * computeT);
                         if (runtimeT < 100) {
                             runtimeT = 100;
                         }
                         Constants.totalTime += computeT;
-                       /* if(Constants.pause.containsKey(this.jobIdStartsFrom)) {
-                            Double last = Constants.pause.get(this.jobIdStartsFrom).getValue();
-                            computeT += last * 1000 * Parameters.getRuntimeScale();
-                        }*/
-                        int size = this.taskList.size();
-                        int sizeId = size + 1;
                         runtimeT *= Parameters.getRuntimeScale();
                         List<Element> fileListT = node.getChildren();
                         List<FileItem> mFileListT = new ArrayList<>();
@@ -653,27 +508,20 @@ public final class XmlUtil {
                                 }
                                 List<Element> ports = f1.get(0).getChildren();
                                 for (Element port : ports) {
+                                    String messageName = port.getAttributeValue("Name");
                                     String messageSize = port.getAttributeValue("MessageSize");
                                     String ipS = port.getAttributeValue("IpAddress");
                                     String period = port.getAttributeValue("SamplePeriod");
                                     ipAndSizes.add(new Pair<>(ipS, messageSize));
-                                    //Log.printLine("App " + aName + " --- " + messageSize + " --> " + ipS);
-                                    Message message = new Message();
-                                    message.period = Double.parseDouble(periodTime);
-                                    message.destIP = ipS;
-                                    message.size = Integer.parseInt(messageSize);
+                                    Message message = new Message(Double.parseDouble(period) * Constants.averageMIPS, ipS, ip, messageName, Double.parseDouble(messageSize));
                                     taskT.messages.add(message);
                                 }
                                 Constants.name2Ips.put(aName, ipAndSizes);
-
                             }
                         }
-                        if(cpuRequest != null && !cpuRequest.replace(" ","").equals("")) {
-                            Double cpus = 1000 * Double.parseDouble(cpuRequest);
-                            taskT.setNumberOfPes(cpus.intValue());
-                        }else{
-                            taskT.setNumberOfPes(1000);
-                        }
+
+                        Double cpus = 1000 * Double.parseDouble(computeTime) / Double.parseDouble(periodTime);
+                        taskT.setNumberOfPes(cpus.intValue());
                         taskT.setType(ip);
                         taskT.setUserId(userId);
                         taskT.setRam(reqMem);
@@ -688,7 +536,7 @@ public final class XmlUtil {
                         taskT.setFileList(mFileListT);
                         taskT.setPeriodTime(Double.parseDouble(periodTime));
                         this.getTaskList().add(taskT);
-                        Log.printLine("Job " + taskT.name + " : || compute time: " + computeTime + " : || cpu request: " + taskT.getNumberOfPes() + " || period: " + taskT.getPeriodTime() +" || ram: " + taskT.getRam() + " ip: " + taskT.getType() + " ||");
+                        Log.printLine("Job " + taskT.name + " : || compute time: " + computeTime + " : || cpu request: " + taskT.getNumberOfPes() + "m || period: " + taskT.getPeriodTime() +" || ram: " + taskT.getRam() + " ip: " + taskT.getType() + " ||");
                     case "":
                 }
             }

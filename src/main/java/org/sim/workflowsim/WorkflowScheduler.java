@@ -246,29 +246,13 @@ public class WorkflowScheduler extends DatacenterBroker {
      * @param ev a simEvent object
      */
     protected void processCloudletUpdate(SimEvent ev) {
-
-        /*BaseSchedulingAlgorithm scheduler = getScheduler(Parameters.getSchedulingAlgorithm());
-        scheduler.setCloudletList(getCloudletList());
-        Log.printLine(getCloudletList().size());
-        scheduler.setVmList(getVmsCreatedList());
-        scheduler.setHostList(getHostList());
-        try {
-            scheduler.run();
-        } catch (Exception e) {
-            Log.printLine("Error in configuring scheduler_method");
-            Constants.nodeEnough = false;
-            e.printStackTrace();
-            return;
-        }
-       // Constants.AppNum = Constants.AppNum + scheduler.getScheduledList().size();
-        List<Cloudlet> scheduledList = scheduler.getScheduledList();*/
         List<Cloudlet> scheduledList = new ArrayList<>();
         for(Object c: getCloudletList()) {
             Job j = (Job)c;
             // if stage-in
-            if(j.getTaskList().size() == 0) {
+            if(j.getTaskList().isEmpty()) {
                 ((Job) c).setVmId(0);
-            }else /*not*/{
+            }else{
                 String name = j.getTaskList().get(0).name;
                 for(Map.Entry<String, Integer> r: Constants.schedulerResult.entrySet()) {
                     if(r.getKey() == null) {

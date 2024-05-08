@@ -1,5 +1,7 @@
 package org.sim.cloudbus.cloudsim;
 
+import org.sim.workflowsim.CondorVM;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,29 @@ public class VmAllocationPolicyMaxMin extends VmAllocationPolicySimple{
      */
     public VmAllocationPolicyMaxMin(List<? extends Host> list) {
         super(list);
+    }
+
+    @Override
+    public boolean scheduleAll() {
+        while(true) {
+            Vm maxVm = null;
+            for(Vm v1: getContainerList()) {
+                if(!getVmTable().containsKey(v1.getUid())) {
+                    maxVm = v1;
+                    break;
+                }
+            }
+            if(maxVm == null)
+                return true;
+            for(Vm v2: getContainerList()) {
+                if(((CondorVM)v2).getLength() > ((CondorVM)maxVm).getLength() && !getVmTable().containsKey(v2.getUid())) {
+                    maxVm = v2;
+                }
+            }
+            Log.printLine(maxVm.getNumberOfPes());
+            if(!allocateHostForVm(maxVm))
+                return false;
+        }
     }
 
     @Override

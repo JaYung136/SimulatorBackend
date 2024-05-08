@@ -25,6 +25,8 @@ public abstract class VmAllocationPolicy {
 	/** The host list. */
 	private List<? extends Host> hostList;
 
+	private List<? extends Vm> containerList;
+
 	/**
 	 * Allocates a new VmAllocationPolicy object.
 	 * 
@@ -35,6 +37,11 @@ public abstract class VmAllocationPolicy {
 	public VmAllocationPolicy(List<? extends Host> list) {
 		setHostList(list);
 	}
+
+	public void setContainerList(List<? extends Vm> list) {this.containerList = list;}
+
+	public List<? extends Vm> getContainerList() {return this.containerList;}
+	public boolean scheduleAll() {return true;}
 
 	/**
 	 * Allocates a host for a given VM. The host to be allocated is the one that was already

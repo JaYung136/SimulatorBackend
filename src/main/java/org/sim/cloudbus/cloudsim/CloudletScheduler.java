@@ -20,7 +20,7 @@ import java.util.List;
  * @since CloudSim Toolkit 1.0
  */
 public abstract class CloudletScheduler {
-
+	public String hostIp;
 	/** The previous time. */
 	private double previousTime;
 

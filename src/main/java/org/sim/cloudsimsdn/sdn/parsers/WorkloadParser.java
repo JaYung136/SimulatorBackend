@@ -27,6 +27,7 @@ import java.util.*;
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
 import static org.sim.cloudsimsdn.core.CloudSim.getEntityId;
 import static org.sim.controller.SDNController.*;
+import static org.sim.service.Constants.workloads;
 
 public class WorkloadParser {
 	private static final int NUM_PARSE_EACHTIME = 200;
@@ -172,8 +173,8 @@ public class WorkloadParser {
 		ArrayList<Double> stimes = new ArrayList<>();
 		if(random_factor >= msgperiod)
 			random_factor = 0.0;
-		if(inplatfrom)
-			starttime += msgperiod*Math.random(); //TODO: 消息起始时间随机化 msgtime+msgperiod*Math.random();
+//		if(inplatfrom)
+//			starttime += msgperiod*Math.random(); //TODO: 消息起始时间随机化 msgtime+msgperiod*Math.random();
 		// 迭代多个容器生命周期
 		while(endtime < simulationend*0.000001){
 			/**
@@ -201,146 +202,171 @@ public class WorkloadParser {
 		return stimes;
 	}
 	private void parseNext(int numRequests) {
-		String line;
-		System.out.println("########################");
+//		String line;
+//		System.out.println("########################");
+//		try{
+////			JSONArray pure_msgs = new JSONArray();
+//			String xml = Files.readString(Path.of(input_app));
+//			JSONArray apps = XML.toJSONObject(xml).getJSONObject("AppInfo").getJSONArray("application");
+//			/**
+//			 * 制作纯净消息，仅包含必要字段：
+//			 * Name 消息名
+//			 * SrcIP 发送方容器ip
+//			 * DstIP 接收方容器ip
+//			 * DstName 接收方任务名称
+//			 * AppPeriod 任务周期 单位秒
+//			 * MsgPeriod 消息周期 单位秒
+//			 * MessageSize 消息大小
+//			 */
+//			int jobid = 1;
+//			for(Object obj : apps) {
+//				JSONObject app = (JSONObject) obj;
+//				String src = app.getString("IpAddress");
+//				Double appPeriod = app.getDouble("Period")*contractRate;
+//				JSONObject tem = app.getJSONObject("A653SamplingPort");
+//				try{
+//					tem = tem.getJSONObject("A664Message");
+//				}catch (Exception e){
+//					continue;
+//				}
+//				Object dataField = tem.opt("A653SamplingPort");
+//				//case1:向>1个cn发送数据包
+//				if (dataField instanceof JSONArray) {
+//					JSONArray msgs = (JSONArray) dataField;
+//					for(Object objj: msgs){
+//						JSONObject msg = (JSONObject) objj;
+//						JSONObject puremsg = new JSONObject();
+//						puremsg.put("Name", msg.getString("Name"))
+//								.put("SrcIP",src)
+//								.put("DstIP",msg.getString("IpAddress"))
+//								.put("DstName",msg.getString("AppName"))
+//								.put("AppPeriod",appPeriod)
+//								.put("MsgPeriod", (msg.getDouble("SamplePeriod"))*contractRate)
+//								.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位b
+//						;
+//						pure_msgs.put(puremsg);
+//						/** TODO: 为每条message创建workload示例
+//						 *根据容器起始、暂停开始、暂停结束、容器结束、容器周期间隔、消息周期间隔、仿真截止时间
+//						 * 得到若干的消息起始时间
+//						 */
+//						AssignInfo ai = assignInfoMap.get(src);
+//						double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
+//						//TODO: 无线取消随机化
+//						AssignInfo dstai = assignInfoMap.get(msg.getString("IpAddress"));
+//						List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
+//								ai.containerperiod, MsgPeriod, simulationStopTime, ai.equals(dstai));
+//						for(Double msgstart : msgStarttimes){
+//							Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
+//							wl.msgName = msg.getString("Name");
+//							wl.time = msgstart;
+//							wl.submitVmName = src;
+//							wl.submitVmId = getVmId(src);
+//							wl.destVmName = msg.getString("IpAddress");
+//							wl.destVmId = getVmId(wl.destVmName);
+//							wl.submitPktSize = msg.getInt("MessageSize")*0.008;
+//							Request req = new Request(userId);
+//							req.addActivity(
+//									new Processing(
+//											generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
+//									)
+//							);
+//							Request endreq = new Request(userId);
+//							endreq.addActivity(
+//									new Processing(
+//											generateCloudlet(req.getRequestId(), wl.destVmId, 0)
+//									)
+//							);
+//							req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
+//							wl.request = req;
+//							parsedWorkloads.add(wl);
+//							++jobid;
+//						}
+//						/****************************/
+//					}
+//				}
+//				//case2:仅向1个cn发送数据包
+//				else {
+//					JSONObject msg = (JSONObject) dataField;
+//					JSONObject puremsg = new JSONObject();
+//					puremsg.put("Name", msg.getString("Name"))
+//							.put("SrcIP",src)
+//							.put("DstIP",msg.getString("IpAddress"))
+//							.put("DstName",msg.getString("AppName"))
+//							.put("AppPeriod",appPeriod)
+//							.put("MsgPeriod", msg.getDouble("SamplePeriod")*contractRate)
+//							.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位Kb?
+//					;
+//					pure_msgs.put(puremsg);
+//					/** TODO: 为每条message创建workload实例
+//					 *根据容器起始、暂停开始、暂停结束、容器结束、容器周期间隔、消息周期间隔、仿真截止时间
+//					 * 得到若干的消息起始时间
+//					 */
+//					AssignInfo ai = assignInfoMap.get(src);
+//					double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
+//					//TODO: 无线取消随机化
+//					AssignInfo dstai = assignInfoMap.get(msg.getString("IpAddress"));
+//					List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
+//							ai.containerperiod, MsgPeriod, simulationStopTime, ai.equals(dstai));
+//					for(Double msgstart : msgStarttimes){
+//						Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
+//						wl.msgName = msg.getString("Name");
+//						wl.time = msgstart;
+//						wl.submitVmName = src;
+//						wl.submitVmId = getVmId(src);
+//						wl.destVmName = msg.getString("IpAddress");
+//						wl.destVmId = getVmId(wl.destVmName);
+//						wl.submitPktSize = msg.getInt("MessageSize")*0.008;
+//						Request req = new Request(userId);
+//						req.addActivity(
+//								new Processing(
+//										generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
+//								)
+//						);
+//						Request endreq = new Request(userId);
+//						endreq.addActivity(
+//								new Processing(
+//										generateCloudlet(req.getRequestId(), wl.destVmId, 0)
+//								)
+//						);
+//						req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
+//						parsedWorkloads.add(wl);
+//						wl.request = req;
+//						++jobid;
+//					}
+//					/****************************/
+//				}
+//			}
+//
+//			String jsonPrettyPrintString = pure_msgs.toString(4);
+//			//保存格式化后的json
+//			FileWriter writer = new FileWriter(workloadf);
+//			writer.write(jsonPrettyPrintString);
+//			writer.close();
+//		}catch (Exception e){
+//			e.printStackTrace();
+//		}
 		try{
-//			JSONArray pure_msgs = new JSONArray();
-			String xml = Files.readString(Path.of(input_app));
-			JSONArray apps = XML.toJSONObject(xml).getJSONObject("AppInfo").getJSONArray("application");
-			/**
-			 * 制作纯净消息，仅包含必要字段：
-			 * Name 消息名
-			 * SrcIP 发送方容器ip
-			 * DstIP 接收方容器ip
-			 * DstName 接收方任务名称
-			 * AppPeriod 任务周期 单位秒
-			 * MsgPeriod 消息周期 单位秒
-			 * MessageSize 消息大小
-			 */
-			int jobid = 1;
-			for(Object obj : apps) {
-				JSONObject app = (JSONObject) obj;
-				String src = app.getString("IpAddress");
-				Double appPeriod = app.getDouble("Period")*contractRate;
-				JSONObject tem = app.getJSONObject("A653SamplingPort");
-				try{
-					tem = tem.getJSONObject("A664Message");
-				}catch (Exception e){
-					continue;
-				}
-				Object dataField = tem.opt("A653SamplingPort");
-				//case1:向>1个cn发送数据包
-				if (dataField instanceof JSONArray) {
-					JSONArray msgs = (JSONArray) dataField;
-					for(Object objj: msgs){
-						JSONObject msg = (JSONObject) objj;
-						JSONObject puremsg = new JSONObject();
-						puremsg.put("Name", msg.getString("Name"))
-								.put("SrcIP",src)
-								.put("DstIP",msg.getString("IpAddress"))
-								.put("DstName",msg.getString("AppName"))
-								.put("AppPeriod",appPeriod)
-								.put("MsgPeriod", (msg.getDouble("SamplePeriod"))*contractRate)
-								.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位b
-						;
-						pure_msgs.put(puremsg);
-						/** TODO: 为每条message创建workload示例
-						 *根据容器起始、暂停开始、暂停结束、容器结束、容器周期间隔、消息周期间隔、仿真截止时间
-						 * 得到若干的消息起始时间
-						 */
-						AssignInfo ai = assignInfoMap.get(src);
-						double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
-						//TODO: 无线取消随机化
-						AssignInfo dstai = assignInfoMap.get(msg.getString("IpAddress"));
-						List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
-								ai.containerperiod, MsgPeriod, simulationStopTime, ai.equals(dstai));
-						for(Double msgstart : msgStarttimes){
-							Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
-							wl.msgName = msg.getString("Name");
-							wl.time = msgstart;
-							wl.submitVmName = src;
-							wl.submitVmId = getVmId(src);
-							wl.destVmName = msg.getString("IpAddress");
-							wl.destVmId = getVmId(wl.destVmName);
-							wl.submitPktSize = msg.getInt("MessageSize")*0.008;
-							Request req = new Request(userId);
-							req.addActivity(
-									new Processing(
-											generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
-									)
-							);
-							Request endreq = new Request(userId);
-							endreq.addActivity(
-									new Processing(
-											generateCloudlet(req.getRequestId(), wl.destVmId, 0)
-									)
-							);
-							req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
-							wl.request = req;
-							parsedWorkloads.add(wl);
-							++jobid;
-						}
-						/****************************/
-					}
-				}
-				//case2:仅向1个cn发送数据包
-				else {
-					JSONObject msg = (JSONObject) dataField;
-					JSONObject puremsg = new JSONObject();
-					puremsg.put("Name", msg.getString("Name"))
-							.put("SrcIP",src)
-							.put("DstIP",msg.getString("IpAddress"))
-							.put("DstName",msg.getString("AppName"))
-							.put("AppPeriod",appPeriod)
-							.put("MsgPeriod", msg.getDouble("SamplePeriod")*contractRate)
-							.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位Kb?
-					;
-					pure_msgs.put(puremsg);
-					/** TODO: 为每条message创建workload实例
-					 *根据容器起始、暂停开始、暂停结束、容器结束、容器周期间隔、消息周期间隔、仿真截止时间
-					 * 得到若干的消息起始时间
-					 */
-					AssignInfo ai = assignInfoMap.get(src);
-					double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
-					//TODO: 无线取消随机化
-					AssignInfo dstai = assignInfoMap.get(msg.getString("IpAddress"));
-					List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
-							ai.containerperiod, MsgPeriod, simulationStopTime, ai.equals(dstai));
-					for(Double msgstart : msgStarttimes){
-						Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
-						wl.msgName = msg.getString("Name");
-						wl.time = msgstart;
-						wl.submitVmName = src;
-						wl.submitVmId = getVmId(src);
-						wl.destVmName = msg.getString("IpAddress");
-						wl.destVmId = getVmId(wl.destVmName);
-						wl.submitPktSize = msg.getInt("MessageSize")*0.008;
-						Request req = new Request(userId);
-						req.addActivity(
-								new Processing(
-										generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
-								)
-						);
-						Request endreq = new Request(userId);
-						endreq.addActivity(
-								new Processing(
-										generateCloudlet(req.getRequestId(), wl.destVmId, 0)
-								)
-						);
-						req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
-						parsedWorkloads.add(wl);
-						wl.request = req;
-						++jobid;
-					}
-					/****************************/
-				}
+			for(Workload wl:workloads){
+				wl.resultWriter = this.resultWriter;
+				wl.submitVmId = getVmId(wl.submitVmName);
+				wl.destVmId = getVmId(wl.destVmName);
+				Request req = new Request(userId);
+				req.addActivity(
+						new Processing(
+								generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
+						)
+				);
+				Request endreq = new Request(userId);
+				endreq.addActivity(
+						new Processing(
+								generateCloudlet(req.getRequestId(), wl.destVmId, 0)
+						)
+				);
+				req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
+				wl.request = req;
+				parsedWorkloads.add(wl);
 			}
-
-			String jsonPrettyPrintString = pure_msgs.toString(4);
-			//保存格式化后的json
-			FileWriter writer = new FileWriter(workloadf);
-			writer.write(jsonPrettyPrintString);
-			writer.close();
+			
 		}catch (Exception e){
 			e.printStackTrace();
 		}

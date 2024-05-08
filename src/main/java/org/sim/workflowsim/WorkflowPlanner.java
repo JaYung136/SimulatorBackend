@@ -168,7 +168,7 @@ public final class WorkflowPlanner extends SimEntity {
                     this.taskList = util.getTaskList();
                     processPlanning();
                     sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, new ArrayList<>());
-                }else if(Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.K8S) {
+                }else {
                     util = new XmlUtil(getClusteringEngine().getWorkflowEngine().getSchedulerId(0));
                     util.parseHostXml(Constants.appFile);
                     setTaskList(util.getTaskList());
@@ -177,17 +177,6 @@ public final class WorkflowPlanner extends SimEntity {
                     processImpactFactors(getTaskList());
                     sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, getTaskList());
                 }
-                else{
-                    util = new XmlUtil(getClusteringEngine().getWorkflowEngine().getSchedulerId(0));
-                    try{
-                        util.parseVMs(Constants.appFile);
-                    }catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    this.taskList = new ArrayList<>();
-                    sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, new ArrayList<>());
-                }
-                //setTaskList(getWorkflowParser().getTaskList());
 
                 break;
             case CloudSimTags.END_OF_SIMULATION:

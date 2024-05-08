@@ -18,6 +18,9 @@ package org.sim.workflowsim;
 import org.sim.cloudbus.cloudsim.Cloudlet;
 import org.sim.cloudbus.cloudsim.Consts;
 import org.sim.cloudbus.cloudsim.UtilizationModelFull;
+import org.sim.cloudsimsdn.Log;
+import org.sim.cloudsimsdn.sdn.Packet;
+import org.sim.cloudsimsdn.sdn.workload.Workload;
 import org.sim.service.Constants;
 import org.sim.service.Message;
 
@@ -43,7 +46,63 @@ public class Task extends Cloudlet {
 
     public String hardware = "";
 
+    private double pauseStartTime = 0;
+
+    private double pauseLastTime = 0;
+
+    private boolean ifPause = false;
+
+    private boolean ifEndPause = true;
+
+    public void SetPause(double s, double l) {
+        this.pauseStartTime = s * Constants.averageMIPS;
+        this.pauseLastTime = l * Constants.averageMIPS;
+        this.ifPause = true;
+        this.ifEndPause = false;
+    }
+
+
+    public boolean IfStartPause(long length) {
+        if(!ifPause)
+            return false;
+        if(ifEndPause)
+            return false;
+        pauseStartTime -= length;
+        return pauseStartTime <= 0;
+    }
+
+    public boolean IfEndPause(long length) {
+        pauseLastTime -= length;
+        if(pauseLastTime <= 0) {
+            ifEndPause = true;
+            return true;
+        }
+        return false;
+    }
     public List<Message> messages = new ArrayList<>();
+
+    public void SendMessage(long length, double current) {
+        for(Message m: messages) {
+            if(m.IfSend(length)) {
+                sendMessage(current, m);
+            }
+        }
+
+    }
+
+    private void sendMessage(double current, Message m) {
+        Workload w = m.Tran2Workload(current);
+        Constants.workloads.add(w);
+    }
+
+    public void ResetMessage() {
+        for(Message m: messages) {
+            m.Rest();
+        }
+        if(Constants.pause.containsKey(getCloudletId())) {
+            SetPause(Constants.pause.get(getCloudletId()).getKey(), Constants.pause.get(getCloudletId()).getValue());
+        }
+    }
     private List<Task> parentList;
     /*
      * The list of child tasks.
@@ -138,6 +197,9 @@ public class Task extends Cloudlet {
         this.fileList = new ArrayList<>();
         this.impact = 0.0;
         this.taskFinishTime = -1.0;
+        if(Constants.pause.containsKey(getCloudletId())) {
+            SetPause(Constants.pause.get(getCloudletId()).getKey(), Constants.pause.get(getCloudletId()).getValue());
+        }
     }
 
     /**

@@ -8,6 +8,7 @@
 package org.sim.cloudbus.cloudsim;
 
 import org.sim.cloudbus.cloudsim.core.CloudSim;
+import org.sim.cloudsimsdn.Log;
 import org.sim.service.Constants;
 import org.sim.workflowsim.Job;
 import org.sim.workflowsim.Task;
@@ -95,90 +96,86 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		double timeSpam = currentTime - getPreviousTime();
 		this.currentRam = ram;
 		this.currentCPUs = mipsShare.size();
-		getCapacity(mipsShare);
-		String containers = "";
+		// 调用这个函数后，如果需要对CPU进行分时复用，那么 mips * task.core 就是任务执行的速度
+		double mips = getCapacity(mipsShare);
 		int taskNum = getCloudletExecList().size();
-		//Log.printLine(getCloudletExecList().size());
+		int coreNeed;
+		List<ResCloudlet> toRemove = new ArrayList<ResCloudlet>();
+		List<ResCloudlet> toPause = new ArrayList<>();
+		//更新每个任务的运行状态并检查有无： 1）运行结束的任务； 2）开始暂停的任务
 		for (ResCloudlet rcl : getCloudletExecList()) {
+			coreNeed = 0;
 			if(!((Job) rcl.getCloudlet()).getTaskList().isEmpty()) {
-				containers += ((Job)rcl.getCloudlet()).getTaskList().get(0).name + " ";
-				//Log.printLine("Remain length :"  + rcl.getRemainingCloudletLength());
+				for(Task t: ((Job)rcl.getCloudlet()).getTaskList())
+					coreNeed += t.getNumberOfPes();
 			}
-
-			rcl.updateCloudletFinishedSoFar((long) (getCapacity(mipsShare) * timeSpam * rcl.getNumberOfPes() * Consts.MILLION));
-			/*if(!((Job) rcl.getCloudlet()).getTaskList().isEmpty()) {
-				Log.printLine("Container " + ((Job) rcl.getCloudlet()).getTaskList().get(0).name + " remain: " + rcl.getRemainingCloudletLength());
-			}*/
+			long length = 0;
+			// 如果任务数小于核心数，那么每个任务占用一个核
+			if(taskNum <= mipsShare.size() / 1000)
+				length = (long) (mipsShare.get(0) * timeSpam);
+			// 否则进行分时复用
+			else
+				length = (long) (mips * timeSpam * coreNeed);
+			// 我们将 length 乘以 Consts.MILLION（这是因为在设置 CloudletFinishedSoFar 的初始值是就设为 cloudlet.length * Consts.MILLION）
+			rcl.updateCloudletFinishedSoFar( length * Consts.MILLION);
+			// 由任务来判断是否需要发送消息
+			((Job)rcl.getCloudlet()).SendMessage(length, currentTime);
+			// 如果任务运行结束或开始暂停，我们将任务从运行队列中剔除出去
+			if(rcl.getRemainingCloudletLength() <= 0) {
+				toRemove.add(rcl);
+				cloudletFinish(rcl);
+				((Job)rcl.getCloudlet()).ResetMessage();
+			}else if(((Job)rcl.getCloudlet()).IfStartPause(length)) {
+				toPause.add(rcl);
+				Log.printLine(currentTime + " : " + ((Job)rcl.getCloudlet()).getTaskList().get(0).name + " 开始暂停");
+			}
 		}
-		//System.out.print(String.format("%-8s", " " + containers));
-		//System.out.print("\n");
-		if (getCloudletExecList().size() == 0 && getCloudletPausedList().size() == 0) {
+		if (getCloudletExecList().isEmpty() && getCloudletPausedList().isEmpty()) {
 			setPreviousTime(currentTime);
 			return 0.0;
 		}
-
-		// check finished cloudlets
+		// 将执行完成或者开始暂停的任务从执行队列中删除
+		getCloudletExecList().removeAll(toRemove);
+		getCloudletExecList().removeAll(toPause);
 		double nextEvent = Double.MAX_VALUE;
-		List<ResCloudlet> toRemove = new ArrayList<ResCloudlet>();
-		for (ResCloudlet rcl : getCloudletExecList()) {
-			long remainingLength = rcl.getRemainingCloudletLength();
-			if (remainingLength == 0 /*|| remainingLength <= (getCapacity(mipsShare) * rcl.getNumberOfPes() * 0.01)*/) {// finished: remove from the list
-				toRemove.add(rcl);
-				cloudletFinish(rcl);
-				//this.usedRam -= ((Job)rcl.getCloudlet()).getRam();
-				continue;
+		List<ResCloudlet> toExec = new ArrayList<ResCloudlet>();
+		for(ResCloudlet rcl: getCloudletPausedList()) {
+			coreNeed = 0;
+			if(!((Job) rcl.getCloudlet()).getTaskList().isEmpty()) {
+				for(Task t: ((Job)rcl.getCloudlet()).getTaskList())
+					coreNeed += t.getNumberOfPes();
+			}
+			long length = (long) (mipsShare.get(0) * timeSpam);
+			if(((Job) rcl.getCloudlet()).IfEndPause(length)) {
+				toExec.add(rcl);
+				Log.printLine(currentTime + " : " + ((Job)rcl.getCloudlet()).getTaskList().get(0).name + " 结束暂停");
 			}
 		}
-		getCloudletExecList().removeAll(toRemove);
-
-		// estimate finish time of cloudlets
-		List<ResCloudlet> rcls = new ArrayList<>();
+		// 将开始暂停的任务加入暂停队列中
+		getCloudletPausedList().addAll(toPause);
+		// 将暂停结束的任务从暂停队列中删除，加入执行队列
+		getCloudletExecList().addAll(toExec);
+		getCloudletPausedList().removeAll(toExec);
+		// 预估下一次任务完成需要的时间
 		for (ResCloudlet rcl : getCloudletExecList()) {
 			double estimatedFinishTime = currentTime
 					+ (rcl.getRemainingCloudletLength() / (getCapacity(mipsShare) * rcl.getNumberOfPes()));
 			if (estimatedFinishTime - currentTime < CloudSim.getMinTimeBetweenEvents()) {
 				estimatedFinishTime = currentTime + CloudSim.getMinTimeBetweenEvents();
 			}
-			if(Constants.pause.containsKey(rcl.getCloudlet().getCloudletId())) {
-				Double start = Constants.pause.get(rcl.getCloudlet().getCloudletId()).getKey();
-				Double last = Constants.pause.get(rcl.getCloudlet().getCloudletId()).getValue();
-				if(currentTime - rcl.getExecStartTime() >= start) {
-					//Log.printLine(CloudSim.clock() + " : Container " + rcl.getCloudletId() + " is paused");
-					//cloudletPause(rcl.getCloudletId());
-					rcls.add(rcl);
-					estimatedFinishTime = Math.min(estimatedFinishTime, rcl.getExecStartTime() + start + last);
-				}
-			}
 			if (estimatedFinishTime < nextEvent) {
 				nextEvent = estimatedFinishTime;
 			}
 		}
-		for(ResCloudlet rcl: rcls) {
-			cloudletPause(rcl.getCloudletId());
-		}
-
-		List<ResCloudlet> toExec = new ArrayList<ResCloudlet>();
-		for(ResCloudlet rcl: getCloudletPausedList()) {
-			Double start = Constants.pause.get(rcl.getCloudlet().getCloudletId()).getKey();
-			Double last = Constants.pause.get(rcl.getCloudlet().getCloudletId()).getValue();
-			if(currentTime >= rcl.getExecStartTime() + start + last) {
-				//Log.printLine(CloudSim.clock() + " : Container " + rcl.getCloudletId() + " is in exec");
-				toExec.add(rcl);
-			} else {
-				double n = rcl.getExecStartTime() + start + last;
-				if(n - currentTime < CloudSim.getMinTimeBetweenEvents()) {
-					n = currentTime + CloudSim.getMinTimeBetweenEvents();
-				}
-				//Log.printLine("pause need to be exec in : " + n);
-				if(n < nextEvent) {
-					nextEvent = n;
-				}
+		for (ResCloudlet rcl: getCloudletPausedList()) {
+			double estimatedFinishTime = currentTime
+					+ (rcl.getRemainingCloudletLength() / (getCapacity(mipsShare) * rcl.getNumberOfPes()));
+			if (estimatedFinishTime - currentTime < CloudSim.getMinTimeBetweenEvents()) {
+				estimatedFinishTime = currentTime + CloudSim.getMinTimeBetweenEvents();
 			}
-		}
-		/*getCloudletPausedList().removeAll(toExec);
-		getCloudletExecList().addAll(toExec);*/
-		for(ResCloudlet rcl: toExec) {
-			cloudletResume(rcl.getCloudletId());
+			if (estimatedFinishTime < nextEvent) {
+				nextEvent = estimatedFinishTime;
+			}
 		}
 		setPreviousTime(currentTime);
 		return nextEvent;
@@ -207,39 +204,33 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 	 * @return the capacity
 	 */
 	protected double getCapacity(List<Double> mipsShare) {
-		double capacity = 0.0;
-		int cpus = 0;
-		capacity = mipsShare.size() * mipsShare.get(0);
-		cpus = mipsShare.size();
+		// cpus 就是所在物理节点的核心数 * 1000
+		int cpus = mipsShare.size();
 		currentCPUs = cpus;
+		int taskNum = 0;
 		int pesInUse = 0;
 		double ramInUse = 0;
 		double rate = 1.0;
 		for (ResCloudlet rcl : getCloudletExecList()) {
-			if(rcl.getCloudletStatus() != Cloudlet.INEXEC) {
+			/*if(rcl.getCloudletStatus() != Cloudlet.INEXEC) {
 				rate = 0.1;
-			}
+			}*/
 			if(!((Job) rcl.getCloudlet()).getTaskList().isEmpty()) {
 				for(Task t: ((Job)rcl.getCloudlet()).getTaskList()) {
 					pesInUse += t.getNumberOfPes() * rate;
 					ramInUse += t.getRam() * rate;
+					taskNum ++;
 				}
 			}
 		}
 		usedPes = Math.min(currentCPUs, pesInUse);
 		usedRam = Math.min(currentRam, ramInUse);
-		//Log.printLine("usedRam: " + usedRam + " curRam: " + currentRam);
-		if(usedRam > currentRam) {
-			Constants.nodeEnough = false;
-		}
-		//Log.printLine("peInUse: " + usedPes);
-		if (usedPes  > currentCPUs) {
-			//Constants.nodeEnough = false;
-			capacity /= usedPes;
+		// 如果任务书小于核数，那么每个任务占用一个核；否则进行分时复用
+		if (taskNum > (currentCPUs / 1000)) {
+			return mipsShare.get(0) / pesInUse;
 		} else {
-			capacity /= currentCPUs;
+			return mipsShare.get(0);
 		}
-		return capacity;
 	}
 
 	/**
@@ -273,8 +264,6 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		position=0;
 		for (ResCloudlet rcl : getCloudletExecList()) {
 			if (rcl.getCloudletId() == cloudletId) {
-				//usedPes -= ((Job)rcl.getCloudlet()).getNumberOfPes();
-				//usedRam -= ((Job)rcl.getCloudlet()).getRam();
 				found = true;
 				break;
 			}
@@ -285,8 +274,8 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 			ResCloudlet rcl = getCloudletExecList().remove(position);
 			if (rcl.getRemainingCloudletLength() == 0) {
 				cloudletFinish(rcl);
+				((Job)rcl.getCloudlet()).ResetMessage();
 			} else {
-				//rcl.setCloudletStatus(Cloudlet.CANCELED);
 				rcl.updateCloudlet();
 			}
 			return rcl.getCloudlet();
@@ -411,22 +400,8 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 	 */
 	@Override
 	public double cloudletSubmit(Cloudlet cloudlet, double fileTransferTime) {
-		Double pauseTime = 0.0;
-		if(!((Job) cloudlet).getTaskList().isEmpty()) {
-			//Log.printLine("Container " + ((Job)cloudlet).getTaskList().get(0).name + " is submitted with length " + ((Job)cloudlet).getTaskList().get(0).getCloudletLength());
-			for(Task t: ((Job)cloudlet).getTaskList()) {
-				if(Constants.pause.containsKey(t.getCloudletId()) && t.ifFirstComputeTurn()) {
-					//Log.printLine("Container " + t.getCloudletId() + " should be paused");
-					pauseTime += Constants.pause.get(t.getCloudletId()).getValue();
-					double extraSize = getCapacity(getCurrentMipsShare()) * pauseTime * cloudlet.getNumberOfPes();
-					long length = (long) (cloudlet.getCloudletLength() + extraSize);
-					cloudlet.setCloudletLength(length);
-				}
-			}
-		}
 		ResCloudlet rcl = new ResCloudlet(cloudlet);
 		rcl.setCloudletStatus(Cloudlet.INEXEC);
-		//Log.printLine("任务" + cloudlet.getCloudletId() + "进入执行队列，长度：" + rcl.getCloudletLength() + " 剩余长度： " + rcl.getRemainingCloudletLength());
 		int cpus = 0;
 		double rams = 0;
 		for(Task t: ((Job)cloudlet).getTaskList()) {
@@ -438,18 +413,13 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		}
 		if(fileTransferTime == -1) {
 			if ((usedRam + rams) / currentRam > Constants.ramUp || (double) (usedPes + cpus) / (double) currentCPUs > Constants.cpuUp) {
-				//Log.printLine("cpu: " + us);
 				return Double.MAX_VALUE;
 			}
 		}
 		getCloudletExecList().add(rcl);
-
-		// use the current capacity to estimate the extra amount of
-		// time to file transferring. It must be added to the cloudlet length
 		double extraSize = getCapacity(getCurrentMipsShare()) * fileTransferTime;
 		long length = (long) (cloudlet.getCloudletLength() + extraSize);
 		cloudlet.setCloudletLength(length);
-
 		return cloudlet.getCloudletLength() / getCapacity(getCurrentMipsShare());
 	}
 

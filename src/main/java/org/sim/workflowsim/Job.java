@@ -15,6 +15,9 @@
  */
 package org.sim.workflowsim;
 
+import org.sim.cloudsimsdn.sdn.Packet;
+import org.sim.service.Message;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +38,8 @@ public class Job extends Task {
      */
     private List<Task> taskList;
 
+
+
     /**
      * Allocates a new Job object. The job length should be greater than or
      * equal to 1.
@@ -52,6 +57,33 @@ public class Job extends Task {
 
         super(jobId, jobLength);
         this.taskList = new ArrayList<>();
+    }
+
+    public void SendMessage(long length, double current) {
+        for(Task t: this.taskList) {
+            t.SendMessage(length, current);
+        }
+    }
+
+    
+    public void ResetMessage() {
+        for(Task t: this.taskList) {
+            t.ResetMessage();
+        }
+    }
+
+    public boolean IfStartPause(long length) {
+        for(Task t: getTaskList()) {
+            return t.IfStartPause(length);
+        }
+        return false;
+    }
+
+    public boolean IfEndPause(long length) {
+        for(Task t: getTaskList()) {
+            return t.IfEndPause(length);
+        }
+        return false;
     }
 
     /**

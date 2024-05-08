@@ -45,7 +45,6 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
     private Map<Task, Double> rank;
     private Map<String, Host> sched;
     private Map<Integer, List<Event>> schedules;
-    private Map<Host, List<Integer>> host2Cpu;
     private Map<Task, Double> earliestFinishTimes;
     private List<Host> hosts;
     private double averageBandwidth;
@@ -87,7 +86,6 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         rank = new HashMap<>();
         earliestFinishTimes = new HashMap<>();
         schedules = new HashMap<>();
-        host2Cpu = new HashMap<>();
         sched = new HashMap<>();
         hosts = new ArrayList<>(Constants.hosts);
     }
@@ -99,7 +97,8 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
     public void run() {
         Log.printLine("HEFT planner running with " + getTaskList().size()
                 + " tasks.");
-
+        for(Host h: hosts)
+            schedules.put(h.getId(), new ArrayList<>());
         averageBandwidth = calculateAverageBandwidth();
         // Prioritization phase
         calculateComputationCosts();
@@ -298,9 +297,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                         String ip = ias.getKey();
                         String mSize = ias.getValue();
                         String destName = Constants.ip2taskName.get(ip);
-                        //Log.printLine("need to send to " + destName);
                         if (destName.equals(host.getName()) && sched.get(parent.name).getId() != host.getId()) {
-                            //Log.printLine(parent.name + " need to send to " + destName);
                             readyTime += Double.parseDouble(mSize) * 8 / (host.getBw() * Consts.MILLION);
                         }
                     }
@@ -308,8 +305,9 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                 minReadyTime = Math.max(minReadyTime, readyTime);
             }
 
-            finishTime = findFinishTime(task, host, minReadyTime, false);
-
+            finishTime = findFinishime(task, host, minReadyTime, false).getSecond();
+            if(finishTime == Double.MAX_VALUE)
+                continue;
             if (finishTime < earliestFinishTime) {
                 bestReadyTime = minReadyTime;
                 earliestFinishTime = finishTime;
@@ -319,7 +317,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         if(chosenVM == null) {
             Constants.nodeEnough = false;
         }
-        findFinishTime(task,chosenVM, bestReadyTime, true);
+        findFinishime(task,chosenVM, bestReadyTime, true);
         earliestFinishTimes.put(task, earliestFinishTime);
         Log.printLine("HEFT: Container " + task.getCloudletId() + " ---> Host " + chosenVM.getId());
         //Constants.AppNum += 1;
@@ -348,7 +346,15 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
      */
     private Pair<Double, Double> findFinishime(Task task, Host vm, double readyTime,
                                        boolean occupySlot) {
-        List<Event> sched = schedules.get(0);
+        CondorVM containerTmp = new CondorVM(task.getCloudletId(), 1, vm.getVmScheduler().getPeCapacity(), task.getNumberOfPes(), (int) task.getRam(), 0, 0, "Xen", new CloudletSchedulerTimeShared());
+        // 我们首先判断是否有足够的资源创建容器
+        if(!vm.vmCreate(containerTmp)) {
+            return new Pair<>(Double.MAX_VALUE, Double.MAX_VALUE);
+        }
+        if(!occupySlot) {
+            vm.vmDeallocate(containerTmp);
+        }
+        List<Event> sched = schedules.get(vm.getId());
         double computationCost = computationCosts.get(task).get(vm);
         double start, finish;
         int pos;

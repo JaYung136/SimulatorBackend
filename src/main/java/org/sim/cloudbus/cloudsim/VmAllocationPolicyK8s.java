@@ -42,6 +42,14 @@ public class VmAllocationPolicyK8s extends VmAllocationPolicySimple{
     }
 
     @Override
+    public boolean scheduleAll() {
+        for(Vm v: getContainerList()) {
+            if(!allocateHostForVm(v))
+                return false;
+        }
+        return true;
+    }
+    @Override
     public boolean allocateHostForVm(Vm vm) {
         int requiredPes = vm.getNumberOfPes();
         boolean result = false;

@@ -30,7 +30,6 @@ import org.sim.workflowsim.clustering.balancing.BalancedClustering;
 import org.sim.workflowsim.utils.Parameters;
 import org.sim.workflowsim.utils.Parameters.ClassType;
 
-import java.lang.invoke.ConstantBootstraps;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -277,7 +276,7 @@ public final class ClusteringEngine extends SimEntity {
                  */
                 processDatastaging();
                 //Log.printLine("Job's size: " + getJobList().size());
-                if(Constants.ifSimulate || Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.K8S)
+                if(Constants.ifSimulate || Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.K8S || Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.MAXMIN)
                     sendNow(this.workflowEngineId, WorkflowSimTags.JOB_SUBMIT, getJobList());
                 else
                     sendNow(this.workflowEngineId, WorkflowSimTags.JOB_SUBMIT, new ArrayList<>());

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
@@ -174,7 +175,7 @@ public class SDNController {
 
     @RequestMapping("/getassign")
     public ResultDTO getassign(@RequestBody String req) throws IOException {
-        String content = Files.readString(Path.of(input_container));
+        String content = Files.lines(Paths.get(input_container)).reduce("", String::concat);//Files.readString(Path.of(input_container));
         JSONArray array = new JSONArray(content);
         return ResultDTO.success(array.toString());
     }
@@ -195,7 +196,7 @@ public class SDNController {
         return ResultDTO.success(array.toString());
     }
     public void convertphytopo() throws IOException {
-        String xml = Files.readString(Path.of(input_topo));
+        String xml = Files.lines(Paths.get(input_topo)).reduce("", String::concat);//Files.readString(Path.of(input_topo));
         JSONObject topojson = XML.toJSONObject(xml).getJSONObject("NetworkTopo");
         JSONObject swes = topojson.getJSONObject("Switches");
         JSONArray swches = new JSONArray();
@@ -309,7 +310,7 @@ public class SDNController {
             }
         }
         // 新建所有的主机
-        xml = Files.readString(Path.of(input_host));
+        xml = Files.lines(Paths.get(input_host)).reduce("", String::concat);//Files.readString(Path.of(input_host));
         JSONObject hostjson = XML.toJSONObject(xml);
         JSONArray hosts = hostjson.getJSONObject("adag").getJSONArray("node");
         for(Object obj : hosts){
@@ -376,7 +377,7 @@ public class SDNController {
 
     // 必需保持 hostname = “host” + hostid 对应关系。flows字段在解析workload文件时添加
     public void convertvirtopo() throws IOException{
-        String content = Files.readString(Path.of(input_container));
+        String content = Files.lines(Paths.get(input_container)).reduce("", String::concat);// Files.readString(Path.of(input_container));
         JSONArray json = new JSONArray(content);
         JSONObject vir = new JSONObject();
         for(Object obj : json){
@@ -405,7 +406,7 @@ public class SDNController {
     }
     public void convertworkload() throws IOException{
         //读result1制作ip->starttime/endtime的字典
-        String content = Files.readString(Path.of(input_container));
+        String content = Files.lines(Paths.get(input_container)).reduce("", String::concat);// Files.readString(Path.of(input_container));
         JSONArray json = new JSONArray(content);
         Map<String, Double> startmap = new HashMap<>();
         Map<String, Double> endmap = new HashMap<>();
@@ -490,7 +491,7 @@ public class SDNController {
     public boolean Checktopo() throws Exception {
         System.out.println("开始文件数据关联性检测");
         // 所有的valid主机名
-        String xml = Files.readString(Path.of(input_host));
+        String xml = Files.lines(Paths.get(input_host)).reduce("", String::concat);// Files.readString(Path.of(input_host));
         JSONObject hostjson = XML.toJSONObject(xml);
         JSONArray hosts = hostjson.getJSONObject("adag").getJSONArray("node");
         Set<String> hostnames = new HashSet<>();
@@ -499,7 +500,7 @@ public class SDNController {
             hostnames.add(host.getString("name"));
         }
         // 所有的valid交换机名
-        xml = Files.readString(Path.of(input_topo));
+        xml = Files.lines(Paths.get(input_topo)).reduce("", String::concat);//Files.readString(Path.of(input_topo));
         JSONObject topojson = XML.toJSONObject(xml).getJSONObject("NetworkTopo");
         JSONObject swes = topojson.getJSONObject("Switches");
         JSONArray swches = new JSONArray();

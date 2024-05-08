@@ -276,12 +276,15 @@ public final class WorkflowEngine extends SimEntity {
     protected void processJobSubmit(SimEvent ev) {
         List<? extends Cloudlet> list = (List) ev.getData();
         //Log.printLine("rec: " + list.size());
-        this.vmAllocationPolicy = new VmAllocationPolicyK8s(Constants.hosts);
+        if(Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.K8S)
+            this.vmAllocationPolicy = new VmAllocationPolicyK8s(Constants.hosts);
+        else
+            this.vmAllocationPolicy = new VmAllocationPolicyMaxMin(Constants.hosts);
         setJobsList(list);
         for(Cloudlet j: list) {
             Job job = (Job)j;
-            if(job.getTaskList().size() >= 1) {
-                computeTime.put(job.getTaskList().get(0).name, 0);
+            for(Task t: job.getTaskList()) {
+                computeTime.put(t.name, 0);
             }
         }
     }
@@ -289,42 +292,51 @@ public final class WorkflowEngine extends SimEntity {
     private void processVmCreate(SimEvent ev) throws Exception {
         Log.printLine("尝试创建容器");
         List<Job> list = (List) ev.getData();
-
+        List<CondorVM> containerList = new ArrayList<>();
         for(Job job: list) {
-            if(job.getTaskList().size() == 0) {
+            for (Task task : job.getTaskList()) {
+                Host h = null;
+                if (!Objects.equals(task.hardware, "")) {
+                    Log.printLine(task.hardware);
+                    for (Host host : hostList) {
+                        if (host.getName().equals(task.hardware)) {
+                            h = host;
+                            break;
+                        }
+                    }
+                }
+                CondorVM containerTmp = new CondorVM(task.getCloudletId(), 1, 0, task.getNumberOfPes(), (int) task.getRam(), 0, 0, "Xen", new CloudletSchedulerTimeShared());
+                containerTmp.setLength(task.getCloudletLength());
+                if (h != null) {
+                    containerTmp.setHost(h);
+                }
+                containerList.add(containerTmp);
+            }
+        }
+        this.vmAllocationPolicy.setContainerList(containerList);
+        if(!this.vmAllocationPolicy.scheduleAll()) {
+            this.shouldStop = true;
+            Constants.nodeEnough = false;
+            Log.printLine("节点资源不足");
+        }
+        int i = 0;
+        for(Job job: list) {
+            if (job.getTaskList().isEmpty()) {
                 job.setCloudletStatus(Cloudlet.SUCCESS);
                 sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, job);
                 continue;
             }
-            Task task = job.getTaskList().get(0);
-            Host h = null;
-            if(!Objects.equals(task.hardware, "")) {
-                Log.printLine(task.hardware);
-                for(Host host: hostList) {
-                    if(host.getName().equals(task.hardware)) {
-                        h = host;
-                        break;
-                    }
-                }
-            }
-            Log.printLine(task.getNumOfPes());
-            CondorVM containerTmp = new CondorVM(task.getCloudletId(), 1, 0, task.getNumberOfPes(), (int) task.getRam(), 0, 0, "Xen", new CloudletSchedulerTimeShared());
-            if(h != null) {
-                containerTmp.setHost(h);
-            }
-            boolean result = this.vmAllocationPolicy.allocateHostForVm(containerTmp);
-            if(!result) {
-                this.shouldStop = true;
-                Constants.nodeEnough = false;
-                Log.printLine("节点资源不足");
-            }else{
+            for (Task task : job.getTaskList()) {
+                CondorVM containerTmp = (CondorVM) this.vmAllocationPolicy.getContainerList().get(i);
                 job.setCloudletStatus(Cloudlet.SUCCESS);
                 sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, job);
                 Log.printLine(task.name + "被分配至节点" + this.vmAllocationPolicy.getHost(containerTmp).getName());
                 Constants.schedulerResult.put(task.name, this.vmAllocationPolicy.getHost(containerTmp).getId());
                 Constants.scheduleResults.add(new ScheduleResult(this.vmAllocationPolicy.getHost(containerTmp).getId(), task.name, task.getNumberOfPes(), task.getRam()));
+                i++;
             }
         }
+
     }
 
     /**
@@ -336,39 +348,30 @@ public final class WorkflowEngine extends SimEntity {
      */
     protected void processJobReturn(SimEvent ev) {
         Job job = (Job) ev.getData();
-        //Log.print("任务 " + job.getCloudletId() + "  结束，");
         if (job.getCloudletStatus() == Cloudlet.FAILED) {
             // Reclusteringengine will add retry job to jobList
-            if(job.getTaskList().size() >= 1) {
-                job.getTaskList().get(0).finishCompute();
+            for(Task t: job.getTaskList()) {
+                t.finishCompute();
             }
             int newId = getJobsList().size() + getJobsSubmittedList().size();
             getJobsList().addAll(ReclusteringEngine.process(job, newId));
-            //Log.print("执行失败\n");
         } else {
-            //Log.print("执行成功\n");
-            if(job.getTaskList().size() >= 1) {
-                job.getTaskList().get(0).finishCompute();
-                Integer time = computeTime.get(job.getTaskList().get(0).name);
+            for(Task t: job.getTaskList()) {
+                t.finishCompute();
+                Integer time = computeTime.get(t.name);
                 if(time == null) {
                     time = 1;
                 }else {
                     time ++;
-                    //Log.printLine(job.getTaskList().get(0).name + " 结束周期 " + time);
-
                 }
-                computeTime.put(job.getTaskList().get(0).name, time);
-                // schedule(getId(), job.getTaskList().get(0).getPeriodTime(), WorkflowSimTags.JOB_NEED_REPEAT, job);
+                computeTime.put(t.name, time);
                 if(time < Constants.repeatTime || Constants.lastTime != 0.0)
-                    startTime.put(job, job.getExecStartTime() + job.getTaskList().get(0).getPeriodTime());
+                    startTime.put(job, job.getExecStartTime() + t.getPeriodTime());
             }
         }
 
         getJobsReceivedList().add(job);
-        /*if(!job.getTaskList().isEmpty())
-            Log.printLine(job.getTaskList().get(0).name + " 返回");*/
         jobsSubmitted--;
-        //Log.printLine("Job submitted: " + jobsSubmitted  + "job received: " + getJobsReceivedList().size());
         if ((getJobsList().isEmpty() && jobsSubmitted == 0 && shouldStop()) || (Constants.lastTime != 0.0 && CloudSim.clock() >= Constants.lastTime)) {
             //send msg to all the schedulers
             shouldStop = true;
@@ -378,7 +381,6 @@ public final class WorkflowEngine extends SimEntity {
                 sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
             }
         } else {
-            //Log.printLine("cloudlet submit");
             sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
         }
         if(start) {
@@ -448,21 +450,20 @@ public final class WorkflowEngine extends SimEntity {
         }
         int num = list.size();
         for (int i = 0; i < num; i++) {
-            //at the beginning
             Job job = list.get(i);
-            //Dont use job.isFinished() it is not right
             if (!hasJobListContainsID(this.getJobsReceivedList(), job.getCloudletId())) {
                 List<Job> parentList = job.getParentList();
                 boolean flag = true;
                 for (Job parent : parentList) {
                     if(parent.getTaskList().isEmpty())
                         continue;
-                    if (!hasJobListContainsName(this.getJobsReceivedList(), parent.getTaskList().get(0).name)) {
-                        flag = false;
-                        /*if(!parent.getTaskList().isEmpty())
-                            Log.printLine(job.getTaskList().get(0).name + " 还有父任务"+ parent.getTaskList().get(0).name +"没有运行");*/
+                    for(Task t: parent.getTaskList()) {
+                        if (!hasJobListContainsName(this.getJobsReceivedList(), t.name))
+                            flag = false;
                         break;
                     }
+                    if(!flag)
+                        break;
                 }
                 /**
                  * This job's parents have all completed successfully. Should
@@ -498,7 +499,6 @@ public final class WorkflowEngine extends SimEntity {
 
             double delaybase = delay;
             int size = submittedList.size();
-            //Log.printLine(size);
             if (interval > 0 && interval <= size) {
                 int index = 0;
                 List subList = new ArrayList();
@@ -506,8 +506,6 @@ public final class WorkflowEngine extends SimEntity {
                     subList.add(submittedList.get(index));
                     index++;
                     if (index % interval == 0) {
-                        //create a new one
-                        //Log.printLine("cc");
                         List<Job> trueList = new ArrayList<>();
                         for(Object j: subList) {
                             Job job = (Job)j;
@@ -516,7 +514,6 @@ public final class WorkflowEngine extends SimEntity {
                                 if(t.needWait) {
                                     Double p = t.getPeriodTime();
                                     Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
-                                    //t.needWait = false;
                                     startTime.put(job, CloudSim.clock() + waitTime);
                                 } else {
                                     trueList.add(job);
@@ -539,7 +536,6 @@ public final class WorkflowEngine extends SimEntity {
                             if(t.needWait) {
                                 Double p = t.getPeriodTime();
                                 Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
-                                //t.needWait = false;
                                 startTime.put(job, CloudSim.clock() + waitTime);
                             } else {
                                 trueList.add(job);
@@ -551,7 +547,9 @@ public final class WorkflowEngine extends SimEntity {
                     schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, trueList);
                 }
             } else if (!submittedList.isEmpty()) {
-                if(!Constants.ifSimulate && Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.K8S)
+                if(!Constants.ifSimulate && (Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.K8S ||
+                        Parameters.getSchedulingAlgorithm() == Parameters.SchedulingAlgorithm.MAXMIN)
+                )
                     sendNow(this.getId(), CloudSimTags.VM_CREATE, submittedList);
                 else {
                     List<Job> trueList = new ArrayList<>();

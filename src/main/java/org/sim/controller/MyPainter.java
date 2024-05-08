@@ -1,8 +1,5 @@
 package org.sim.controller;
 
-
-import jdk.dynalink.beans.BeansLinker;
-import org.jdom2.Element;
 import org.jfree.chart.*;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;

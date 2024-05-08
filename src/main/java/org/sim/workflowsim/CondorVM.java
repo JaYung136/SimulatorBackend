@@ -28,6 +28,11 @@ import org.sim.cloudbus.cloudsim.Vm;
  */
 public class CondorVM extends Vm {
 
+    private long length;
+
+    public void setLength(long l) {this.length = l;}
+
+    public long getLength() {return this.length;}
     /*
      * The state of a vm. It should be either WorkflowSimTags.VM_STATUS_IDLE
      * or VM_STATUS_READY (not used in workflowsim) or VM_STATUS_BUSY

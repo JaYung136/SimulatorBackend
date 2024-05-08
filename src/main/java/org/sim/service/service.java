@@ -29,13 +29,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 @Service
 public class service {
     public List<Host> hostList;
-
-    public List<Host> hostToBalance;
 
     protected List<CondorVM> createVM(int userId, int vms) {
         //Creates a container to store VMs. This list is passed to the broker later
@@ -81,12 +78,6 @@ public class service {
             }
             util.parseHostXml(Constants.hostFile);
             hostList = util.getHostList();
-            hostToBalance = new ArrayList<>(hostList);
-            Double mips = 0.0;
-            for(Host h: hostList) {
-                mips += h.getVmScheduler().getPeCapacity();
-            }
-            Constants.averageMIPS = mips / hostList.size();
             int vmNum = 1;//number of vms;
             FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_ALL;
             /**
@@ -112,7 +103,7 @@ public class service {
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.HEFT;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
-
+            Log.printLine(arithmetic + "----------");
             switch (arithmetic) {
                 case 1:
                     sch_method = Parameters.SchedulingAlgorithm.ROUNDROBIN;
@@ -195,10 +186,7 @@ public class service {
              */
             //List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), 1);
             List<CondorVM> vmlist0 = null;
-            if(!Constants.ifSimulate && arithmetic != 5 && arithmetic != 7)
-                vmlist0 = parseVm(wfEngine.getSchedulerId(0));
-            else
-                vmlist0 = createVM(wfEngine.getSchedulerId(0), 1);
+            vmlist0 = createVM(wfEngine.getSchedulerId(0), 1);
             Constants.Scheduler_Id = wfEngine.getSchedulerId(0);
             Constants.LOG_PATH = System.getProperty("user.dir")+"\\OutputFiles\\hostUtil\\hostUtilization.xml";
             Constants.FAULT_LOG_PATH = System.getProperty("user.dir") + "\\OutputFiles\\faultLog\\faultLog.xml";
@@ -234,32 +222,6 @@ public class service {
         return util.getContainers();
     }
 
-    private double leastRequestedPriority(Host host) {
-        double cpu_score = (double) (host.getVmScheduler().getAvailableMips()) / (double) (host.getNumberOfPes() * host.getVmScheduler().getPeCapacity());
-        //Log.printLine("cpu_score: " + cpu_score);
-        double ram_score = (double) (host.getRamProvisioner().getAvailableRam()) / (double) host.getRamProvisioner().getRam();
-        //Log.printLine("ram_score: " + ram_score);
-        return 10 * (cpu_score + ram_score) / 2;
-    }
-
-    private double balancedResourceAllocation(Host host) {
-        double cpu_fraction = 1 -  (host.getVmScheduler().getAvailableMips()) / (double) (host.getNumberOfPes() * host.getVmScheduler().getPeCapacity());
-        //Log.printLine("cpu_: " + cpu_fraction);
-        double ram_fraction = 1 - (double) (host.getRamProvisioner().getAvailableRam()) / (double) host.getRamProvisioner().getRam();
-        //Log.printLine("ram: " + ram_fraction);
-        double mean = (cpu_fraction + ram_fraction) / 2;
-        //Log.printLine("mean: " + mean);
-        double variance = ((cpu_fraction - mean)*(cpu_fraction - mean)
-                + (ram_fraction - mean)*(ram_fraction - mean)
-        ) / 2;
-        //Log.printLine("variance: " + variance);
-        return 10 - variance * 10;
-    }
-
-    private double getScore(Host host) {
-        return (balancedResourceAllocation(host) + leastRequestedPriority(host)) / 2;
-    }
-
     protected WorkflowDatacenter createDatacenter(String name, Integer a) {
         String arch = "x86";      // system architecture
         String os = "Linux";          // operating system
@@ -292,7 +254,7 @@ public class service {
                     v = new VmAllocationPolicyRR(hostList);
                     break;
                 case 2:
-                    v = new VmAllocationPolicyMaxMin(hostList);
+                    //v = new VmAllocationPolicyMaxMin(hostList);
                     break;
                 case 3:
                     v = new VmAllocationPolicyFCFS(hostList);
@@ -348,7 +310,8 @@ public class service {
             if(job.getTaskList().size() == 0)
                 continue;
             if(Constants.ifSimulate)
-                Log.print(indent + job.getTaskList().get(0).name + indent + indent);
+                for(Task t: job.getTaskList())
+                    Log.print(indent + t.name + indent + indent);
             if (job.getClassType() == Parameters.ClassType.STAGE_IN.value) {
                 if(Constants.ifSimulate)
                     Log.print("Stage-in");
@@ -371,7 +334,7 @@ public class service {
                             + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
                 }
                 lastTime = dft.format(job.getFinishTime());
-                if(job.getTaskList().size() >= 1 && !ifLog.containsKey(job.getTaskList().get(0).name)) {
+                if(!job.getTaskList().isEmpty() && !ifLog.containsKey(job.getTaskList().get(0).name)) {
                     Result r = new Result();
                     double t1 = job.getFinishTime();
 
@@ -405,16 +368,9 @@ public class service {
                     r.ram = job.getTaskList().get(0).getRam();
                     r.period = job.getTaskList().get(0).getPeriodTime();
                     r.datacenter = host.datacenterName;
-                    Task task = job.getTaskList().get(0);
                     if(Constants.pause.get(job.getTaskList().get(0).getCloudletId()) != null) {
                         r.pausestart = Constants.pause.get(job.getTaskList().get(0).getCloudletId()).getKey();
                         r.pauseend = Constants.pause.get(job.getTaskList().get(0).getCloudletId()).getValue();
-                    }
-                    CondorVM containerTmp = new CondorVM(task.getCloudletId(), 1, 0, task.getNumberOfPes(), (int) task.getRam(), 0, 0, "Xen", new CloudletSchedulerTimeShared());
-                    for(Host h: hostToBalance) {
-                        if(h.getName().equals(r.host)) {
-                            h.vmCreate(containerTmp);
-                        }
                     }
                     Constants.results.add(r);
                     ifLog.put(job.getTaskList().get(0).name, true);
@@ -436,15 +392,7 @@ public class service {
                 Constants.score /= Constants.repeatTime;
             Constants.score = 1 - Constants.score;
             Constants.score *= 100;
-            Constants.balanceScore = 0.0;
-            for(Host h: hostToBalance) {
-               Constants.balanceScore += getScore(h);
-            }
-            Constants.balanceScore /= hostToBalance.size();
-            Constants.balanceScore *= 10;
         }
-        /*if(Constants.lastTime == 0.0)
-            return;*/
         try {
             int size_T = 0;
             File file = new File(Constants.LOG_PATH);

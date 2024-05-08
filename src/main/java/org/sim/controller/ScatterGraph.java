@@ -96,14 +96,14 @@ public class ScatterGraph {
         JFreeChart chart = scatterGraph_.makescatterchart(data, graphname, keys);
     }
 
-    public static void main(String[] args) {
-        ScatterGraph scatterGraph_ = new ScatterGraph();
-        List<double[][]> data = new ArrayList<>();
-        double[][] a = {{1, 2, 3}, {4, 5, 6}};
-        double[][] b = {{2, 3, 10}, {7, 8, 10}};
-        data.add(a);
-        data.add(b);
-        JFreeChart chart = scatterGraph_.makescatterchart(data, "延迟图像", List.of(new String[]{"serie1", "serie2"}));
-    }
+//    public static void main(String[] args) {
+//        ScatterGraph scatterGraph_ = new ScatterGraph();
+//        List<double[][]> data = new ArrayList<>();
+//        double[][] a = {{1, 2, 3}, {4, 5, 6}};
+//        double[][] b = {{2, 3, 10}, {7, 8, 10}};
+//        data.add(a);
+//        data.add(b);
+//        JFreeChart chart = scatterGraph_.makescatterchart(data, "延迟图像", List.of(new String[]{"serie1", "serie2"}));
+//    }
 }
 

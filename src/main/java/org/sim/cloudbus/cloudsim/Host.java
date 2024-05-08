@@ -360,7 +360,7 @@ public class Host {
 	 * 
 	 * @param vm the VM
 	 */
-	protected void vmDeallocate(Vm vm) {
+	public void vmDeallocate(Vm vm) {
 		getRamProvisioner().deallocateRamForVm(vm);
 		getBwProvisioner().deallocateBwForVm(vm);
 		getVmScheduler().deallocatePesForVm(vm);
