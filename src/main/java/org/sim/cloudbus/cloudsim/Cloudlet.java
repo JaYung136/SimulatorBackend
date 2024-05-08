@@ -32,6 +32,19 @@ public class Cloudlet {
 	 **/
 	private int userId;
 
+	private double startup;
+
+	private double startdown;
+
+	public void setUpAndDown(double u, double d) {
+		startup = u;
+		startdown = d;
+	}
+
+	public double getStartTime() {
+		return startdown + (startup - startdown) * Math.random();
+	}
+
 	/**
 	 * The size of this Cloudlet to be executed in a CloudResource (unit: in MI).
 	 */

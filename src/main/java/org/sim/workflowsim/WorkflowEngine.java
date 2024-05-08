@@ -512,9 +512,8 @@ public final class WorkflowEngine extends SimEntity {
                             if(job.getTaskList().size() >= 1) {
                                 Task t = job.getTaskList().get(0);
                                 if(t.needWait) {
-                                    Double p = t.getPeriodTime();
-                                    Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
-                                    startTime.put(job, CloudSim.clock() + waitTime);
+                                    Double waitTime = t.getStartTime();
+                                    startTime.put(job, Math.max(waitTime, CloudSim.clock() + 1));
                                 } else {
                                     trueList.add(job);
                                 }
@@ -534,9 +533,8 @@ public final class WorkflowEngine extends SimEntity {
                         if(job.getTaskList().size() >= 1) {
                             Task t = job.getTaskList().get(0);
                             if(t.needWait) {
-                                Double p = t.getPeriodTime();
-                                Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
-                                startTime.put(job, CloudSim.clock() + waitTime);
+                                Double waitTime = t.getStartTime();
+                                startTime.put(job, Math.max(waitTime, CloudSim.clock() + 1));
                             } else {
                                 trueList.add(job);
                             }
@@ -558,11 +556,8 @@ public final class WorkflowEngine extends SimEntity {
                         if(job.getTaskList().size() >= 1) {
                             Task t = job.getTaskList().get(0);
                             if(t.needWait) {
-                                //Log.printLine(t.name + "need to wait before running");
-                                Double p = t.getPeriodTime();
-                                Double waitTime = ((p - t.getCloudletLength() / Constants.averageMIPS) / 2) * Math.random();
-                                //t.needWait = false;
-                                startTime.put(job, CloudSim.clock() + waitTime);
+                                Double waitTime = t.getStartTime();
+                                startTime.put(job, Math.max(waitTime, CloudSim.clock() + 1));
                             } else {
                                 trueList.add(job);
                             }

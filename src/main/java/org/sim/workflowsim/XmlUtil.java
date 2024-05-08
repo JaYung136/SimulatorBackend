@@ -385,6 +385,8 @@ public final class XmlUtil {
                         String computeTime = node.getAttributeValue("ComputeTime");
                         String ip = node.getAttributeValue("IpAddress");
                         String cpuRequest = node.getAttributeValue("CpuRequest");
+                        String startUp = node.getAttributeValue("StartUp");
+                        String startDown = node.getAttributeValue("StartDown");
                         Integer reqMem = Integer.parseInt(requiredMem);
                         Double computeT = Double.parseDouble(computeTime);
 
@@ -428,6 +430,13 @@ public final class XmlUtil {
                         }else {
                             Double cpus =  Double.parseDouble(cpuRequest);
                             taskT.setNumberOfPes(cpus.intValue());
+                        }
+                        if(startUp == null || startDown == null) {
+                            taskT.setUpAndDown(0, 0);
+                        } else {
+                            double u = Double.parseDouble(startUp);
+                            double d = Double.parseDouble(startDown);
+                            taskT.setUpAndDown(u, d);
                         }
                         taskT.setType(ip);
                         taskT.setUserId(userId);

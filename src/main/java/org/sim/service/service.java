@@ -216,11 +216,6 @@ public class service {
         }
     }
 
-    protected List<CondorVM> parseVm(Integer userId) throws Exception {
-        XmlUtil util = new XmlUtil(userId);
-        util.parseVMs(Constants.appFile);
-        return util.getContainers();
-    }
 
     protected WorkflowDatacenter createDatacenter(String name, Integer a) {
         String arch = "x86";      // system architecture
