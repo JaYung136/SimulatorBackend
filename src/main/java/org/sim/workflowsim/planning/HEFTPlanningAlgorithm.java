@@ -319,17 +319,12 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         }
         findFinishime(task,chosenVM, bestReadyTime, true);
         earliestFinishTimes.put(task, earliestFinishTime);
-        Log.printLine("HEFT: Container " + task.getCloudletId() + " ---> Host " + chosenVM.getId());
+        Log.printLine(task.name + "被分配至节点" + chosenVM.getName());
         //Constants.AppNum += 1;
         task.setVmId(chosenVM.getId());
         sched.put(task.name, chosenVM);
         Constants.schedulerResult.put(task.name, chosenVM.getId());
         Constants.scheduleResults.add(new ScheduleResult(chosenVM.getId(), task.name, task.getNumberOfPes(), task.getRam()));
-    }
-
-    private double findFinishTime(Task task, Host host, double readyTime,
-                                  boolean occupySlot) {
-        return host.findContainerFinishTime(task, readyTime, occupySlot);
     }
 
     /**

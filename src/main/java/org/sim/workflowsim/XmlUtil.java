@@ -151,104 +151,6 @@ public final class XmlUtil {
         }
     }
 
-    public void parseVMs(File f) throws Exception{
-        try {
-
-            SAXBuilder builder = new SAXBuilder();
-            //parse using builder to get DOM representation of the XML file
-            Document dom = builder.build(f);
-            Element root = dom.getRootElement();
-            List<Element> list = root.getChildren();
-            for (Element node : list) {
-                //Log.printLine("node: " + node.getName().toLowerCase());
-                switch (node.getName().toLowerCase()) {
-                    case "application":
-                        String aName = node.getAttributeValue("Name");
-                        //String aMemBss = node.getAttributeValue("MemoryBssSize");
-                        //String aMemeData = node.getAttributeValue("MemoryDataSize");
-                        //String aMemPersistBss = node.getAttributeValue("MemoryPersistentBssSize");
-                        //String aMemPersistData = node.getAttributeValue("MemoryPersistentDataSize");
-                        //String aMemText = node.getAttributeValue("MemoryTextSize");
-                        String requiredMem = node.getAttributeValue("RequiredMemorySize");
-                        String periodTime = node.getAttributeValue("Period");
-                        //String cpuRequest = node.getAttributeValue("CpuRequest");
-                        // Log.printLine(requiredMem);
-                        //String upBandwidth = node.getAttributeValue("UpBandwidth");
-                        //String downBandwidth = node.getAttributeValue("DownBandwidth");
-                        String computeTime = node.getAttributeValue("ComputeTime");
-                        String ip = node.getAttributeValue("IpAddress");
-                        /*Integer memBss = Integer.parseInt(aMemBss);
-                        Integer memData = Integer.parseInt(aMemeData);
-                        Integer memPersistBss = Integer.parseInt(aMemPersistBss);
-                        Integer memPersistData = Integer.parseInt(aMemPersistData);
-                        Integer memText = Integer.parseInt(aMemText);*/
-                        Integer reqMem = Integer.parseInt(requiredMem);
-                        //Integer upB = Integer.parseInt(upBandwidth);
-                        //Integer downB = Integer.parseInt(downBandwidth);
-                        Double computeT = Double.parseDouble(computeTime);
-                        String hardware = node.getAttributeValue("Hardware");
-
-                        long runtimeT = (long) (20000 * computeT);
-                        if (runtimeT < 100) {
-                            runtimeT = 100;
-                        }
-                       /* if(Constants.pause.containsKey(this.jobIdStartsFrom)) {
-                            Double last = Constants.pause.get(this.jobIdStartsFrom).getValue();
-                            computeT += last * 1000 * Parameters.getRuntimeScale();
-                        }*/
-                        int size = this.taskList.size();
-                        int sizeId = size + 1;
-                        runtimeT *= Parameters.getRuntimeScale();
-                        List<Element> fileListT = node.getChildren();
-                        for (Element file : fileListT) {
-                            if (file.getName().equals("A653SamplingPort")) {
-                                List<Pair<String, String>> ipAndSizes = new ArrayList<>();
-                                List<Element> f1 = file.getChildren();
-                                if (f1.isEmpty()) {
-                                    continue;
-                                }
-                                List<Element> ports = f1.get(0).getChildren();
-                                for (Element port : ports) {
-                                    String messageSize = port.getAttributeValue("MessageSize");
-                                    String ipS = port.getAttributeValue("IpAddress");
-                                    ipAndSizes.add(new Pair<>(ipS, messageSize));
-                                    Log.printLine("App " + aName + " --- " + messageSize + " --> " + ipS);
-                                }
-                                Constants.name2Ips.put(aName, ipAndSizes);
-                            }
-                        }
-                        CondorVM taskT;
-                        //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent.
-                        synchronized (this) {
-                            Double cpus = 1000 * computeT / Double.parseDouble(periodTime);
-                            Integer cpuInt = cpus.intValue();
-                            taskT = new CondorVM(this.jobIdStartsFrom, userId, 0, cpuInt, reqMem, 0, 0, "Xen", new CloudletSchedulerTimeShared());
-                            this.jobIdStartsFrom++;
-                        }
-                        if(hardware != null && !hardware.equals("")) {
-                            for(Host h: Constants.hosts) {
-                                if(h.getName().equals(hardware)) {
-                                    taskT.setHost(h);
-                                    break;
-                                }
-                            }
-                        }
-                        taskT.setIp(ip);
-                        taskT.setName(aName);
-                        Constants.ip2taskName.put(ip, aName);
-                        Constants.id2Name.put(taskT.getId(), aName);
-                        taskT.setPeriodTime(Double.parseDouble(periodTime));
-                        taskT.setComputeTime(runtimeT);
-                        this.containerList.add(taskT);
-                        Log.printLine("Job " + taskT.getName() + " : || compute time: " + computeTime + " || period: " + taskT.getPeriodTime() +" || ram: " + taskT.getRam() + " ip: " + taskT.getIp() + " || period: " + node.getAttributeValue("Period"));
-                }
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
     public void parseHostXml(File f) {
         parseXmlFile(f);
     }
@@ -482,6 +384,7 @@ public final class XmlUtil {
                         String hardware = node.getAttributeValue("Hardware");
                         String computeTime = node.getAttributeValue("ComputeTime");
                         String ip = node.getAttributeValue("IpAddress");
+                        String cpuRequest = node.getAttributeValue("CpuRequest");
                         Integer reqMem = Integer.parseInt(requiredMem);
                         Double computeT = Double.parseDouble(computeTime);
 
@@ -519,9 +422,13 @@ public final class XmlUtil {
                                 Constants.name2Ips.put(aName, ipAndSizes);
                             }
                         }
-
-                        Double cpus = 1000 * Double.parseDouble(computeTime) / Double.parseDouble(periodTime);
-                        taskT.setNumberOfPes(cpus.intValue());
+                        if(cpuRequest == null) {
+                            Double cpus = 1000 * Double.parseDouble(computeTime) / Double.parseDouble(periodTime);
+                            taskT.setNumberOfPes(cpus.intValue());
+                        }else {
+                            Double cpus =  Double.parseDouble(cpuRequest);
+                            taskT.setNumberOfPes(cpus.intValue());
+                        }
                         taskT.setType(ip);
                         taskT.setUserId(userId);
                         taskT.setRam(reqMem);

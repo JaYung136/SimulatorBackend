@@ -35,7 +35,6 @@ public class VmAllocationPolicyMaxMin extends VmAllocationPolicySimple{
                     maxVm = v2;
                 }
             }
-            Log.printLine(maxVm.getNumberOfPes());
             if(!allocateHostForVm(maxVm))
                 return false;
         }
@@ -51,29 +50,28 @@ public class VmAllocationPolicyMaxMin extends VmAllocationPolicySimple{
             freePesTmp.add(freePes);
         }
 
-        if (!getVmTable().containsKey(vm.getUid())) { // if this vm was not created
-            do {// we still trying until we find a host or until we try all of them
-                double moreFree = Double.MIN_VALUE;
+        if (!getVmTable().containsKey(vm.getUid())) {
+            do {
+                int moreFree = Integer.MIN_VALUE;
                 int idx = -1;
-                //Log.printLine(freePesTmp.size());
-                // we want the host with less pes in use
                 for (int i = 0; i < freePesTmp.size(); i++) {
-                    //Log.printLine(getScore(getHostList().get(i)));
                     if(freePesTmp.get(i) == Integer.MIN_VALUE) {
                         continue;
                     }
-                    if (getHostList().get(i).getVmScheduler().getPeCapacity() > moreFree) {
-                        moreFree = getHostList().get(i).getVmScheduler().getPeCapacity();
+                    int totalUsedPes = getHostList().get(i).getNumberOfPes() - freePesTmp.get(i);
+                    if (totalUsedPes > moreFree) {
+                        moreFree = totalUsedPes;
                         idx = i;
                     }
                 }
                 if(idx == -1) {
                     return false;
                 }
+                //Log.printLine(((CondorVM)vm).getName() + " 选中 " + idx);
                 Host host = getHostList().get(idx);
                 result = host.vmCreate(vm);
 
-                if (result) { // if vm were succesfully created in the host
+                if (result) {
                     getVmTable().put(vm.getUid(), host);
                     getUsedPes().put(vm.getUid(), requiredPes);
                     getFreePes().set(idx, getFreePes().get(idx) - requiredPes);
