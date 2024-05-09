@@ -14,9 +14,12 @@ public class Message {
     private String name;
 
     private Double size;
+    private double precorded;
 
     public Message(double period, String dI, String sI, String n, Double size) {
-        this.period = 0; // 因为容器一运行就要发消息，所以设为0
+        this.precorded = period * Math.random()*0.5;
+        this.period = this.precorded;
+//        this.period = 0; // 因为容器一运行就要发消息，所以设为0
         this.periodStatic = period;
         this.destIP = dI;
         this.srcIP = sI;
@@ -44,6 +47,7 @@ public class Message {
     }
 
     public void Rest() {
-        period = periodStatic;
+//        period = periodStatic;
+        this.period = this.precorded;
     }
 }

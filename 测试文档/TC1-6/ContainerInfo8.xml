@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adag xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  version="2.1">
+    <container AppName = "HF_SM_1"  image = "nginx" WorkingDir = "" >
+        <label Key="type" val = "App" />
+        <command Content="printenv" />
+        <args Content="HOSTNAME" />
+        <args Content="KUBERNETES_PORT" />
+    </container>
+    <container AppName = "HF_SM_2"  image = "nginx" WorkingDir = "" >
+    </container>
+    <container AppName = "HF_SM_3"  image = "nginx" WorkingDir = "" >
+    </container>
+    <container AppName = "HF_SM_4"  image = "nginx" WorkingDir = "" >
+        <label Key="type" val = "App" />
+    </container>
+    <container AppName = "HF_SM_5"  image = "nginx" WorkingDir = "" >
+    </container>
+    <container AppName = "HF_SM_6"  image = "nginx" WorkingDir = "" >
+    </container>
+    <container AppName = "HF_SM_7"  image = "nginx" WorkingDir = "" >
+    </container>
+    <container AppName = "HF_SM_8"  image = "nginx" WorkingDir = "" >
+    </container>
+</adag>

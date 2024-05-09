@@ -351,6 +351,7 @@ public class WorkloadParser {
 				wl.time = wl.time * contractRate;
 				wl.submitVmId = getVmId(wl.submitVmName);
 				wl.destVmId = getVmId(wl.destVmName);
+				wl.submitPktSize = wl.submitPktSize * 0.008;
 				Request req = new Request(userId);
 				req.addActivity(
 						new Processing(

@@ -34,6 +34,8 @@ import java.util.*;
 public class service {
     public List<Host> hostList;
 
+    public List<Host> hostToBalance;
+
     protected List<CondorVM> createVM(int userId, int vms) {
         //Creates a container to store VMs. This list is passed to the broker later
         LinkedList<CondorVM> list = new LinkedList<>();
@@ -78,6 +80,7 @@ public class service {
             }
             util.parseHostXml(Constants.hostFile);
             hostList = util.getHostList();
+            hostToBalance = new ArrayList<>(hostList);
             int vmNum = 1;//number of vms;
             FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_ALL;
             /**
@@ -272,6 +275,31 @@ public class service {
         return datacenter;
     }
 
+    private double leastRequestedPriority(Host host) {
+        double cpu_score = (double) (host.getVmScheduler().getAvailableMips()) / (double) (host.getNumberOfPes() * host.getVmScheduler().getPeCapacity());
+        //Log.printLine("cpu_score: " + cpu_score);
+        double ram_score = (double) (host.getRamProvisioner().getAvailableRam()) / (double) host.getRamProvisioner().getRam();
+        //Log.printLine("ram_score: " + ram_score);
+        return 10 * (cpu_score + ram_score) / 2;
+    }
+
+    private double balancedResourceAllocation(Host host) {
+        double cpu_fraction = 1 -  (host.getVmScheduler().getAvailableMips()) / (double) (host.getNumberOfPes() * host.getVmScheduler().getPeCapacity());
+        //Log.printLine("cpu_: " + cpu_fraction);
+        double ram_fraction = 1 - (double) (host.getRamProvisioner().getAvailableRam()) / (double) host.getRamProvisioner().getRam();
+        //Log.printLine("ram: " + ram_fraction);
+        double mean = (cpu_fraction + ram_fraction) / 2;
+        //Log.printLine("mean: " + mean);
+        double variance = ((cpu_fraction - mean)*(cpu_fraction - mean)
+                + (ram_fraction - mean)*(ram_fraction - mean)
+        ) / 2;
+        //Log.printLine("variance: " + variance);
+        return 10 - variance * 10;
+    }
+
+    private double getScore(Host host) {
+        return (balancedResourceAllocation(host) + leastRequestedPriority(host)) / 2;
+    }
 
     /**
      * Prints the job objects
@@ -363,9 +391,16 @@ public class service {
                     r.ram = job.getTaskList().get(0).getRam();
                     r.period = job.getTaskList().get(0).getPeriodTime();
                     r.datacenter = host.datacenterName;
+                    Task task = job.getTaskList().get(0);
                     if(Constants.pause.get(job.getTaskList().get(0).getCloudletId()) != null) {
                         r.pausestart = Constants.pause.get(job.getTaskList().get(0).getCloudletId()).getKey();
                         r.pauseend = Constants.pause.get(job.getTaskList().get(0).getCloudletId()).getValue();
+                    }
+                    CondorVM containerTmp = new CondorVM(task.getCloudletId(), 1, 0, task.getNumberOfPes(), (int) task.getRam(), 0, 0, "Xen", new CloudletSchedulerTimeShared());
+                    for(Host h: hostToBalance) {
+                        if(h.getName().equals(r.host)) {
+                            h.vmCreate(containerTmp);
+                        }
                     }
                     Constants.results.add(r);
                     ifLog.put(job.getTaskList().get(0).name, true);
@@ -381,12 +416,25 @@ public class service {
             }
         }
         if(Constants.ifSimulate) {
-            Log.printLine(Constants.repeatTime + "周期下，任务群总完成时间为：" + lastTime);
+            Log.printLine(Constants.repeatTime + "周期下，任务群总完成时间为：" + lastTime );
             Constants.score = Double.valueOf(lastTime) / (Constants.totalTime);
             if (Constants.repeatTime > 0)
                 Constants.score /= Constants.repeatTime;
             Constants.score = 1 - Constants.score;
             Constants.score *= 100;
+            Double leastRequestScore = 0.0;
+            Double balanceScore = 0.0;
+            for(Host h: hostToBalance) {
+                leastRequestScore += leastRequestedPriority(h);
+                balanceScore += balancedResourceAllocation(h);
+            }
+            balanceScore /= hostToBalance.size();
+            balanceScore *= 10;
+            leastRequestScore /= hostToBalance.size();
+            leastRequestScore *= 10;
+            Double totalScore = (leastRequestScore + balanceScore) / 2;
+            Constants.balanceScore = "\r\n 资源均衡度打分:\r\n BalanceResourceAllocation: " + dft.format(balanceScore) + "\r\n LeastRequestPriority: " + dft.format(leastRequestScore)
+                    + "\r\n 总得分: " + dft.format(totalScore) + "\r\n 运行时间打分\r\n" + "任务群仿真运行" + Constants.repeatTime + "周期总时间：" + lastTime + "\r\n 得分: " + dft.format(Constants.score);
         }
         try {
             int size_T = 0;

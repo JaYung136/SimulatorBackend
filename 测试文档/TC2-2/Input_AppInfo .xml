@@ -17,7 +17,7 @@
             </A664Message>
         </A653SamplingPort>
     </application>
-    <application Name="HF_SM_4" IpAddress="10.31.40.4" Hardware="" ComputeTime="15" Period="60" RequiredMemorySize="30000">
+    <application Name="HF_SM_4" IpAddress="10.31.40.4" Hardware="" ComputeTime="60" Period="240" RequiredMemorySize="30000">
         <A653SamplingPort>
             <A664Message>
                 <A653SamplingPort Name="msg03" MessageSize="1200" SamplePeriod="10" IpAddress="10.31.40.3"/>

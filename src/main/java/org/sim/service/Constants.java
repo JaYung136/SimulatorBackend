@@ -25,6 +25,8 @@ public class Constants {
     public static List<Workload> workloads = new ArrayList<>();
     public static List<ScheduleResult> scheduleResults = new ArrayList<>();
 
+    public static List<Task> tasks = new ArrayList<>();
+
     public static Double finishTime = 0.0;
     public static Double averageMIPS = 1000.0;
     public static Boolean ifSimulate = true;
@@ -40,6 +42,8 @@ public class Constants {
     public static File topoFile = null;
 
     public static Double score = 0.0;
+
+    public static String balanceScore = "";
 
     public static Double totalTime = 0.0;
     public static Map<String, ContainerInfo> containerInfoMap = new HashMap<>();

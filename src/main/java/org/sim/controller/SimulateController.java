@@ -396,7 +396,7 @@ public class SimulateController {
                 return m;
             }
             Log.printLine("============================== 开始仿真 ==============================");
-            m = simulate(arithmetic, 3, 0.0);
+            m = simulate(arithmetic, 1, 0.0);
             if(m.code == ResultDTO.ERROR_CODE) {
                 return m;
             }
@@ -409,7 +409,7 @@ public class SimulateController {
             m = writeYaml();
             Constants.faultFile = null;
             DecimalFormat dft = new DecimalFormat("###.##");
-            m.data = dft.format(Constants.score);
+            m.data = Constants.balanceScore;
             return m;
         }catch (Exception e) {
             return ResultDTO.error(e.getMessage());
@@ -478,7 +478,7 @@ public class SimulateController {
             Constants.apps = new ArrayList<>();
             Constants.ip2taskName = new HashMap<>();
             Constants.name2Ips = new HashMap<>();
-            simulate(8, 3, 0.0);
+            simulate(8, 1, 0.0);
             YamlWriter writer = new YamlWriter();
             try {
                 String path = System.getProperty("user.dir")+"\\OutputFiles\\yaml";
@@ -492,7 +492,7 @@ public class SimulateController {
             return ResultDTO.error(e.getMessage());
         }
         DecimalFormat dft = new DecimalFormat("###.##");
-        return ResultDTO.success(dft.format(Constants.score));
+        return ResultDTO.success(Constants.balanceScore);
     }
 
     @RequestMapping("/pauseContainer")
