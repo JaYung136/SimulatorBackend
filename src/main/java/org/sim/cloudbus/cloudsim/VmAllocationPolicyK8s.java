@@ -59,7 +59,7 @@ public class VmAllocationPolicyK8s extends VmAllocationPolicySimple{
             freePesTmp.add(freePes);
         }
         Boolean ifStatic = true;
-        Log.printLine("k8s调度");
+
         if (!getVmTable().containsKey(vm.getUid())) { // if this vm was not created
             do {// we still trying until we find a host or until we try all of them
                 double moreFree = Double.MIN_VALUE;
@@ -67,7 +67,7 @@ public class VmAllocationPolicyK8s extends VmAllocationPolicySimple{
                 //Log.printLine(freePesTmp.size());
                 if(vm.getHost() != null && ifStatic) {
                     idx = vm.getHost().getId();
-                    Log.printLine("静态调度");
+
                     ifStatic = false;
                 } else {
                     for (int i = 0; i < freePesTmp.size(); i++) {

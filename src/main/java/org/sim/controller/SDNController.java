@@ -564,7 +564,7 @@ public class SDNController {
             }catch (Exception e){
                 //Do nothing
             }
-            Log.printLine("mes size " + Constants.workloads.size());
+            //Log.printLine("mes size " + Constants.workloads.size());
             convertphytopo();
             convertvirtopo();
             convertworkload();

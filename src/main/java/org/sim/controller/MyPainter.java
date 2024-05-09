@@ -106,7 +106,7 @@ public class MyPainter extends JFrame {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
-        setVisualUI(chart);
+        setVisualUIForLink(chart);
         if(save)
 //        if(false)
             saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
@@ -138,7 +138,7 @@ public class MyPainter extends JFrame {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
-        setVisualUI(chart);
+        setVisualUIForHost(chart);
         saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+"cpu利用率图像.png", 1200, 800);
     }
 
@@ -165,7 +165,7 @@ public class MyPainter extends JFrame {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
-        setVisualUI(chart);
+        setVisualUIForHost(chart);
 //        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+ host.getName() +"cpu利用率图像.png", 1200, 800);
     }
     public void setVisualUI(JFreeChart chart){
@@ -174,6 +174,38 @@ public class MyPainter extends JFrame {
         xyplot.setBackgroundPaint(Color.white);//设置背景面板颜色
         ValueAxis vaaxis = xyplot.getDomainAxis();
         vaaxis.setAxisLineStroke(new BasicStroke(1.5f));//设置坐标轴粗细
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public void setVisualUIForLink(JFreeChart chart){
+        ChartFrame frame = new ChartFrame("图像", chart, true);
+        XYPlot xyplot = (XYPlot) chart.getPlot();
+        xyplot.setBackgroundPaint(Color.white);//设置背景面板颜色
+        ValueAxis vaaxis = xyplot.getDomainAxis();
+        vaaxis.setAxisLineStroke(new BasicStroke(1.5f));//设置坐标轴粗细
+
+        ValueAxis axis = xyplot.getRangeAxis();
+        axis.setRange(0,100);
+        xyplot.setRangeAxis(axis);
+
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public void setVisualUIForHost(JFreeChart chart){
+        ChartFrame frame = new ChartFrame("图像", chart, true);
+        XYPlot xyplot = (XYPlot) chart.getPlot();
+        xyplot.setBackgroundPaint(Color.white);//设置背景面板颜色
+        ValueAxis vaaxis = xyplot.getDomainAxis();
+        vaaxis.setAxisLineStroke(new BasicStroke(1.5f));//设置坐标轴粗细
+
+        ValueAxis axis = xyplot.getRangeAxis();
+        axis.setRange(0,1);
+        xyplot.setRangeAxis(axis);
+
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);

@@ -11,6 +11,7 @@ public class Helper {
     private service service;
 
     private void resetForSimulator() {
+        Constants.workloads = new ArrayList<>();
         Constants.lastTime = 0.0;
         Constants.results = new ArrayList<>();
         Constants.logs = new ArrayList<>();
@@ -22,6 +23,7 @@ public class Helper {
         Constants.ip2taskName = new HashMap<>();
         Constants.name2Ips = new HashMap<>();
         Constants.finishTime = 0.0;
+        Constants.totalTime = 0.0;
         service = new service();
     }
     public Message simulate(Integer a, Integer repeatTime, Double lastTime) {
@@ -42,6 +44,7 @@ public class Helper {
     }
 
     public Message simForCpu(Double lastTime) {
+
         return simulate(8, 3, lastTime);
     }
 }

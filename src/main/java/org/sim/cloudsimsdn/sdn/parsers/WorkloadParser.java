@@ -18,6 +18,7 @@ import org.sim.cloudsimsdn.sdn.Configuration;
 import org.sim.cloudsimsdn.sdn.physicalcomponents.SDNDatacenter;
 import org.sim.cloudsimsdn.sdn.workload.*;
 import org.sim.controller.AssignInfo;
+import org.sim.service.Constants;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -27,7 +28,6 @@ import java.util.*;
 import static org.sim.cloudsimsdn.core.CloudSim.assignInfoMap;
 import static org.sim.cloudsimsdn.core.CloudSim.getEntityId;
 import static org.sim.controller.SDNController.*;
-import static org.sim.service.Constants.workloads;
 
 public class WorkloadParser {
 	private static final int NUM_PARSE_EACHTIME = 200;
@@ -346,7 +346,7 @@ public class WorkloadParser {
 //			e.printStackTrace();
 //		}
 		try{
-			for(Workload wl:workloads){
+			for(Workload wl: Constants.workloads){
 				wl.resultWriter = this.resultWriter;
 				wl.time = wl.time * contractRate;
 				wl.submitVmId = getVmId(wl.submitVmName);
