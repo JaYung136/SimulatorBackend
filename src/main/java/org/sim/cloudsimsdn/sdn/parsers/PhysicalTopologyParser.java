@@ -64,7 +64,7 @@ public class PhysicalTopologyParser {
 			nos = new NetworkOperatingSystemSimple("NOS_"+dcName);
 
 			netOsList.put(dcName, nos);
-			// 在这里 parse switch 和 host
+			//TODO: 在这里 parse switch 和 host
 			parser.parseNode(dcName);
 		}
 		parser.parseLink();

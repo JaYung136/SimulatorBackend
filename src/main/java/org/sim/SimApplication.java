@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 import java.io.File;
+import java.io.PrintStream;
 
 @SpringBootApplication(exclude= {SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class})
 public class SimApplication {
