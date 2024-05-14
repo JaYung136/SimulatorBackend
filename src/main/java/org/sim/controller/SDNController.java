@@ -451,6 +451,7 @@ public class SDNController {
         for(int i=0; i<wls.size(); ++i){
             Workload msg = wls.get(i);
             try {
+                System.out.println("容器" + msg.destVmId + "接收到容器" + msg.submitVmId + "发送的消息，网络传输时间:" + msg.networktransmissiontime);
                 bw.write("\t<Message MessageName=\"" + msg.msgName + "\" Src=\"" + msg.submitVmName + "\" Dst=\"" + msg.destVmName + "\" StartTime=\"" + msg.time + "\" EndTime=\"" + msg.end2endfinishtime
                         + "\" NetworkTime=\"" + (msg.networktransmissiontime)
                         + "\" WaitingTime=\"" + (msg.dagschedulingtime)
