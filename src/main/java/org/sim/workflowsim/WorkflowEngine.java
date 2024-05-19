@@ -217,23 +217,26 @@ public final class WorkflowEngine extends SimEntity {
         }
     }
 
+    /**
+     * 每隔 1 微秒执行一次，判断是否有任务可以开始执行
+     */
     protected void processEngineEvent() {
         Boolean ifRepeat = false;
         for(Iterator<Job> iterator = startTime.keySet().iterator(); iterator.hasNext(); ) {
             Job job = iterator.next();
             Double start = startTime.get(job);
-            //Log.printLine(job.getTaskList().get(0).name + " need to repeat at " + start);
             if(CloudSim.clock() >= start) {
                 ifRepeat = true;
                 iterator.remove();
+                // 如果 needWait 是真，表明这个任务是第一次执行
                 if(!job.getTaskList().isEmpty() && job.getTaskList().get(0).needWait) {
                     job.getTaskList().get(0).needWait = false;
                     List l = new ArrayList();
                     l.add(job);
                     sendNow(this.getSchedulerId(0), CloudSimTags.CLOUDLET_SUBMIT, l);
                 } else {
+                    // 任务开始执行下一个周期
                     int newId = getJobsList().size() + getJobsSubmittedList().size();
-                    // Log.printLine("jobs: " + getJobsList().size());
                     getJobsList().addAll(ReclusteringEngine.process(job, newId));
                 }
             }
@@ -246,7 +249,6 @@ public final class WorkflowEngine extends SimEntity {
     protected void processJobRepeat(SimEvent ev) {
         Job job = (Job) ev.getData();
         int newId = getJobsList().size() + getJobsSubmittedList().size();
-        // Log.printLine("jobs: " + getJobsList().size());
         getJobsList().addAll(ReclusteringEngine.process(job, newId));
     }
     /**
@@ -289,13 +291,18 @@ public final class WorkflowEngine extends SimEntity {
         }
     }
 
+    /**
+     * 如果调度算法是 K8s 或 Maxmin,工作流引擎会调用这个函数调度容器
+      */
     private void processVmCreate(SimEvent ev) throws Exception {
         Log.printLine("尝试创建容器");
+        // list 包含所有可以调度的容器（可以调度的条件是所有前置任务都已经调度好了，如果没有 DAG 关系则不用考虑）
         List<Job> list = (List) ev.getData();
         List<CondorVM> containerList = new ArrayList<>();
         for(Job job: list) {
             for (Task task : job.getTaskList()) {
                 Host h = null;
+                // 如果输入的 Appinfo.xml 中有 application 的 Hardware 字段指定了容器所在节点名， k8s算法会静态地调度
                 if (!Objects.equals(task.hardware, "")) {
                     Log.printLine(task.hardware);
                     for (Host host : hostList) {
@@ -314,6 +321,7 @@ public final class WorkflowEngine extends SimEntity {
             }
         }
         this.vmAllocationPolicy.setContainerList(containerList);
+        // 如果调度的返回值是 False，表明集群的资源不足
         if(!this.vmAllocationPolicy.scheduleAll()) {
             this.shouldStop = true;
             Constants.nodeEnough = false;
@@ -340,16 +348,14 @@ public final class WorkflowEngine extends SimEntity {
     }
 
     /**
-     * Process a job return event.
-     *
-     * @param ev a SimEvent object
-     * @pre ev != $null
-     * @post $none
-     */
+     * 当一个执行完成的任务回到工作流引擎，我们对其进行处理：
+     * 1）任务是否执行成功
+     * 2）仿真是否已到达时间上限
+     **/
     protected void processJobReturn(SimEvent ev) {
         Job job = (Job) ev.getData();
         if (job.getCloudletStatus() == Cloudlet.FAILED) {
-            // Reclusteringengine will add retry job to jobList
+            // 任务执行失败，重新投入执行
             for(Task t: job.getTaskList()) {
                 t.finishCompute();
             }
@@ -358,6 +364,7 @@ public final class WorkflowEngine extends SimEntity {
         } else {
             for(Task t: job.getTaskList()) {
                 t.finishCompute();
+                // computeTime 记录任务已经执行了几个周期
                 Integer time = computeTime.get(t.name);
                 if(time == null) {
                     time = 1;
@@ -365,6 +372,7 @@ public final class WorkflowEngine extends SimEntity {
                     time ++;
                 }
                 computeTime.put(t.name, time);
+                // 如果任务的执行周期数小于 Constants.repeatTime(调度时才有意义，默认为 1) 或者当前是在仿真，我们记录任务下一个周期何时开始执行
                 if(time < Constants.repeatTime || Constants.lastTime != 0.0)
                     startTime.put(job, job.getExecStartTime() + t.getPeriodTime());
             }
@@ -372,8 +380,10 @@ public final class WorkflowEngine extends SimEntity {
 
         getJobsReceivedList().add(job);
         jobsSubmitted--;
+        // 第一个括号是调度时的仿真结束条件：所有任务都执行完了要求的周期数（Constants.repeatTime)
+        // 第二个括号是仿真时的仿真结束条件：时间到达用户设定上限
         if ((getJobsList().isEmpty() && jobsSubmitted == 0 && shouldStop()) || (Constants.lastTime != 0.0 && CloudSim.clock() >= Constants.lastTime)) {
-            //send msg to all the schedulers
+            // 通知工作流调度器结束仿真
             shouldStop = true;
             Constants.finishTime = CloudSim.clock();
             Log.printLine("任务全部执行结束，记录当前时间：" + Constants.finishTime + "预期持续时间： " + Constants.lastTime);
@@ -383,6 +393,7 @@ public final class WorkflowEngine extends SimEntity {
         } else {
             sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
         }
+        // 如果是第一个返回的任务，工作流引擎开始每1微妙执行一次 processEngineEvent()
         if(start) {
             send(this.getId(), 1, WorkflowSimTags.ENGINE_EVENT);
             start = false;
