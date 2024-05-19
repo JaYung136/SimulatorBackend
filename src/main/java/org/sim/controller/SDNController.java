@@ -77,9 +77,9 @@ public class SDNController {
         JSONObject state = new JSONObject(req);
         halfDuplex = !state.getBoolean("switchstate");
         if (halfDuplex) {
-//            System.out.println("半双工");
+            System.out.println("半双工");
         } else {
-//            System.out.println("全双工");
+            System.out.println("全双工");
         }
         CloudSim.HalfDuplex = halfDuplex;
         return ResultDTO.success("ok");

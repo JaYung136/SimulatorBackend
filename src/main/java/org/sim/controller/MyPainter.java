@@ -13,14 +13,9 @@ import org.sim.service.Constants;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
-
-import static org.sim.controller.SDNController.ethernetSpeed;
 
 public class MyPainter extends JFrame {
     public static StandardChartTheme createChartTheme(String fontName) {
@@ -94,7 +89,7 @@ public class MyPainter extends JFrame {
             saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
     }
 
-    public void paintLink(XYSeries[] xys, String pngName, String ylabel, boolean save) throws Exception {
+    public void paintLink(XYSeries[] xys, String pngName, String ylabel, boolean save, double maxvalue) throws Exception {
         XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
         for(XYSeries xy: xys) {
             xySeriesCollection.addSeries(xy);
@@ -106,7 +101,7 @@ public class MyPainter extends JFrame {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
-        setVisualUIForLink(chart);
+        setVisualUIForLink(chart, maxvalue);
         if(save)
 //        if(false)
             saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
@@ -179,7 +174,7 @@ public class MyPainter extends JFrame {
         frame.setVisible(true);
     }
 
-    public void setVisualUIForLink(JFreeChart chart){
+    public void setVisualUIForLink(JFreeChart chart, double maxvalue){
         ChartFrame frame = new ChartFrame("图像", chart, true);
         XYPlot xyplot = (XYPlot) chart.getPlot();
         xyplot.setBackgroundPaint(Color.white);//设置背景面板颜色
@@ -187,7 +182,7 @@ public class MyPainter extends JFrame {
         vaaxis.setAxisLineStroke(new BasicStroke(1.5f));//设置坐标轴粗细
 
         ValueAxis axis = xyplot.getRangeAxis();
-        axis.setRange(0,100);
+        axis.setRange(0,maxvalue*1.5);
         xyplot.setRangeAxis(axis);
 
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -325,6 +320,7 @@ public class MyPainter extends JFrame {
         MyPainter p = new MyPainter("链路利用率图像");
         p.setSize(50000, 100000);
         Map<String, XYSeries> xySerieMap = new HashMap<>();
+        double maxvalue = 0;
         for (LinkUtil lu : lus.values()) {
             if(lu.printable == false)
                 continue;
@@ -334,11 +330,13 @@ public class MyPainter extends JFrame {
             for(int i=0; i<lu.recordTimes.size(); ++i) {
                 forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i));
                 backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i));
+                maxvalue = (lu.UnitUtilForward.get(i)  > maxvalue)? lu.UnitUtilForward.get(i)  : maxvalue;
+                maxvalue = (lu.UnitUtilBackward.get(i) > maxvalue)? lu.UnitUtilBackward.get(i) : maxvalue;
             }
             xySerieMap.put(lu.lowOrder+"-"+lu.highOrder, forwardline);
             xySerieMap.put(lu.highOrder+"-"+lu.lowOrder, backwardline);
         }
-        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路利用率图像", "利用率", save);
+        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), "链路利用率图像", "利用率", save, maxvalue);
 
 //        p = new MyPainter("链路带宽速率图像");
 //        p.setSize(50000, 100000);
@@ -364,32 +362,32 @@ public class MyPainter extends JFrame {
         MyPainter p = new MyPainter(name+"利用率图像");
         p.setSize(50000, 100000);
         Map<String, XYSeries> xySerieMap = new HashMap<>();
+        double maxvalue = 0;
         for (LinkUtil lu : lus.values()) {
             if(!lu.printable) {
                 continue;
             }
-
             String linkname1 = lu.lowOrder+"-"+lu.highOrder;
             String linkname2 = lu.highOrder+"-"+lu.lowOrder;
-
             if(namelist.contains(linkname1)) {
                 XYSeries forwardline = new XYSeries(linkname1);
                 for(int i=0; i<lu.recordTimes.size(); ++i) {
                     forwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilForward.get(i));
+                    maxvalue = (lu.UnitUtilForward.get(i)  > maxvalue)? lu.UnitUtilForward.get(i)  : maxvalue;
                 }
                 xySerieMap.put(linkname1, forwardline);
 
             }
-
             if(namelist.contains(linkname2)) {
                 XYSeries backwardline = new XYSeries(linkname2);
                 for(int i=0; i<lu.recordTimes.size(); ++i) {
                     backwardline.add(lu.recordTimes.get(i)*1000000, lu.UnitUtilBackward.get(i));
+                    maxvalue = (lu.UnitUtilBackward.get(i) > maxvalue)? lu.UnitUtilBackward.get(i) : maxvalue;
                 }
                 xySerieMap.put(linkname2, backwardline);
             }
         }
-        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"利用率图像", "利用率",false);
+        p.paintLink(xySerieMap.values().toArray(new XYSeries[xySerieMap.size()]), name+"利用率图像", "利用率",false, maxvalue);
 
 //        p = new MyPainter(name+"带宽速率图像");
 //        p.setSize(50000, 100000);
