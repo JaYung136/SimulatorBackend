@@ -219,8 +219,10 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 	public Packet addPacketToChannel(Packet orgPkt) {
 		double timenow = CloudSim.clock();
 		Packet pkt = orgPkt;
+		//发送方容器
 		int src = pkt.getOrigin();
 		String srchostname = ((SDNVm) NetworkOperatingSystem.findVmGlobal(src)).getHostName();
+		//接收方容器
 		int dst = pkt.getDestination();
 		String dsthostname = ((SDNVm) NetworkOperatingSystem.findVmGlobal(dst)).getHostName();
 		int flowId = pkt.getFlowId();
@@ -229,10 +231,9 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		// 终端发包流程step1:创建端到端通道，分配网络带宽等资源
 		// 如果不存在【src->dst】的端到端虚拟链路，就新建。会给新建的端到端虚拟链路分配网络带宽等资源
 		if(channel == null) {
-			//No channel established. Create a new channel.
+			//新建channel
 			SDNHost sender = findHost(src);
 			channel = channelManager.createChannel(src, dst, flowId, sender);
-
 			if(channel == null) {
 				// failed to create channel
 				System.err.println("ERROR!! Cannot create channel!" + pkt);
@@ -244,7 +245,7 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		// 终端发包流程step2:拷贝数据包到队列
 		// 将数据包传入端到端虚拟链路
 		channel.addTransmission(new Transmission(pkt));
-
+		// 发送一个“网络包”事件到全局仿真队列
 		sendInternalEvent();
 
 		return pkt;
@@ -299,12 +300,6 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		send(dc.getId(), latency, CloudSimTagsSDN.SDN_PACKET_FAILED, pkt);
 	}
 
-//	public void sendAdjustAllChannelEvent() {
-//		if(CloudSim.clock() != lastAdjustAllChannelTime) {
-//			send(getId(), 0, CloudSimTagsSDN.SDN_INTERNAL_CHANNEL_PROCESS);
-//			lastAdjustAllChannelTime = CloudSim.clock();
-//		}
-//	}
 
 	private void processWirelessTimeSlot(String chankey) {
 		List<Channel> list = CloudSim.wirelessScheduler.GetChanList(chankey);
@@ -313,10 +308,13 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 			return;
 		}
 		double timenow = CloudSim.clock();
-		CloudSim.wirelessScheduler.PushBackAndDisableOthers(chankey);
 
+		// TDMA机制：一个无线通道里可以有多个channels，但每个时间片只激活其中一个
+		// PushBackAndDisableOthers函数会以 round-robin 的形式在每个时间片只激活无线通道里的一个channel，其他channels关闭传输
+		CloudSim.wirelessScheduler.PushBackAndDisableOthers(chankey);
+		// 被激活的channel可以传输数据
 		channelManager.updatePacketProcessing(); // 此步会处理 processCompletePackets
-		// 继续该chankey对应的 timeslot
+		// 继续下一个时间片(timeslot)
 		sendWirelessTimeSlide(this.getId(), chankey);
 	}
 
@@ -327,24 +325,26 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 		if(channelManager.getTotalChannelNum() != 0) {
 			if(nextEventTime == CloudSim.clock() + CloudSim.getMinTimeBetweenEvents())
 				return;
-			// 预计数据包传达时间
+			//遍历netOS管理的所有channels。预计每个channel中数据包传达时间
+			//最早的那个时间作为delay
+			//发送一个“处理传输网络包”事件到全局仿真队列
+			//事件的触发时刻：当前时刻+delay
 			double delay = channelManager.nextFinishTime();
-
 			if(delay == Double.POSITIVE_INFINITY) {// channel都被disable了，TDMA中会出现此情况
 				return;
 			}
-
+			// --------- cloudsim自带的格式，可忽略 -----------------
 			if (delay < CloudSim.getMinTimeBetweenEvents()) {
 				delay = CloudSim.getMinTimeBetweenEvents();
 			}
-
 			if((nextEventTime > CloudSim.clock() + delay) || nextEventTime <= CloudSim.clock() )
 			{
 				CloudSim.cancelAll(getId(), new PredicateType(CloudSimTagsSDN.SDN_INTERNAL_PACKET_PROCESS));
-				// 在预计时间发送event
+				// 发送event，event的触发时刻：当前时刻+delay
 				send(this.getId(), delay, CloudSimTagsSDN.SDN_INTERNAL_PACKET_PROCESS);
 				nextEventTime = CloudSim.clock()+delay;
 			}
+			// -----------------------------------------------------
 		}
 	}
 
@@ -369,15 +369,6 @@ public abstract class NetworkOperatingSystem extends SimEntity {
 
 		return bw;
 	}
-
-//	public void updateBandwidthFlow(int srcVm, int dstVm, int flowId, long newBw) {
-//		if(flowId == -1) {
-//			return;
-//		}
-//
-//		FlowConfig flow = gFlowMapFlowId2Flow.get(flowId);
-//		flow.updateReqiredBandwidth(newBw);
-//	}
 
 	public void setDatacenter(SDNDatacenter dc) {
 		this.datacenter = dc;

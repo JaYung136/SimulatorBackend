@@ -38,34 +38,37 @@ import java.util.List;
 public class Channel {
 	public boolean isWireless;
 	public int wirelessLevel = 0;
-	public List<Node> nodes;
-	public List<Node> nodesAll;
-	public List<Link> links;
-	public List<Link> linksAll;
-	public double allocatedBandwidth; // Actual bandwidth allocated to the channel
+	public List<Node> nodes; //组成本channel的节点
+	public List<Node> nodesAll;//从src到dest经过的所有节点。可能涉及跨平台，有好几段channel
+	public List<Link> links; //组成本channel的链路
+	public List<Link> linksAll;//从src到dest经过的所有链路
+	public double allocatedBandwidth; //分配的带宽
 	private double previousTime;
-
 	private final int srcId;
 	private final int dstId;
-	private final int chId;// flowID，也是 channelID
+	private final int chId;// channelID
 	public double BandwidthBackup;// 带宽的备份，用于 enable / disable channel
-
-	public double totalLatency = 0;
+	public double totalLatency = 0;//不使用
 
 	private SDNVm srcVm;
-//	private SDNVm dstVm;
-
-	//PacketScheduler packetScheduler = new PacketSchedulerSpaceShared(this);
-	public PacketScheduler packetScheduler = new PacketSchedulerTimeShared(this);
+	public PacketScheduler packetScheduler = new PacketSchedulerTimeShared(this);//channel内部的发包调度器
 
 	public Channel(int chId, int srcId, int dstId, List<Node> nodes, List<Link> links, double bandwidth, SDNVm srcVm, SDNVm dstVm, boolean wireless, int wirelessLevel) {
+		//是否经过无线网
 		this.isWireless = wireless;
+		/**
+		 * wirelessLevel=0: 发送方以太网内的一条channel： srcHost -> GatewaySwitch
+		 * wirelessLevel=1: 上行无线channel： GatewaySwitch -> InterCloudSwitch(无线网)
+		 * wirelessLevel=2: 下行无线channel： InterCloudSwitch(无线网) -> 接收平台的GatewaySwitch
+		 * wirelessLevel=3: 接收方以太网内的一条channel： GatewaySwitch -> destHost
+		 * 如果不过经无线网，wirelessLevel参数不被使用
+		 */
 		this.wirelessLevel = wirelessLevel;
 		this.chId = chId;
 		this.srcId = srcId;
 		this.dstId = dstId;
-		int gatewayIndex = -1;
-		int interCloudIndex = -1;
+		int gatewayIndex = -1; //GatewaySwitch在nodesAll中的下标
+		int interCloudIndex = -1; //InterCloudSwitch在nodesAll中的下标
 		if (isWireless) {
 			switch (wirelessLevel){
 				case 0: // 发送方有线网： srcHost -> GatewaySwitch
@@ -79,7 +82,7 @@ public class Channel {
 					this.nodes = nodes.subList(0, gatewayIndex+1); //srcHost -> GatewaySwitch
 					this.links = links.subList(0, gatewayIndex);
 					break;
-				case 1: // 上传WIFI： GatewaySwitch -> InterCloudSwitch(wifi)
+				case 1: // 上传无线网： GatewaySwitch -> InterCloudSwitch(无线网)
 					for (int i=0; i<nodes.size(); ++i){
 						Node node_i = nodes.get(i);
 						if (node_i instanceof GatewaySwitch){// 碰见第一个 GatewaySwitch
@@ -93,7 +96,7 @@ public class Channel {
 					this.nodes = nodes.subList(gatewayIndex, interCloudIndex+1);
 					this.links = links.subList(gatewayIndex, interCloudIndex);
 					break;
-				case 2: // WIFI下载： InterCloudSwitch -> GatewaySwitch
+				case 2: // 无线网下行： InterCloudSwitch -> GatewaySwitch
 					for (int i=0; i<nodes.size(); ++i){
 						Node node_i = nodes.get(i);
 						if (node_i instanceof IntercloudSwitch){// 碰见 IntercloudSwitch
@@ -129,7 +132,7 @@ public class Channel {
 			this.nodes = nodes;
 			this.links = links;
 		}
-
+		//如果isWireless是false，直接跳到这里。nodesAll就是nodes，linksAll就是links
 		this.nodesAll = nodes;
 		this.linksAll = links;
 		this.allocatedBandwidth = this.BandwidthBackup = bandwidth;
@@ -562,9 +565,8 @@ public class Channel {
 	public boolean updatePacketProcessing() {
 		double timenow = CloudSim.clock();
 		double processedBytes = packetScheduler.updatePacketProcessing();
-		// TODO:次步将传输的bytes数累积到link的成员变量里
+		// TODO: 将传输的bytes数累积到link的成员变量里
 		this.increaseProcessedBytes(processedBytes); // for monitoring
-
 		if(packetScheduler.getCompletedTransmission().isEmpty()
 				&& packetScheduler.getTimedOutTransmission().isEmpty())
 			return false;	// Nothing changed

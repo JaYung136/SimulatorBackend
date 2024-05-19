@@ -12,6 +12,7 @@ import java.io.PrintStream;
 
 @SpringBootApplication(exclude= {SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class})
 public class SimApplication {
+	/* 删除旧的输出结果目录和文件 */
 	public static boolean deleteDir(File dir) {
 		if (dir.isDirectory()) {
 			String[] children = dir.list();
@@ -48,6 +49,7 @@ public class SimApplication {
 	public static void main(String[] args) {
 		String path = System.getProperty("user.dir")+"\\OutputFiles\\yaml";
 		deleteDir(new File(path));
+		/* 新建输出结果目录 */
 		File dir = new File(path);
 		dir.mkdirs();
 		path = System.getProperty("user.dir")+"\\Intermediate";

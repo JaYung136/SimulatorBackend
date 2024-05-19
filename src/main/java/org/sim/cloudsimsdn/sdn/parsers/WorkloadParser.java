@@ -76,11 +76,11 @@ public class WorkloadParser {
 	}
 
 	/**
-	 * 将文件的每一行(workload)依次添加到 parsedWorkloads中
+	 * parse 消息
 	 */
 	public void parseNextWorkloads() {
 		this.parsedWorkloads = new ArrayList<Workload>();
-		parseNext(NUM_PARSE_EACHTIME);
+		parseNext(NUM_PARSE_EACHTIME); /* 创建消息的核心函数 */
 	}
 
 	public List<Workload> getParsedWorkloads() {
@@ -113,245 +113,32 @@ public class WorkloadParser {
 		return cloudlet;
 	}
 
-	// Cloud_Len -> /FlowId/ -> ToVmId -> PktSize
-//	private Request parseRequest(int fromVmId, Queue<String> lineitems) {
-//		long cloudletLen = Long.parseLong(lineitems.poll());
-//		cloudletLen*=Configuration.CPU_SIZE_MULTIPLY;
-//
-//		Request req = new Request(userId);
-//		Cloudlet cl = generateCloudlet(req.getRequestId(), fromVmId, (int) cloudletLen);
-//		//this.parsedCloudlets.add(cl);
-//
-//		Processing proc = new Processing(cl);
-//		req.addActivity(proc);
-//
-//		if(lineitems.size() != 0) {
-//			// Has more requests after this. Create a transmission and add
-//			String linkName = lineitems.poll();
-//			Integer flowId = this.flowNames.get(linkName);
-//
-//			if(flowId == null) {
-//				throw new IllegalArgumentException("No such link name in virtual.json:"+linkName);
-//			}
-//
-//			String vmName = lineitems.poll();
-//			destVMName = vmName;
-//			int toVmId = getVmId(vmName);
-//			SDNDatacenter toDC = (SDNDatacenter) SDNDatacenter.findDatacenterGlobal(toVmId);
-//
-//			long pktSize = Long.parseLong(lineitems.poll());
-//			pktSize*=Configuration.NETWORK_PACKET_SIZE_MULTIPLY;
-//			if(pktSize<0)
-//				pktSize=0;
-//
-//			Request nextReq = parseRequest(toVmId, lineitems);
-//
-//			Transmission trans = new Transmission(fromVmId, toVmId, pktSize, flowId, nextReq);
-//			req.addActivity(trans);
-//		} else {
-//			// this is the last request.
-//		}
-//		return req;
-//	}
 
-	private void openFile() {
-		try {
-			bufReader = new BufferedReader(new FileReader(Configuration.workingDirectory+file));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			@SuppressWarnings("unused")
-			String head=bufReader.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	static double random_factor = 0.0;
-	private List<Double> calMsgStarttimes(Double starttime, Double pausestart, Double pauseend, Double endtime, Double containerperiod, Double msgperiod, Double simulationend, Boolean inplatfrom) {
-		ArrayList<Double> stimes = new ArrayList<>();
-		if(random_factor >= msgperiod)
-			random_factor = 0.0;
-//		if(inplatfrom)
-//			starttime += msgperiod*Math.random(); //TODO: 消息起始时间随机化 msgtime+msgperiod*Math.random();
-		// 迭代多个容器生命周期
-		while(endtime < simulationend*0.000001){
-			/**
-			 * 容器的一个生命周期时间内，计算所有的消息发送时间
-			 * |(starttime)--------(starttime+pausestart)|  暂停  |(starttime+pausestart+pauseend)--------(endtime)|
-			 * while starttime <= msgtime < starttime+pausestart:
-			 * 		msgtime += msgperiod;
-			 * while starttime+pausestart+pauseend <= msgtime < endtime:
-			 * 		msgtime += msgperiod;
-			 */
-			Double msgtime = starttime;
-			while(starttime <= msgtime && msgtime < starttime+pausestart){
-				stimes.add(msgtime);
-				msgtime += msgperiod;
-			}
-			msgtime = starttime+pausestart+pauseend;
-			while(starttime+pausestart+pauseend <= msgtime && msgtime < endtime){
-				stimes.add(msgtime);
-				msgtime += msgperiod;
-			}
-			starttime += containerperiod;
-			endtime += containerperiod;
-		}
-		random_factor += 1.2;
-		return stimes;
-	}
-	private void parseNext(int numRequests) {
-//		String line;
-//		System.out.println("########################");
-//		try{
-////			JSONArray pure_msgs = new JSONArray();
-//			String xml = Files.readString(Path.of(input_app));
-//			JSONArray apps = XML.toJSONObject(xml).getJSONObject("AppInfo").getJSONArray("application");
-//			/**
-//			 * 制作纯净消息，仅包含必要字段：
-//			 * Name 消息名
-//			 * SrcIP 发送方容器ip
-//			 * DstIP 接收方容器ip
-//			 * DstName 接收方任务名称
-//			 * AppPeriod 任务周期 单位秒
-//			 * MsgPeriod 消息周期 单位秒
-//			 * MessageSize 消息大小
-//			 */
-//			int jobid = 1;
-//			for(Object obj : apps) {
-//				JSONObject app = (JSONObject) obj;
-//				String src = app.getString("IpAddress");
-//				Double appPeriod = app.getDouble("Period")*contractRate;
-//				JSONObject tem = app.getJSONObject("A653SamplingPort");
-//				try{
-//					tem = tem.getJSONObject("A664Message");
-//				}catch (Exception e){
-//					continue;
-//				}
-//				Object dataField = tem.opt("A653SamplingPort");
-//				//case1:向>1个cn发送数据包
-//				if (dataField instanceof JSONArray) {
-//					JSONArray msgs = (JSONArray) dataField;
-//					for(Object objj: msgs){
-//						JSONObject msg = (JSONObject) objj;
-//						JSONObject puremsg = new JSONObject();
-//						puremsg.put("Name", msg.getString("Name"))
-//								.put("SrcIP",src)
-//								.put("DstIP",msg.getString("IpAddress"))
-//								.put("DstName",msg.getString("AppName"))
-//								.put("AppPeriod",appPeriod)
-//								.put("MsgPeriod", (msg.getDouble("SamplePeriod"))*contractRate)
-//								.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位b
-//						;
-//						pure_msgs.put(puremsg);
-//						/** TODO: 为每条message创建workload示例
-//						 *根据容器起始、暂停开始、暂停结束、容器结束、容器周期间隔、消息周期间隔、仿真截止时间
-//						 * 得到若干的消息起始时间
-//						 */
-//						AssignInfo ai = assignInfoMap.get(src);
-//						double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
-//						//TODO: 无线取消随机化
-//						AssignInfo dstai = assignInfoMap.get(msg.getString("IpAddress"));
-//						List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
-//								ai.containerperiod, MsgPeriod, simulationStopTime, ai.equals(dstai));
-//						for(Double msgstart : msgStarttimes){
-//							Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
-//							wl.msgName = msg.getString("Name");
-//							wl.time = msgstart;
-//							wl.submitVmName = src;
-//							wl.submitVmId = getVmId(src);
-//							wl.destVmName = msg.getString("IpAddress");
-//							wl.destVmId = getVmId(wl.destVmName);
-//							wl.submitPktSize = msg.getInt("MessageSize")*0.008;
-//							Request req = new Request(userId);
-//							req.addActivity(
-//									new Processing(
-//											generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
-//									)
-//							);
-//							Request endreq = new Request(userId);
-//							endreq.addActivity(
-//									new Processing(
-//											generateCloudlet(req.getRequestId(), wl.destVmId, 0)
-//									)
-//							);
-//							req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
-//							wl.request = req;
-//							parsedWorkloads.add(wl);
-//							++jobid;
-//						}
-//						/****************************/
-//					}
-//				}
-//				//case2:仅向1个cn发送数据包
-//				else {
-//					JSONObject msg = (JSONObject) dataField;
-//					JSONObject puremsg = new JSONObject();
-//					puremsg.put("Name", msg.getString("Name"))
-//							.put("SrcIP",src)
-//							.put("DstIP",msg.getString("IpAddress"))
-//							.put("DstName",msg.getString("AppName"))
-//							.put("AppPeriod",appPeriod)
-//							.put("MsgPeriod", msg.getDouble("SamplePeriod")*contractRate)
-//							.put("MessageSize",msg.getInt("MessageSize")*0.008)//单位Kb?
-//					;
-//					pure_msgs.put(puremsg);
-//					/** TODO: 为每条message创建workload实例
-//					 *根据容器起始、暂停开始、暂停结束、容器结束、容器周期间隔、消息周期间隔、仿真截止时间
-//					 * 得到若干的消息起始时间
-//					 */
-//					AssignInfo ai = assignInfoMap.get(src);
-//					double MsgPeriod = msg.getDouble("SamplePeriod") * contractRate;
-//					//TODO: 无线取消随机化
-//					AssignInfo dstai = assignInfoMap.get(msg.getString("IpAddress"));
-//					List<Double> msgStarttimes = calMsgStarttimes(ai.starttime, ai.pausestart, ai.pauseend, ai.endtime,
-//							ai.containerperiod, MsgPeriod, simulationStopTime, ai.equals(dstai));
-//					for(Double msgstart : msgStarttimes){
-//						Workload wl = new Workload(workloadNum++, jobid, this.resultWriter);
-//						wl.msgName = msg.getString("Name");
-//						wl.time = msgstart;
-//						wl.submitVmName = src;
-//						wl.submitVmId = getVmId(src);
-//						wl.destVmName = msg.getString("IpAddress");
-//						wl.destVmId = getVmId(wl.destVmName);
-//						wl.submitPktSize = msg.getInt("MessageSize")*0.008;
-//						Request req = new Request(userId);
-//						req.addActivity(
-//								new Processing(
-//										generateCloudlet(req.getRequestId(), wl.submitVmId, 0)
-//								)
-//						);
-//						Request endreq = new Request(userId);
-//						endreq.addActivity(
-//								new Processing(
-//										generateCloudlet(req.getRequestId(), wl.destVmId, 0)
-//								)
-//						);
-//						req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
-//						parsedWorkloads.add(wl);
-//						wl.request = req;
-//						++jobid;
-//					}
-//					/****************************/
-//				}
-//			}
-//
-//			String jsonPrettyPrintString = pure_msgs.toString(4);
-//			//保存格式化后的json
-//			FileWriter writer = new FileWriter(workloadf);
-//			writer.write(jsonPrettyPrintString);
-//			writer.close();
-//		}catch (Exception e){
-//			e.printStackTrace();
-//		}
+	/**
+	 * 从容器模块读取消息
+	 * 将所有的消息制作成“event”放到全局仿真队列中
+	 */
+	private void parseNext(int numRequests) { //参数不使用
 		try{
+			// Constants.workloads是容器模块赋值的静态变量，包含所有消息
 			for(Workload wl: Constants.workloads){
 				wl.resultWriter = this.resultWriter;
+				//time消息起始时间
+				// contractRate将时间从微秒转为秒，Cloudsim仿真时间以秒为单位
 				wl.time = wl.time * contractRate;
+				//发送者，Vm即代表容器
 				wl.submitVmId = getVmId(wl.submitVmName);
+				//接受者
 				wl.destVmId = getVmId(wl.destVmName);
+				//消息大小
+				// 8代表Byte到bit的转化，0.001代表数值放缩
+				// 在Cloudsim系统中，所有与数据量大小相关的值（带宽和包大小）都缩小了1000倍，提升效率
+				// 比如10M带宽从10*1000000变为10*1000; 1000B网络包从1000变为1。
+				// 相除后传输时间和原本是一样的
 				wl.submitPktSize = wl.submitPktSize * 0.008;
+
+				//将消息制作成Cloudsim网络仿真需要的格式
+				// --------- cloudsim自带的格式，可忽略 -----------------
 				Request req = new Request(userId);
 				req.addActivity(
 						new Processing(
@@ -366,6 +153,7 @@ public class WorkloadParser {
 				);
 				req.addActivity(new Transmission(wl.submitVmId, wl.destVmId, wl.submitPktSize, this.flowNames.get("default"), endreq));
 				wl.request = req;
+				// -----------------------------------------------------
 				parsedWorkloads.add(wl);
 			}
 

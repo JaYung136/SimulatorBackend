@@ -507,10 +507,9 @@ public class SDNDatacenter extends Datacenter {
 	private void processNextActivity(Request req) {
 		Activity ac = req.removeNextActivity();
 		if(req.activities.size() == 1) {
-			ac = req.removeNextActivity();//不涉及cloudlet，仅仿真网络时延
+			ac = req.removeNextActivity();
 		}
 		ac.setStartTime(CloudSim.clock());
-
 		if(ac instanceof Transmission) {
 			processNextActivityTransmission((Transmission)ac);
 		}
@@ -522,9 +521,8 @@ public class SDNDatacenter extends Datacenter {
 
 	private void processNextActivityTransmission(Transmission tr) {
 		Packet pkt = tr.getPacket();
-
 		//send package to router via channel (NOS)
-		pkt = nos.addPacketToChannel(pkt);
+		pkt = nos.addPacketToChannel(pkt); //通过channel传输packet
 		pkt.setPacketStartTime(CloudSim.clock());
 		tr.setRequestedBW(nos.getBandwidthBackup(pkt));
 	}
@@ -534,26 +532,26 @@ public class SDNDatacenter extends Datacenter {
 	 * 向自己 send cloudlet任务
 	 * processing.setVmMipsPerPE(vm.mips);
 	 */
-	private void processNextActivityProcessing(Processing proc, Request reqAfterCloudlet) {
-		Cloudlet cl = proc.getCloudlet();
-		proc.clearCloudlet();
-
-		requestsTable.put(cl.getCloudletId(), reqAfterCloudlet);
-		double timenow = CloudSim.clock();
-		sendNow(getId(), CloudSimTags.CLOUDLET_SUBMIT, cl);
-
-		// Set the requested MIPS for this cloudlet.
-		int userId = cl.getUserId();
-		int vmId = cl.getVmId();
-
-		Host host = getVmAllocationPolicy().getHost(vmId, userId);
-		if(host == null) {
-			throw new NullPointerException("Error! cannot find a host for Workload:"+ proc+". VM="+vmId);
-		}
-		Vm vm = host.getVm(vmId, userId);
-		double mips = vm.getMips();
-		proc.setVmMipsPerPE(mips);
-	}
+//	private void processNextActivityProcessing(Processing proc, Request reqAfterCloudlet) {
+//		Cloudlet cl = proc.getCloudlet();
+//		proc.clearCloudlet();
+//
+//		requestsTable.put(cl.getCloudletId(), reqAfterCloudlet);
+//		double timenow = CloudSim.clock();
+//		sendNow(getId(), CloudSimTags.CLOUDLET_SUBMIT, cl);
+//
+//		// Set the requested MIPS for this cloudlet.
+//		int userId = cl.getUserId();
+//		int vmId = cl.getVmId();
+//
+//		Host host = getVmAllocationPolicy().getHost(vmId, userId);
+//		if(host == null) {
+//			throw new NullPointerException("Error! cannot find a host for Workload:"+ proc+". VM="+vmId);
+//		}
+//		Vm vm = host.getVm(vmId, userId);
+//		double mips = vm.getMips();
+//		proc.setVmMipsPerPE(mips);
+//	}
 
 	public void printDebug() {
 		System.err.println(CloudSim.clock()+": # of currently processing Cloudlets: "+this.requestsTable.size());

@@ -544,9 +544,8 @@ public class SDNController {
 
     @RequestMapping("/run")
     public ResultDTO run() throws IOException {
-
-        CloudSim.HalfDuplex = false;
         CloudSim.wirelesschan_bw = wirelessChan_bw;
+        // 检查关联性数据
         try {
             if (!Checktopo()) {
                 return ResultDTO.error("检测到输入文件错误");
@@ -565,55 +564,35 @@ public class SDNController {
             }catch (Exception e){
                 //Do nothing
             }
-            //Log.printLine("mes size " + Constants.workloads.size());
+            //将输入host.xml、topo.xml文件转换为中间JSON文件
             convertphytopo();
+            //将输入容器调度模块的结果assign.json文件转换为中间JSON文件
             convertvirtopo();
+            //将输入appinfo.xml文件转换为中间JSON文件
             convertworkload();
             String args[] = {"", physicalf, virtualf, ""};
             LogWriter.resetLogger(bwutil_result);
+            //带宽利用率writer
             LogWriter log = LogWriter.getLogger(bwutil_result);
             log.printLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             log.printLine("<Links Timespan=\"" + monitoringTimeInterval + "\">");
+            /* 新建一个仿真器 */
             simulator = new SimpleExampleInterCloud();
             wls.clear();
             linkUtilMap.clear();
             pure_msgs.clear();
+            /* 仿真的主函数 */
             wls.addAll( simulator.main(args) );
             log = LogWriter.getLogger(bwutil_result);
             log.printLine("</Links>");
+            //延迟结果写入输出文件
             outputdelay(wls);
+            //画图像。延迟、带宽
             System.out.println("绘制图像");
             paintMultiLatencyGraph(wls, true);
 //            completeLinkUtil();
             paintMultiLinkGraph(linkUtilMap, true);
-            List<WorkloadResult> wrlist = new ArrayList<>();
-            for (Workload workload : wls) {
-                //------------------------------------------ calculate total time
-                double finishTime = -1;
-                double startTime = -1;
-                double Time = -1;
-                finishTime = WorkloadResultWriter.getWorkloadFinishTime(workload);
-                startTime = WorkloadResultWriter.getWorkloadStartTime(workload);
-                if (finishTime > 0)
-                    Time = finishTime - startTime;
-                //------------------------------------------
-                WorkloadResult wr = new WorkloadResult();
-                wr.msgname = workload.msgName;
-                wr.jobid = workload.jobId;
-                wr.workloadid = workload.workloadId;
-                wr.vmid = workload.submitVmName;
-                wr.destid = workload.destVmName;
-                if (workload.failed)
-                    wr.status = "timeout";
-                else
-                    wr.status = "arrived";
-                wr.finishtime = String.format("%.8f", finishTime);
-                wr.starttime = String.format("%.8f", startTime);
-                wr.time = String.format("%.8f", Time);
-                wrlist.add(wr);
-            }
-            WorkloadResult[] wrarray = wrlist.toArray(new WorkloadResult[wrlist.size()]);
-            return ResultDTO.success(wrarray);
+            return ResultDTO.success("仿真结束");
         } catch (Exception e) {
             e.printStackTrace();
             return ResultDTO.error(e.getMessage());

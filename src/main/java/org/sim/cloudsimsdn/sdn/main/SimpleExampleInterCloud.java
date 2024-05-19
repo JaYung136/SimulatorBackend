@@ -72,20 +72,16 @@ public class SimpleExampleInterCloud {
 	 */
 	@SuppressWarnings("unused")
 	public List<Workload> main(String[] args) throws IOException {
+		// --------- cloudsim自带的格式，可忽略 ------------------
 		CloudSimEx.setStartTime();
-
 		workloads = new ArrayList<String>();
-
-		// Parse system arguments
 		if(args.length < 1) {
 			printUsage();
 			System.exit(1);
 		}
-
 		VmAllocationPolicyEnum vmAllocPolicy = VmAllocationPolicyEnum.valueOf("LFF");
 		if(args.length > 1)
 			physicalTopologyFile = args[1];
-
 		if(args.length > 2)
 			deploymentFile = args[2];
 		if(args.length > 3)
@@ -94,8 +90,7 @@ public class SimpleExampleInterCloud {
 			}
 		else
 			workloads = (List<String>) Arrays.asList(workload_files);
-
-//		printArguments(physicalTopologyFile, deploymentFile, workloads);
+		// ----------------------------------------------------
 
 		Log.printLine("启动仿真...");
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
@@ -114,29 +109,22 @@ public class SimpleExampleInterCloud {
 			};
 			LinkSelectionPolicy ls = new LinkSelectionPolicyBandwidthAllocation();
 
-//			Configuration.monitoringTimeInterval = Configuration.migrationTimeInterval = 5;
-
-			// Create multiple Datacenters
+			// 创建物理拓扑（平台、平台内netOS（网络管理系统）、物理主机、交换机、链路）
 			Map<NetworkOperatingSystem, SDNDatacenter> dcs = createPhysicalTopology(physicalTopologyFile, ls, vmAllocationFac);
-			// Broker
+			// --------- cloudsim自带的格式，可忽略 ------------------
 			SDNBroker broker = createBroker();
 			int brokerId = broker.getId();
-
-			// Submit virtual topology 创建虚拟机等
 			broker.submitDeployApplication(dcs.values(), deploymentFile);
-
-			// Submit individual workloads
 			submitWorkloads(broker);
-
-			// Sixth step: Starts the simulation
 			if(!SimpleExampleInterCloud.logEnabled)
 				Log.disable();
-
+			// ----------------------------------------------------
+			// 仿真主函数
 			List<Workload> res = startSimulation(broker, dcs.values());
 
-//			Log.printLine("================ bandwidth ===============");
+
 			Log.printLine("================ 网络负载 =================");
-			//TODO:打印带宽负载的方差
+			//TODO:后端打印链路带宽负载
 			int link_num = 0;
 			List<Double> linkAccumuUtils = new ArrayList<>();
 			for (NetworkOperatingSystem netos : dcs.keySet()){
@@ -155,18 +143,15 @@ public class SimpleExampleInterCloud {
 								&& link.highOrder instanceof GatewaySwitch != true) {
 							System.out.println(link.shortName() + "\t单链路负载(Kb): " + link.monitoringUpTotal);
 							System.out.println(link.shortNameInverse() + "\t单链路负载(Kb): " + link.monitoringDownTotal);
-//						linkAccumuUtils.add(link);
 						}
 					}
 				}
 			}
 
 			Log.printLine("网络总负载: "+ CloudSim.bwTotalutil);
-//			Log.printLine("带宽最大利用率: "+ CloudSim.bwMaxutil);
 			CloudSim.bwTotalutil = 0.0;
 			CloudSim.bwUtilnum = 0;
 			CloudSim.bwMaxutil= 0.0;
-//			System.out.println("网络负载方差: "+Cal_Variance(linkAccumuUtils));
 
 			Log.printLine("========== Simulation finished ===========");
 			TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
@@ -197,18 +182,14 @@ public class SimpleExampleInterCloud {
 	}
 
 	public static List<Workload> startSimulation(SDNBroker broker, Collection<SDNDatacenter> dcs) {
-		double finishTime = CloudSim.startSimulation();
-		CloudSim.stopSimulation();
+		double finishTime = CloudSim.startSimulation(); // 仿真开始
+		CloudSim.stopSimulation(); // 仿真结束
+		// 打印一些 log
 		Log.enable();
 		List<Workload> reswls = broker.printResult();
-		// Print results when simulation is over
 		List<Workload> wls = broker.getWorkloads();
 		if(wls != null)
 			LogPrinter.printWorkloadList(wls);
-//		// Print hosts' and switches' total utilization.
-//		List<Host> hostList = getAllHostList(dcs);
-//		List<Switch> switchList = getAllSwitchList(dcs);
-//		LogPrinter.printEnergyConsumption(hostList, switchList, finishTime);
 		return reswls;
 	}
 
@@ -236,10 +217,11 @@ public class SimpleExampleInterCloud {
 	 */
 	public static Map<NetworkOperatingSystem, SDNDatacenter> createPhysicalTopology(String physicalTopologyFile, LinkSelectionPolicy ls, VmAllocationPolicyFactory vmAllocationFac) {
 		HashMap<NetworkOperatingSystem, SDNDatacenter> dcs = new HashMap<NetworkOperatingSystem, SDNDatacenter>();
-		// This funciton creates Datacenters and NOS inside the data cetner.
-		// TODO:在此创建dc、netos、hostnode
+		// TODO: 在此创建netOS、host、switch、link
 		Map<String, NetworkOperatingSystem> dcNameNOS = PhysicalTopologyParser.loadPhysicalTopologyMultiDC(physicalTopologyFile);
+		// 每个dc的无线接入点
 		Map<String, Node> dcAndWirelessGateway = PhysicalTopologyParser.getDcAndWirelessGateway(physicalTopologyFile);
+		// 将netOS放置到对应的dc(datacenter,平台)中
 		for(String dcName:dcNameNOS.keySet()) {
 			NetworkOperatingSystem nos = dcNameNOS.get(dcName);
 			Node node = dcAndWirelessGateway.get(dcName);

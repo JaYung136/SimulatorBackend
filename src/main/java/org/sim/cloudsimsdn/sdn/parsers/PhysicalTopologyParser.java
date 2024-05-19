@@ -62,13 +62,14 @@ public class PhysicalTopologyParser {
 		for(String dcName: dcNameType.keySet()) {
 			NetworkOperatingSystem nos;
 			nos = new NetworkOperatingSystemSimple("NOS_"+dcName);
-
 			netOsList.put(dcName, nos);
-			//TODO: 在这里 parse switch 和 host
+			//TODO: 在这里解析中间文件，创建 switch 和 host
 			parser.parseNode(dcName);
 		}
+		//TODO: 在这里解析中间文件，创建 link
 		parser.parseLink();
 
+		// --------- cloudsim自带的格式，可忽略 -----------------
 		for(String dcName: dcNameType.keySet()) {
 			if(!"network".equals(dcNameType.get(dcName))) {
 				NetworkOperatingSystem nos = netOsList.get(dcName);
@@ -81,6 +82,7 @@ public class PhysicalTopologyParser {
 				nos.configurePhysicalTopology(parser.getHosts(dcName), parser.getSwitches(dcName), parser.getLinks());
 			}
 		}
+		// -----------------------------------------------------
 
 		return netOsList;
 	}
@@ -167,25 +169,25 @@ public class PhysicalTopologyParser {
 					////////////////////////////////////////
 					// Host
 					////////////////////////////////////////
-
+					/**
+					 * 忽略这些参数
+					 * host主要在容器模块的仿真中被使用，由容器模块创建
+					 * 网络仿真中host无作用
+					 */
 					long pes = (Long) node.get("pes");
 					long mips = (Long) node.get("mips");
 					int ram = new BigDecimal((Long)node.get("ram")).intValueExact();
 					long storage = (Long) node.get("storage");
 					long bw = new BigDecimal((Long)node.get("bw")).longValueExact();
-
 					int num = 1;
 					if (node.get("nums")!= null)
 						num = new BigDecimal((Long)node.get("nums")).intValueExact();
-
 					for(int n = 0; n< num; n++) {
 						String nodeName2 = nodeName;
 						if(num >1) nodeName2 = nodeName + n;
-
 						SDNHost sdnHost = hostFactory.createHost(ram, bw, storage, pes, mips, nodeName);
 						nameNodeTable.put(nodeName2, sdnHost);
 						//hostId++;
-
 						this.sdnHosts.put(dcName, sdnHost);
 					}
 
@@ -193,30 +195,27 @@ public class PhysicalTopologyParser {
 					////////////////////////////////////////
 					// Switch
 					////////////////////////////////////////
-
 					int MAX_PORTS = 256;
-
 					long bw = new BigDecimal((Long)node.get("bw")).longValueExact();
 					long iops = 0;//(Long) node.get("iops");
 					int upports = MAX_PORTS;
 					int downports = MAX_PORTS;
-					if (node.get("upports")!= null)
-						upports = new BigDecimal((Long)node.get("upports")).intValueExact();
-					if (node.get("downports")!= null)
-						downports = new BigDecimal((Long)node.get("downports")).intValueExact();
 					Switch sw = null;
-
+					//核心交换机，连接交换机与交换机
 					if(nodeType.equalsIgnoreCase("core")) {
 						sw = new CoreSwitch(nodeName, bw, iops, upports, downports);
+					//aggregate不使用
 					} else if (nodeType.equalsIgnoreCase("aggregate")){
 						sw = new AggregationSwitch(nodeName, bw, iops, upports, downports);
+					//边缘交换机，连接主机与主机 or 主机与交换机
 					} else if (nodeType.equalsIgnoreCase("edge")){
 						sw = new EdgeSwitch(nodeName, bw, iops, upports, downports);
+					//intercloud代表无线网络
 					} else if (nodeType.equalsIgnoreCase("intercloud")){
 						sw = new IntercloudSwitch(nodeName, bw, iops, upports, downports);
 						this.dcAndWirelessGateway.put(datacenterName, sw);
+					//平台的无线接入点
 					} else if (nodeType.equalsIgnoreCase("gateway")){
-						// Find if this gateway is already created? If so, share it!
 						if(nameNodeTable.get(nodeName) != null)
 							sw = (Switch)nameNodeTable.get(nodeName);
 						else
@@ -224,7 +223,6 @@ public class PhysicalTopologyParser {
 					} else {
 						throw new IllegalArgumentException("No switch found!");
 					}
-
 					if(sw != null) {
 						nameNodeTable.put(nodeName, sw);
 						this.switches.put(dcName, sw);
@@ -260,17 +258,11 @@ public class PhysicalTopologyParser {
 					// Switch
 					////////////////////////////////////////
 					int MAX_PORTS = 256;
-
 					long bw = new BigDecimal((Long)node.get("bw")).longValueExact();
 					long iops = (Long) node.get("iops");
 					int upports = MAX_PORTS;
 					int downports = MAX_PORTS;
-					if (node.get("upports")!= null)
-						upports = new BigDecimal((Long)node.get("upports")).intValueExact();
-					if (node.get("downports")!= null)
-						downports = new BigDecimal((Long)node.get("downports")).intValueExact();
 					Switch sw = null;
-
 					if (nodeType.equalsIgnoreCase("gateway")){
 						sw = new IntercloudSwitch(nodeName, bw, iops, upports, downports);
 						this.dcAndWirelessGateway.put(datacenterName, sw);
@@ -285,19 +277,18 @@ public class PhysicalTopologyParser {
 	public void parseLink() {
 		try {
     		JSONObject doc = (JSONObject) JSONValue.parse(new FileReader(this.filename));
-
 			JSONArray links = (JSONArray) doc.get("links");
 			@SuppressWarnings("unchecked")
 			Iterator<JSONObject> linksIter =links.iterator();
 			while(linksIter.hasNext()){
 				JSONObject link = linksIter.next();
-				String src = (String) link.get("source");
-				String dst = (String) link.get("destination");
-				double lat = Double.parseDouble((String)link.get("latency"));
-				String name = (String) link.get("name");
+				String src = (String) link.get("source");//链路连接的一端节点
+				String dst = (String) link.get("destination");//链路连接的另一端节点
+				double lat = Double.parseDouble((String)link.get("latency"));//不使用
+				String name = (String) link.get("name");//链路名称
 				Node srcNode = nameNodeTable.get(src);
 				Node dstNode = nameNodeTable.get(dst);
-				//TODO: -1? bw在addLink函数中根据switch赋值
+				//TODO: bw在addLink函数中根据switch赋值
 				Link l = new Link(srcNode, dstNode, lat, -1, name); //(Double) link.get("bw")); // Temporary Link (blueprint) to create the real one in NOS
 				this.links.add(l);
 			}

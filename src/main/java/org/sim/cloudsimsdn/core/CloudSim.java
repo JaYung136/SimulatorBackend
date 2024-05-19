@@ -191,6 +191,7 @@ public class CloudSim {
 	public static double startSimulation() throws NullPointerException {
 		Log.printConcatLine("Starting CloudSim version ", CLOUDSIM_VERSION_STRING);
 		try {
+			/* run，开始仿真 */
 			double clock = run();
 
 			// reset all static variables
@@ -520,17 +521,17 @@ public class CloudSim {
 	public static boolean runClockTick() {
 		SimEntity ent;
 		boolean queue_empty;
-
 		int entities_size = entities.size();
 
+		// --------- cloudsim自带的“基于事件（event）的仿真机制”，可忽略 -----------------
+		// 每个仿真组件都执行一次仿真逻辑
 		for (int i = 0; i < entities_size; i++) {
 			ent = entities.get(i);
 			if (ent.getState() == SimEntity.RUNNABLE) {
 				ent.run();
 			}
 		}
-
-		// If there are more future events then deal with them
+		// 接收下一次仿真的事件到队列中
 		if (future.size() > 0) {
 			List<SimEvent> toRemove = new ArrayList<SimEvent>();
 			Iterator<SimEvent> fit = future.iterator();
@@ -538,9 +539,7 @@ public class CloudSim {
 			SimEvent first = fit.next();
 			processEvent(first); //CloudSim处理系统事件,将消息从future转移到deferred
 			future.remove(first);
-
 			fit = future.iterator();
-
 			// Check if next events are at same time...
 			boolean trymore = fit.hasNext();
 			while (trymore) {
@@ -553,15 +552,13 @@ public class CloudSim {
 					trymore = false;
 				}
 			}
-
 			future.removeAll(toRemove);
-
 		} else {
 			queue_empty = true;
 			running = false;
 			printMessage(CloudSim.clock()+": Simulation: No more future events");
 		}
-
+		// -----------------------------------------------------
 		return queue_empty;
 	}
 
@@ -898,12 +895,13 @@ public class CloudSim {
 			DeferredQueue b = deferred;
 			double time = clock();
 
+			// runClockTick：在当前仿真时刻，执行一次仿真逻辑
 			if (runClockTick() || abruptTerminate) {
 				// future为空，即可停止循环。结束模拟。
 				break;
 			}
 
-			// this block allows termination of simulation at a specific time
+			// cloudsim自带，无用
 			if (terminateAt > 0.0 && clock >= terminateAt) {
 				terminateSimulation();
 				clock = terminateAt;

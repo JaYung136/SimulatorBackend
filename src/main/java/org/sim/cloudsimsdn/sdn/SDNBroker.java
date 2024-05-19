@@ -252,22 +252,21 @@ public class SDNBroker extends SimEntity {
 	}
 
 	/**
-	 * scheduleRequest为一个 workload文件创建 requests
+	 * scheduleRequest从容器模块读取结果，创建消息
 	 */
 	private void scheduleRequest(WorkloadParser workParser) {
-		// 这里指的是appID
 		int workloadId = this.workloadId.get(workParser);
-		// 读表格
-		workParser.parseNextWorkloads();
+		workParser.parseNextWorkloads(); /* 创建消息的核心函数 */
 		List<Workload> parsedWorkloads = workParser.getParsedWorkloads();
 
+		//将消息发送到仿真全局队列
+		// --------- cloudsim自带的格式，可忽略 -----------------
 		if(parsedWorkloads.size() > 0) {
 			// Schedule the parsed workloads
 			for(Workload wl: parsedWorkloads) {
 				double scehduleTime = wl.time - CloudSim.clock();
 				if(scehduleTime <0) {
 					double timenow = CloudSim.clock();
-					//throw new IllegalArgumentException("SDNBroker.scheduleRequest(): Workload's start time is negative: " + wl);
 					Log.printLine("**"+CloudSim.clock()+": SDNBroker.scheduleRequest(): abnormal start time." + wl);
 					continue;
 				}
@@ -276,14 +275,8 @@ public class SDNBroker extends SimEntity {
 				send(dc.getId(), scehduleTime, CloudSimTagsSDN.REQUEST_SUBMIT, wl.request);
 				requestMap.put(wl.request.getTerminalRequest().getRequestId(), wl);
 			}
-
-//			this.cloudletList.addAll(workParser.getParsedCloudlets());
-//			this.workloads.addAll(parsedWorkloads);
-
-			// Schedule the next workload submission
-//			Workload lastWorkload = parsedWorkloads.get(parsedWorkloads.size()-1);
-//			send(this.getId(), lastWorkload.time - CloudSim.clock(), CloudSimTagsSDN.REQUEST_OFFER_MORE, workParser);
 		}
+		// -----------------------------------------------------
 	}
 
 	public List<Workload> getWorkloads() {
