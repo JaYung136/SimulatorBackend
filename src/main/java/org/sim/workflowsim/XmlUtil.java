@@ -87,7 +87,7 @@ public final class XmlUtil {
 
     public DistributionGenerator.DistributionFamily distributionFamily;
 
-    public FailureParameters.FTCluteringAlgorithm ftCluteringAlgorithm;
+    public FailureParameters.FTCluteringAlgorithm ftCluteringAlgorithm = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
 
     public Double scale;
     public Double shape;

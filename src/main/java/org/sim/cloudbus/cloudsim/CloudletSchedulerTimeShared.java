@@ -120,8 +120,9 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 			if(rcl.getRemainingCloudletLength() <= 0) {
 				toRemove.add(rcl);
 				cloudletFinish(rcl);
-				for(Task t: ((Job)rcl.getCloudlet()).getTaskList())
+				for(Task t: ((Job)rcl.getCloudlet()).getTaskList()) {
 					t.setTaskFinishTime(currentTime);
+				}
 				((Job)rcl.getCloudlet()).ResetMessage();
 			}else if(((Job)rcl.getCloudlet()).IfStartPause(length)) {
 				toPause.add(rcl);

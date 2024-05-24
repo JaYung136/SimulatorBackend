@@ -36,6 +36,7 @@ public class VmAllocationPolicyMaxMin extends VmAllocationPolicySimple{
                     maxVm = v2;
                 }
             }
+            Log.printLine("max: " + maxVm.getId());
             // 为容器分配集群中已用 CPU 最多的节点
             if(!allocateHostForVm(maxVm))
                 return false;
