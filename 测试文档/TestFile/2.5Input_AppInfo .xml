@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInfo RleaseDate="27/01/2021 21:52:29" ICDVerison="BP2.3.1">
+    <!-- application中， Name为必填项，表示应用名； IpAddress为必填项，表示给容器赋的ip； ComputeTime为必填项，表示应用运行一个周期的平均时间； RequiredMemorySize为必填项，表示应用需求的内存； CpuRequest为选填项，单位为m, 1000表示需要占有一个cpu核，默认为1000； Period为必填项，表示应用周期间隔时长-->
+    <application Name="HF_SM_1" IpAddress="10.31.40.1" Hardware="" ComputeTime="10" Period="50" RequiredMemorySize="10000">
+        <A653SamplingPort>
+            <A664Message >
+                <A653SamplingPort Name="msg01" MessageSize="800" SamplePeriod="10" IpAddress="10.31.40.6" />
+            </A664Message>
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_2" IpAddress="10.31.40.2" Hardware="" ComputeTime="10" Period="50" RequiredMemorySize="10000">
+    </application>
+    <application Name="HF_SM_3" IpAddress="10.31.40.3" Hardware="" ComputeTime="12" Period="20" RequiredMemorySize="20000">
+        <A653SamplingPort>
+            <A664Message>
+                <A653SamplingPort Name="msg02" MessageSize="900" SamplePeriod="10" IpAddress="10.31.40.2"/>
+            </A664Message>
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_4" IpAddress="10.31.40.4" Hardware="" ComputeTime="15" Period="60" RequiredMemorySize="30000">
+        <A653SamplingPort>
+            <A664Message>
+                <A653SamplingPort Name="msg03" MessageSize="1200" SamplePeriod="10" IpAddress="10.31.40.3"/>
+            </A664Message>
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_5" IpAddress="10.31.40.5" Hardware="" ComputeTime="18" Period="90" RequiredMemorySize="60000">
+        <A653SamplingPort>
+            <A664Message>
+                <A653SamplingPort Name="msg04" MessageSize="900" SamplePeriod="10" IpAddress="10.31.40.7"/>
+            </A664Message>
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_6" IpAddress="10.31.40.6" Hardware="" ComputeTime="10" Period="40" RequiredMemorySize="60000">
+        <A653SamplingPort>
+            <A664Message>
+                <A653SamplingPort Name="msg05" MessageSize="1100" SamplePeriod="10" IpAddress="10.31.40.1"/>
+            </A664Message>
+        </A653SamplingPort>
+    </application>
+    <application Name="HF_SM_7" IpAddress="10.31.40.7" Hardware="" ComputeTime="12" Period="40" RequiredMemorySize="60000">
+    </application>
+    <application Name="HF_SM_8" IpAddress="10.31.40.8" Hardware="" ComputeTime="12" Period="40" RequiredMemorySize="60000">
+        <A653SamplingPort>
+            <A664Message>
+                <A653SamplingPort Name="msg06" MessageSize="1000" SamplePeriod="10" IpAddress="10.31.40.4"/>
+            </A664Message>
+        </A653SamplingPort>
+    </application>
+</AppInfo>

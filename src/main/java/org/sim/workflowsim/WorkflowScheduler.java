@@ -254,6 +254,9 @@ public class WorkflowScheduler extends DatacenterBroker {
                 ((Job) c).setVmId(0);
             }else{
                 String name = j.getTaskList().get(0).name;
+                // 调度的实际过程并不发生在 WorkflowEngine 中，如果是 K8s算法和 Maxmin算法，调度发生在 WorkflowEngine 的 processVmCreate()
+                // 如果是 HEFT 算法，调度发生在 WorkflowPlanner 的 processPlanning()
+                // 调度结果存储在 Constants.schedulerResult 中，我们根据调度结果将任务发送给对于的节点
                 for(Map.Entry<String, Integer> r: Constants.schedulerResult.entrySet()) {
                     if(r.getKey() == null) {
                         continue;

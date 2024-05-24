@@ -20,22 +20,9 @@ import java.util.Map;
 
 
 public class YamlWriter {
-    /*public static com.wfc.cloudsim.workflowsim.k8s.Pod ParsePodFromPath(String path) throws FileNotFoundException {
-        Yaml yaml = new Yaml();
-        InputStream input = new FileInputStream(new File(path));
-        Scanner s = new Scanner(input).useDelimiter("\\A");
-        String result = s.hasNext() ? s.next() : "";
-        Log.printLine(result);
-        Pod pod;
-        pod = yaml.loadAs(input, Pod.class);
-        return pod;
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        Pod pod = YamlUtil.ParsePodFromPath("config/pod/pod.yml");
-
-    }*/
-
+    /**
+     * 根据调度结果输出 YAML 文件
+     */
     public void writeYaml(String path) throws Exception {
         Log.printLine("YamlWriter: write yaml");
         Map<String, Boolean> judge = new HashMap<>();

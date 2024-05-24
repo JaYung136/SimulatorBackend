@@ -385,6 +385,9 @@ public class WorkflowDatacenter extends Datacenter {
     }
 
 
+    /**
+     * 每隔 1 微秒执行一次，更新集群中每个节点上所有任务的状态
+     */
     @Override
     protected void updateCloudletProcessing() {
         if(CloudSim.clock() > Constants.finishTime && Constants.finishTime != 0)
@@ -395,6 +398,7 @@ public class WorkflowDatacenter extends Datacenter {
         }
         double currentTime = CloudSim.clock();
         if(currentTime > getLastProcessTime()) {
+            // updateCloudletProcessingWithoutSchedulingFutureEventsForce()会更新集群中每个节点上所有任务的状态
             double minTime = updateCloudletProcessingWithoutSchedulingFutureEventsForce();
             if(minTime < CloudSim.clock() + 0.11) {
                 minTime = CloudSim.clock() + 0.11;
@@ -403,9 +407,8 @@ public class WorkflowDatacenter extends Datacenter {
                 setLastProcessTime(CloudSim.clock());
                 return;
             }
+            // 如果有节点的资源使用率达到上限，会触发迁移
             List<Map<String, Object>> migrationMap = getVmAllocationPolicy().optimizeAllocation(getVmList());
-
-
             if(migrationMap != null) {
                 for(Map<String, Object> migrate: migrationMap) {
                     super.setInMigrate();
@@ -420,6 +423,7 @@ public class WorkflowDatacenter extends Datacenter {
                     data[3] = targetHost.getId();
                     data[4] = getId();
                     oldHost.getCloudletScheduler().setInMigrate(data[0]);
+                    // 容器迁移的过程在 Datacenter 的 CloudletMove函数中
                     send(getId(), (1000 / Math.min(oldHost.getBw(), targetHost.getBw())), CloudSimTags.CLOUDLET_MOVE, data);
                     super.addMigrateNum();
                     Log.printLine(oldHost.getName() + "cpu资源占用 " + oldHost.getUtilizationOfCpu() + " ; 内存占用 " + targetHost.getUtilizationOfRam());
@@ -434,6 +438,10 @@ public class WorkflowDatacenter extends Datacenter {
         schedule(getId(), getSchedulingInterval() + 1, CloudSimTags.VM_DATACENTER_EVENT);
     }
 
+    /**
+     *
+     * 更新集群中每个节点上所有任务的状态
+     */
     private double updateCloudletProcessingWithoutSchedulingFutureEventsForce() {
         double currentTime = CloudSim.clock();
         double minTime = Double.MAX_VALUE;
@@ -445,16 +453,19 @@ public class WorkflowDatacenter extends Datacenter {
             ifLog = true;
         }
         DecimalFormat dft = new DecimalFormat("###.##");
+        // 遍历每个节点
         for (Host host : this.getHostList()) {
             if(ifLog) {
                 Constants.logs.add(new LogEntity(dft.format(currentTime), dft.format(host.getUtilizationOfCpu()), dft.format(host.getUtilizationOfRam()), host.getId()));
             }
+            // 最终会调用到 CloudletSchedulerTimeshared 的 updateVmProcessing()
             double time = host.updateVmsProcessing(currentTime); // inform VMs to update processing
             if (time < minTime) {
                 minTime = time;
             }
         }
 
+        // 检查是否有任务执行完成，有则上传给 WorkflowEngine，WorkflowEngine 会调用 processJobReturn()
         checkCloudletCompletion();
         setLastProcessTime(currentTime);
         return minTime;
@@ -483,6 +494,7 @@ public class WorkflowDatacenter extends Datacenter {
                         for(Task t: ((Job) cl).getTaskList()) {
                             String aName = t.name;
                             taskName2HostId.put(aName, host.getId());
+                            //t.setTaskFinishTime(CloudSim.clock());
                         }
                         sendNow(cl.getUserId(), CloudSimTags.CLOUDLET_RETURN, cl);
                         register(cl);

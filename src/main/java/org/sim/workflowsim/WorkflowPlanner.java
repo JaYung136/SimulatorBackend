@@ -166,7 +166,7 @@ public final class WorkflowPlanner extends SimEntity {
                     util.parseHostXml(Constants.appFile);
                     setTaskList(util.getTaskList());
                     this.taskList = util.getTaskList();
-                    processPlanning();
+                    processPlanning(); // heft
                     sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, new ArrayList<>());
                 }else {
                     util = new XmlUtil(getClusteringEngine().getWorkflowEngine().getSchedulerId(0));

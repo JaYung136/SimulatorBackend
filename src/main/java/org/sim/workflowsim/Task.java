@@ -61,7 +61,10 @@ public class Task extends Cloudlet {
         this.ifEndPause = false;
     }
 
-
+    /**
+     *
+     * 判断是否开始暂停，参数是执行长度
+     */
     public boolean IfStartPause(long length) {
         if(!ifPause)
             return false;
@@ -71,6 +74,10 @@ public class Task extends Cloudlet {
         return pauseStartTime <= 0;
     }
 
+    /**
+     *
+     * 判断是否结束暂停，参数是执行长度
+     */
     public boolean IfEndPause(long length) {
         pauseLastTime -= length;
         if(pauseLastTime <= 0) {
@@ -81,6 +88,10 @@ public class Task extends Cloudlet {
     }
     public List<Message> messages = new ArrayList<>();
 
+    /**
+     *
+     * 判断是否在这一微秒发送消息
+     */
     public void SendMessage(long length, double current) {
         for(Message m: messages) {
             if(m.IfSend(length)) {
@@ -95,6 +106,9 @@ public class Task extends Cloudlet {
         Constants.workloads.add(w);
     }
 
+    /**
+     * 每次任务执行结束时调用，重置任务状态
+     */
     public void ResetMessage() {
         for(Message m: messages) {
             m.Rest();

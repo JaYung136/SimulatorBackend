@@ -437,13 +437,13 @@ public class ReclusteringEngine {
         //record.delayLength = getCumulativeDelay(job.getDepth());
         int suggestedK;//FailureMonitor.getClusteringFactor(record);
         
-        double theta = FailureParameters.getGenerator(job.getVmId(), job.getDepth()).getMLEMean();
+        double theta = FailureParameters.getGenerator(0, 0).getMLEMean();
         
-        double phi_gamma = FailureParameters.getGenerator(job.getVmId(), job.getDepth()).getLikelihoodPrior();
+        double phi_gamma = FailureParameters.getGenerator(0, 0).getLikelihoodPrior();
         suggestedK = ClusteringSizeEstimator.estimateK(taskLength, delay, 
                 theta, phi_gamma, phi_ts);
 
-        Log.printLine("t=" + taskLength +" d=" + delay + " theta=" + theta + " k=" + suggestedK);
+        //Log.printLine("t=" + taskLength +" d=" + delay + " theta=" + theta + " k=" + suggestedK);
         if (suggestedK == 0) {
             //not really k=0, just too big
             jobList.add(createJob(id, job, job.getCloudletLength(), allTaskList, true));

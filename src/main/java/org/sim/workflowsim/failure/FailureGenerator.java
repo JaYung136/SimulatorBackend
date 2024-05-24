@@ -25,6 +25,8 @@ import org.sim.cloudbus.cloudsim.Cloudlet;
 import org.sim.workflowsim.Task;
 import org.sim.workflowsim.utils.DistributionGenerator;
 
+import java.util.List;
+
 /**
  * FailureGenerator creates a failure when a job returns
  *
@@ -116,10 +118,11 @@ public class FailureGenerator {
         
         double start = task.getExecStartTime();
         double end = task.getTaskFinishTime();
-        
+        // 如果没有错误输入文件，那当然任务不会发生错误
         if(Constants.faultFile == null) {
             return false;
         }
+        // 得到错误时间点
         double[] samples = generator.getCumulativeSamples();
         if(!Constants.faultNum.containsKey(task.name)) {
             Constants.faultNum.put(task.name, 0);
@@ -129,6 +132,7 @@ public class FailureGenerator {
                 return false;
             }
         }
+        // 如果错误时间点的最后一个都小于任务的开始时间，我们生成一系列新的错误时间点
         while (samples[samples.length - 1] < start) {
             generator.extendSamples();
             samples = generator.getCumulativeSamples();
@@ -138,16 +142,14 @@ public class FailureGenerator {
 
             }
         }
-
+        // 如何判断一个任务是否执行失败：只要有错误时间点在它的执行时间段内
         for (int sampleId = 0; sampleId < samples.length; sampleId++) {
-
             if (end < samples[sampleId]) {
-                //no failure
-
+                //如果第一个错误时间点都在任务执行结束之后，任务当然执行成功
                 return false;
             }
             if (start <= samples[sampleId]) {
-                //has a failure
+                //有错误
                 /** The idea is we need to update the cursor in generator**/
                 generator.getNextSample();
                 Integer n = Constants.faultNum.get(task.name);
@@ -156,7 +158,6 @@ public class FailureGenerator {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -174,10 +175,10 @@ public class FailureGenerator {
             return jobFailed;
         }
         try {
+            // 对与每个任务，我们判断执行过程中是否遇到错误发生
             for (Task task : job.getTaskList()) {
                 int failedTaskSum = 0;
                 if (checkFailureStatus(task, job.getVmId())) {
-                    //this task fail
                     jobFailed = true;
                     failedTaskSum++;
                     task.setCloudletStatus(Cloudlet.FAILED);

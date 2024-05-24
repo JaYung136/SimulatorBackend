@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Constants {
+    public static List<Double> errors;
+
     public static List<Workload> workloads = new ArrayList<>();
     public static List<ScheduleResult> scheduleResults = new ArrayList<>();
 
@@ -62,6 +64,8 @@ public class Constants {
     public static Map<String, List<Pair<String, String>>> name2Ips = new HashMap<>();
     public static String LOG_PATH = "";
     public static String FAULT_LOG_PATH = "";
+
+    public static String ERROR_TIME_PATH = "";
     public static List<LogEntity> logs = new ArrayList<>();
     public static List<Result> results = new ArrayList<>();
     public static Map<String, Integer> faultNum = new HashMap<>();

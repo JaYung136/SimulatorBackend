@@ -27,6 +27,7 @@ import org.sim.service.Constants;
 import org.sim.service.Container;
 import org.sim.service.ContainerInfo;
 import org.sim.service.Message;
+import org.sim.workflowsim.failure.FailureParameters;
 import org.sim.workflowsim.utils.DistributionGenerator;
 import org.sim.workflowsim.utils.Parameters;
 import org.sim.workflowsim.utils.ReplicaCatalog;
@@ -85,6 +86,8 @@ public final class XmlUtil {
     private int jobIdStartsFrom;
 
     public DistributionGenerator.DistributionFamily distributionFamily;
+
+    public FailureParameters.FTCluteringAlgorithm ftCluteringAlgorithm = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
 
     public Double scale;
     public Double shape;
@@ -170,6 +173,10 @@ public final class XmlUtil {
         }
     }
 
+    /**
+     *
+     * 解析输入的 YAML 格式的容器信息文件
+     */
     public void parseContainerInfo(File f) throws Exception{
         try {
 
@@ -252,6 +259,10 @@ public final class XmlUtil {
         }
     }
 
+    /**
+     *
+     *  将调度结果写回 AppInfo.xml 中
+     */
     public void rewriteAppInfoXml(File file) throws Exception{
         try {
             SAXBuilder builder = new SAXBuilder();
@@ -290,7 +301,7 @@ public final class XmlUtil {
     }
 
     /**
-     * Parse a DAX file with jdom
+     * 解析输入的 XML 文件，包括 Host.xml AppInfo.xml ContainerInfo.xml FaultInject.xml
      */
     private void parseXmlFile(File fil) {
 
@@ -375,6 +386,18 @@ public final class XmlUtil {
                             if(element.getName().equals("shape")) this.shape = Double.parseDouble(element.getText());
                         }
                         Log.printLine("Fault Inject: || type: " + fType + " || scale: " + this.scale + " || shape: " + shape);
+                        break;
+
+                    case "faultrepair":
+                        String fType1 = node.getAttributeValue("type");
+                        if(fType1.equals("DR")) {
+                            this.ftCluteringAlgorithm = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
+                            Log.printLine("错误恢复策略： 动态重聚类");
+                        }
+                        else {
+                            this.ftCluteringAlgorithm = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
+                            Log.printLine("错误恢复策略： 直接重运行");
+                        }
                         break;
 
                     case "application":

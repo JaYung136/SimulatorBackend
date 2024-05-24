@@ -81,14 +81,10 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 
 
 	/**
-	 * Updates the processing of cloudlets running under management of this scheduler.
-	 * 
-	 * @param currentTime current simulation time
-	 * @param mipsShare array with MIPS share of each processor available to the scheduler
-	 * @return time predicted completion time of the earliest finishing cloudlet, or 0 if there is
-	 *         no next events
-	 * @pre currentTime >= 0
-	 * @post $none
+	 * 根据时间片长度更新任务的状态，包括：
+	 * 1）任务是否执行完成
+	 * 2）任务是否开始暂停
+	 * 3）任务是否需要向其他节点发送消息
 	 */
 	@Override
 	public double updateVmProcessing(double currentTime, List<Double> mipsShare, double ram) {
@@ -124,6 +120,9 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 			if(rcl.getRemainingCloudletLength() <= 0) {
 				toRemove.add(rcl);
 				cloudletFinish(rcl);
+				for(Task t: ((Job)rcl.getCloudlet()).getTaskList()) {
+					t.setTaskFinishTime(currentTime);
+				}
 				((Job)rcl.getCloudlet()).ResetMessage();
 			}else if(((Job)rcl.getCloudlet()).IfStartPause(length)) {
 				toPause.add(rcl);
@@ -390,13 +389,8 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 	}
 
 	/**
-	 * Receives an cloudlet to be executed in the VM managed by this scheduler.
-	 * 
-	 * @param cloudlet the submited cloudlet
-	 * @param fileTransferTime time required to move the required files from the SAN to the VM
-	 * @return expected finish time of this cloudlet
-	 * @pre gl != null
-	 * @post $none
+	 * 接收一个任务，并判断是否有足够资源承接
+	 * 注意：我们在调度时已经保证了资源是足够的，只有仿真是发生了迁移才可能资源不够
 	 */
 	@Override
 	public double cloudletSubmit(Cloudlet cloudlet, double fileTransferTime) {
@@ -411,6 +405,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		for (int i = 0; i < cpus; i++) {
 			rcl.setMachineAndPeId(0, i);
 		}
+		//如果为-1，表示此时任务是迁移过来的任务
 		if(fileTransferTime == -1) {
 			if ((usedRam + rams) / currentRam > Constants.ramUp || (double) (usedPes + cpus) / (double) currentCPUs > Constants.cpuUp) {
 				return Double.MAX_VALUE;

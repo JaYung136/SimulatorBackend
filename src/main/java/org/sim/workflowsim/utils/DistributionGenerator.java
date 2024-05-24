@@ -19,7 +19,9 @@ package org.sim.workflowsim.utils;
 
 
 import org.apache.commons.math3.distribution.*;
+import org.sim.service.Constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -109,6 +111,9 @@ public class DistributionGenerator {
         for (int i = 1; i < samples.length; i++) {
             cumulativeSamples[i] = cumulativeSamples[i - 1] + samples[i];
         }
+        Constants.errors = new ArrayList<>();
+        for(double e: cumulativeSamples)
+            Constants.errors.add(e);
     }
 
     /**

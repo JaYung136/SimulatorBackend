@@ -63,14 +63,8 @@ public class service {
         Double s = 100.0;
         Double shape = 1.0;
         try {
-            // First step: Initialize the WorkflowSim package.
-            /**
-             * However, the exact number of vms may not necessarily be vmNum If
-             * the data center or the host doesn't have sufficient resources the
-             * exact vmNum would be smaller than that. Take care.
-             */
             XmlUtil util = new XmlUtil(6);
-            //util.parseHostXml("D:/WorkflowSim-1.0/config/tmp/Host_8.xml");
+            // 解析错误注入文件
             if(Constants.faultFile != null) {
                 util.parseHostXml(Constants.faultFile);
                 f = util.distributionFamily;
@@ -78,35 +72,23 @@ public class service {
                 shape = util.shape;
                 Log.printLine("FaultInject: || "  + "type: " + f.name() + "  scale: " + s + " shape: " + shape + " ||");
             }
+            // 解析物理节点文件
             util.parseHostXml(Constants.hostFile);
             hostList = util.getHostList();
             hostToBalance = new ArrayList<>(hostList);
             int vmNum = 1;//number of vms;
             FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_ALL;
-            /**
-             * Similar to FTCMonitor, FTCFailure controls the way how we
-             * generate failures.
-             */
             FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_ALL;
-            /**
-             * In this example, we have no clustering and thus it is no need to
-             * do Fault Tolerant Clustering. By default, WorkflowSim will just
-             * rety all the failed task.
-             */
-            FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
-            /**
-             * Task failure rate for each level
-             *
-             */
+            FailureParameters.FTCluteringAlgorithm ftc_method = util.ftCluteringAlgorithm;
             DistributionGenerator[][] failureGenerators = new DistributionGenerator[1][1];
             failureGenerators[0][0] = new DistributionGenerator(f,
                     s, shape, 30, 300, 0.78);
-
 
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.HEFT;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
             Log.printLine(arithmetic + "----------");
+            // 解析调度算法类型
             switch (arithmetic) {
                 case 1:
                     sch_method = Parameters.SchedulingAlgorithm.ROUNDROBIN;
@@ -141,16 +123,7 @@ public class service {
 
             FailureMonitor.init();
             FailureGenerator.init();
-
-
-            /**
-             * No overheads
-             */
             OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
-
-            /**
-             * No Clustering
-             */
             ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.NONE;
             ClusteringParameters cp = new ClusteringParameters(0, 0, method, null);
             FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, failureGenerators);
@@ -158,41 +131,21 @@ public class service {
                     null, op, cp, sch_method, pln_method,
                     null, 0);
             ReplicaCatalog.init(file_system);
-
-            /**
-             * Initialize static parameters
-             */
-
-            // before creating any entities.
             int num_user = 1;   // number of grid users
             Calendar calendar = Calendar.getInstance();
             boolean trace_flag = false;  // mean trace events
-
-            // Initialize the CloudSim library
             CloudSim.init(num_user, calendar, trace_flag);
-
+            // 创建工作流数据中心
             WorkflowDatacenter datacenter0 = createDatacenter("Datacenter_0", arithmetic);
-
-            /**
-             * Create a WorkflowPlanner with one schedulers.
-             */
             WorkflowPlanner wfPlanner = new WorkflowPlanner("planner_0", 1);
             //wfPlanner.setAppPath("D:/WorkflowSim-1.0/config/tmp/app10.xml");
             wfPlanner.setAppPath("");
-            /**
-             * Create a WorkflowEngine.
-             */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
-            /**
-             * Create a list of VMs.The userId of a vm is basically the id of
-             * the scheduler that controls this vm.
-             */
-            //List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), 1);
-            List<CondorVM> vmlist0 = null;
-            vmlist0 = createVM(wfEngine.getSchedulerId(0), 1);
+            List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), 1);
             Constants.Scheduler_Id = wfEngine.getSchedulerId(0);
             Constants.LOG_PATH = System.getProperty("user.dir")+"\\OutputFiles\\hostUtil\\hostUtilization.xml";
             Constants.FAULT_LOG_PATH = System.getProperty("user.dir") + "\\OutputFiles\\faultLog\\faultLog.xml";
+            Constants.ERROR_TIME_PATH = System.getProperty("user.dir") + "\\OutputFiles\\faultLog\\faultTime.xml";
             /**
              * Submits this list of vms to this WorkflowEngine.
              */
@@ -302,9 +255,7 @@ public class service {
     }
 
     /**
-     * Prints the job objects
-     *
-     * @param list list of jobs
+     * 输出仿真结果，包括CPU 利用率文件、错误时间点文件
      */
     protected void printJobList(List<Job> list) {
         String indent = "    ";
@@ -553,6 +504,17 @@ public class service {
             xmlOutput.output(doc, new FileOutputStream(file));
             /*MyPainter painter = new MyPainter("CPU Usage");
             painter.paintCPU(xySeries, "cpu_usage");*/
+            file = new File(Constants.ERROR_TIME_PATH);
+            root = new Element("root");
+            doc = new Document(root);
+            for(Double err: Constants.errors) {
+                if(err > Constants.finishTime)
+                    break;
+                Element e = new Element("FaultTime");
+                e.setAttribute("time", dfs.format(err));
+                doc.getRootElement().addContent(e);
+            }
+            xmlOutput.output(doc, new FileOutputStream(file));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {

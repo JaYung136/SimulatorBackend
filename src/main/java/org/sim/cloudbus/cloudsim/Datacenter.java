@@ -641,13 +641,7 @@ public class Datacenter extends SimEntity {
 	}
 
 	/**
-	 * Process the event for an User/Broker who wants to move a Cloudlet.
-	 * 
-	 * @param receivedData information about the migration
-	 * @param type event tag
-	 * @pre receivedData != null
-	 * @pre type > 0
-	 * @post $none
+	 * 进行容器迁移
 	 */
 	protected void processCloudletMove(int[] receivedData, int type) {
 		//Log.printLine("move");
@@ -660,9 +654,7 @@ public class Datacenter extends SimEntity {
 		int vmDestId = array[3];
 		int destId = array[4];
 
-		// get the cloudlet
-		/*Cloudlet cl = getVmAllocationPolicy().getHost(vmId, userId).getVm(vmId,userId)
-				.getCloudletScheduler().cloudletCancel(cloudletId);*/
+	  // 待迁移容器
 		Cloudlet cl = this.getHostList().get(vmId)
 				.getCloudletScheduler().cloudletCancel(cloudletId);
 		boolean failed = false;
@@ -670,7 +662,7 @@ public class Datacenter extends SimEntity {
 			failed = true;
 			//Log.printLine("fail");
 		} else {
-			// has the cloudlet already finished?
+			// 如果容器里的任务已经执行结束，无需迁移
 			if (cl.getCloudletStatus() == Cloudlet.SUCCESS) {// if yes, send it back to user
 				int[] data = new int[3];
 				data[0] = getId();
@@ -681,10 +673,6 @@ public class Datacenter extends SimEntity {
 				sendNow(cl.getUserId(), CloudSimTags.CLOUDLET_RETURN, cl);
 			}
 
-			// prepare cloudlet for migration
-			//cl.setVmId(vmDestId);
-			// the cloudlet will migrate from one vm to another does the destination VM exist?
-			//Log.printLine("as");
 
 				cl.setVmId(vmDestId);
 				Host vm = this.getHostList().get(vmDestId);
@@ -693,8 +681,7 @@ public class Datacenter extends SimEntity {
 				if (vm == null) {
 					failed = true;
 				} else {
-					// time to transfer the files
-					//double fileTransferTime = predictFileTransferTime(cl.getRequiredFiles());
+					// 如果目标物理节点资源不足，迁移失败
 					if(vm.getCloudletScheduler().cloudletSubmit(cl, -1) == Double.MAX_VALUE) {
 						//迁移失败
 						Log.printLine("迁移失败");

@@ -30,11 +30,14 @@ public class VmAllocationPolicyMaxMin extends VmAllocationPolicySimple{
             }
             if(maxVm == null)
                 return true;
+            // 遍历所有待创建的容器，选择执行时间最长的容器优先调度
             for(Vm v2: getContainerList()) {
                 if(((CondorVM)v2).getLength() > ((CondorVM)maxVm).getLength() && !getVmTable().containsKey(v2.getUid())) {
                     maxVm = v2;
                 }
             }
+            Log.printLine("max: " + maxVm.getId());
+            // 为容器分配集群中已用 CPU 最多的节点
             if(!allocateHostForVm(maxVm))
                 return false;
         }
@@ -67,7 +70,7 @@ public class VmAllocationPolicyMaxMin extends VmAllocationPolicySimple{
                 if(idx == -1) {
                     return false;
                 }
-                //Log.printLine(((CondorVM)vm).getName() + " 选中 " + idx);
+
                 Host host = getHostList().get(idx);
                 result = host.vmCreate(vm);
 
