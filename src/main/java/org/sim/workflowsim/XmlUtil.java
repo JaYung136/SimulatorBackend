@@ -419,7 +419,7 @@ public final class XmlUtil {
                                     String period = port.getAttributeValue("SamplePeriod");
                                     ipAndSizes.add(new Pair<>(ipS, messageSize));
                                     Message message = new Message(Double.parseDouble(period) * Constants.averageMIPS, ipS, ip, messageName, Double.parseDouble(messageSize));
-                                    Log.printLine("消息建模:\t源任务:" + ip + "\t目的任务:" + ipS + "\t消息负载:" + messageSize + "\t消息周期:" + period);
+                                    Log.printLine("消息建模:\t源:" + ip + "\t目的:" + ipS + "\t消息负载:" + messageSize + "\t消息周期:" + period);
                                     taskT.messages.add(message);
                                 }
                                 Constants.name2Ips.put(aName, ipAndSizes);

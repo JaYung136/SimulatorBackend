@@ -13,6 +13,9 @@ import org.sim.service.Constants;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -28,9 +31,9 @@ public class MyPainter extends JFrame {
         };
         fontName = (fontName.length()==0) ? "宋体" : fontName;
         theme.setExtraLargeFont(new Font(fontName, Font.PLAIN, 25));
-        theme.setLargeFont(new Font(fontName, Font.PLAIN, 24));
-        theme.setRegularFont(new Font(fontName, Font.PLAIN, 22));
-        theme.setSmallFont(new Font(fontName, Font.PLAIN, 20));
+        theme.setLargeFont(new Font(fontName, Font.PLAIN, 20));
+        theme.setRegularFont(new Font(fontName, Font.PLAIN, 15));
+        theme.setSmallFont(new Font(fontName, Font.PLAIN, 10));
         theme.setLegendBackgroundPaint(Color.white);
         theme.setChartBackgroundPaint(Color.white);
         theme.setPlotBackgroundPaint(Color.white);
@@ -77,6 +80,7 @@ public class MyPainter extends JFrame {
             xySeriesCollection.addSeries(xy);
         }
         JFreeChart chart = ChartFactory.createXYLineChart(pngName, "发送时刻(微秒)", "延迟(微秒)", xySeriesCollection);
+
         ChartPanel chartPanel = new ChartPanel(chart);
         //chartPanel.setPreferredSize(new Dimension(100 ,100));
         setContentPane(chartPanel);
@@ -95,16 +99,16 @@ public class MyPainter extends JFrame {
             xySeriesCollection.addSeries(xy);
         }
         JFreeChart chart = ChartFactory.createXYLineChart(pngName, "记录时刻(微秒)", ylabel, xySeriesCollection);
+        chart.getLegend().setItemFont(new Font("宋体", Font.PLAIN, 10));
         ChartPanel chartPanel = new ChartPanel(chart);
-        //chartPanel.setPreferredSize(new Dimension(100 ,100));
+
+        chartPanel.setPreferredSize(new Dimension(1024 ,2048));
         setContentPane(chartPanel);
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));//定义时区，可以避免虚拟机时间与系统时间不一致的问题
         SimpleDateFormat matter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         matter.format(new Date()).toString();
         setVisualUIForLink(chart, maxvalue);
-        if(save)
-//        if(false)
-            saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
+        saveAsFile(chart, System.getProperty("user.dir")+"\\OutputFiles\\Graphs\\"+matter.format(new Date()).toString()+pngName+".png", 1200, 800);
     }
 
 
