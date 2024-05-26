@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NetworkTopo RleaseDate="27/01/2021 21:52:27" ICDVerison="BP2.3.1">
+    <Switches>
+        <!-- 交换机。<Switches>和<Links>定义的speed=10、BW=10表示平台内部以太网速率为10Gbps -->
+        <Switch Name="edge1" Network="A" PortNum="4" Type="edge" Speed="10" IpAddress="10.31.42.3" Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" ExtGuid="125">
+        </Switch>
+    </Switches>
+
+    <Links>
+        <!-- 以太网速率为10Gbps、链路延迟0.001毫秒 -->
+        <Link Name="LINK1" Src="edge1" Dst="host1" BW="10" Latency="0.001">
+        </Link>
+        <Link Name="LINK2" Src="edge1" Dst="host2" BW="10" Latency="0.001">
+        </Link>
+    </Links>
+</NetworkTopo>
