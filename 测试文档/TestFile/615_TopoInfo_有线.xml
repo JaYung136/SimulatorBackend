@@ -1,0 +1,37 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<NetworkTopo ICDVerison="BP2.3.1" RleaseDate="11/24/23 16:31:48" >
+  <Switches>
+    <!--    Type分为两种，Switch和WirelessAp。前者表示普通交换机，后者表示无线接入点-->
+    <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.1" Name="edge1" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host1" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host2" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host3" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="" LinkedHwPort="" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="" LinkedHwPort="" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="" LinkedHwPort="" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="" LinkedHwPort="" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="" LinkedHwPort="" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+  </Switches>
+
+  <EndSystems>
+    <EndSystem Group="A" TA="-1" EdeSubscriberIndex="-1" EquipmentPosition="-1" HwTableBankIndex="-1" HwType="GPM" Name="XXX">
+      <AesPhysPorts>
+        <AesPhysPort MACAddress="-1" Name="A" Network="A" Speed="100" />
+      </AesPhysPorts>
+    </EndSystem>
+    <EndSystem Group="A" ATA="快取记录装置" HwType="GPM" Name="AGPM1">
+      <AesPhysPorts>
+        <AesPhysPort Name="A" Speed="2g" />
+      </AesPhysPorts>
+    </EndSystem>
+    <EndSystem Group="A" ATA="大屏触摸显示器1" HwType="GPM" Name="AGPM2">
+      <AesPhysPorts>
+        <AesPhysPort Name="A" Speed="2g" />
+      </AesPhysPorts>
+    </EndSystem>
+   </EndSystems>
+
+</NetworkTopo>

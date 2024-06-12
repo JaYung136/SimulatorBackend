@@ -198,6 +198,8 @@ public class SDNController {
     }
     public void convertphytopo() throws IOException {
         String xml = Files.lines(Paths.get(input_topo)).reduce("", String::concat);//Files.readString(Path.of(input_topo));
+        Set<String> linkNameSet = new HashSet<>();
+        Set<String> wirelessSwitchSet= new HashSet();
         JSONObject topojson = XML.toJSONObject(xml).getJSONObject("NetworkTopo");
         JSONObject swes = topojson.getJSONObject("Switches");
         JSONArray swches = new JSONArray();
@@ -207,27 +209,28 @@ public class SDNController {
             swches.clear();
             swches.put(swes.getJSONObject("Switch"));
         }
-        JSONArray links = topojson.getJSONObject("Links").getJSONArray("Link");
+        //解析无线AP
+        try {
+            JSONObject apjson = topojson
+                    .getJSONObject("Aps");
+            JSONArray aps = apjson.getJSONArray("Ap");
+            for (Object obj : aps) {
+                JSONObject wirelesschan = (JSONObject) obj;
+                String name = wirelesschan.getString("Group");
+                long bw = (long) (wirelesschan.getDouble("Speed") * 1000); //MB
+                wirelessChan_bw.put(name, bw);
+                wirelessSwitchSet.add(wirelesschan.getString("Name"));
+            }
+        }catch (Exception e) {
+        }
+//        JSONArray links = topojson.getJSONObject("Links").getJSONArray("Link");
+        //新建所有的平台
         Set<String> dcnames = new HashSet<>();
         for(Object obj : swches){
             JSONObject swch = (JSONObject) obj;
-            String dcname = swch.getString("Network");
-//            (long) swch.getDouble("Speed")*1000000)
-            if(swch.getDouble("Speed") >= 100) {
-                ethernetSpeed = 100000000; //100G
-                monitoringTimeInterval = 0.000010; //10微秒
-            }
-            else if(swch.getDouble("Speed") >= 40) {
-                ethernetSpeed = 40000000;
-                monitoringTimeInterval = 0.000010; //10微秒
-            }
-            else {
-                ethernetSpeed = 10000000;
-                monitoringTimeInterval = 0.000010; //10微秒
-            }
+            String dcname = swch.getString("Group");
             dcnames.add(dcname);
         }
-
         JSONObject topo = new JSONObject();
         // 新建wirelessnetwork dc、interswitch
         topo.accumulate("datacenters", new JSONObject()
@@ -264,30 +267,49 @@ public class SDNController {
                     .put("bw", 100000000) //100M
             );
         }
-        // 新建所有的交换机、links
+        // 新建所有的交换机
         for(Object obj : swches){
             JSONObject swch = (JSONObject) obj;
-            if(swch.getString("Type").equals("wirelessAP")){
+            String swchname = swch.getString("Name");
+            // 该交换机的类型，普通交换机 or 无线接入点
+            if( wirelessSwitchSet.contains(swchname) ){
                 swch.put("Type", "core");
+            } else {
+                swch.put("Type", "edge");
             }
+            // 该交换机的带宽
+            JSONArray ports = swch.getJSONObject("AswPhysPorts").getJSONArray("AswPhysPort");
+            double bw = ((JSONObject)ports.get(0)).getDouble("Speed");
+            // 创建交换机节点
             topo.accumulate("nodes", new JSONObject()
                     .put("upports", 0)
                     .put("downports", 0)
                     .put("iops", 1000000000)
                     .put("name",swch.getString("Name"))
                     .put("type",swch.getString("Type"))
-                    .put("datacenter",swch.getString("Network"))
-                    .put("ports",swch.getInt("PortNum"))
-                    .put("bw",(long) swch.getDouble("Speed")*1000000));
-        }
-        for(Object obj : links){
-            JSONObject link = (JSONObject) obj;
-            topo.accumulate("links", new JSONObject()
-                    .put("source",link.getString("Src"))
-                    .put("destination",link.getString("Dst"))
-                    .put("latency",String.valueOf(link.getDouble("Latency")))
-                    .put("name", link.getString("Name"))
-            );
+                    .put("datacenter",swch.getString("Group"))
+                    .put("ports",8)
+                    .put("bw",(long)bw * 1000000));
+            // 创建 交换机的链路连接
+            for(Object obj1 : ports){
+                JSONObject port = (JSONObject)obj1;
+                //如果没有连接，跳过
+                if(port.getString("LinkedHwName").equals("")){
+                    continue;
+                }
+                //如果有重复，跳过；
+                if(linkNameSet.contains(swchname+"@"+port.getString("LinkedHwName")) || linkNameSet.contains(port.getString("LinkedHwName")+"@"+swchname)){
+                    continue;
+                }
+                topo.accumulate("links", new JSONObject()
+                        .put("source",swchname)
+                        .put("destination",port.getString("LinkedHwName"))
+                        .put("latency", "0")
+                        .put("name", "None")
+                );
+                linkNameSet.add(swchname+"@"+port.getString("LinkedHwName"));
+                linkNameSet.add(port.getString("LinkedHwName")+"@"+swchname);
+            }
         }
         // 补建links：gateway<->interswitch
         for(String dcname : dcnames){
@@ -301,12 +323,12 @@ public class SDNController {
         // 补建links：core<->gateway
         for(Object obj : swches){
             JSONObject swch = (JSONObject) obj;
-            if( swch.getString("Type").equals("core")){
+            if(swch.getString("Type").equals("core") || swch.getString("Type").equals("WirelessAp")){
                 topo.accumulate("links", new JSONObject()
                         .put("source",swch.getString("Name"))
-                        .put("destination","gw"+swch.getString("Network"))
+                        .put("destination","gw"+swch.getString("Group"))
                         .put("latency","0")
-                        .put("name", "gw"+swch.getString("Network")+"-core")
+                        .put("name", "gw"+swch.getString("Group")+"-core")
                 );
             }
         }
@@ -331,20 +353,7 @@ public class SDNController {
         FileWriter writer = new FileWriter(physicalf);
         writer.write(jsonPrettyPrintString);
         writer.close();
-        try {
-            JSONObject endsys = topojson
-                    .getJSONObject("EndSystems")
-                    .getJSONObject("EndSystem")
-                    .getJSONObject("AesPhysPorts");
-            JSONArray sys = endsys.getJSONArray("AesPhysPort");
-            for (Object obj : sys) {
-                JSONObject wirelesschan = (JSONObject) obj;
-                String name = wirelesschan.getString("Network");
-                long bw = (long) (wirelesschan.getDouble("Speed") * 1000); //MB
-                wirelessChan_bw.put(name, bw);
-            }
-        }catch (Exception e) {
-        }
+
         CloudSim.bwLimit = 1.0;
 
         try {
@@ -546,15 +555,15 @@ public class SDNController {
     public ResultDTO run() throws IOException {
         CloudSim.wirelesschan_bw = wirelessChan_bw;
         // 检查关联性数据
-        try {
-            if (!Checktopo()) {
-                return ResultDTO.error("检测到输入文件错误");
-            } else {
-                System.out.println("文件数据关联性检测通过");
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+//        try {
+//            if (!Checktopo()) {
+//                return ResultDTO.error("检测到输入文件错误");
+//            } else {
+//                System.out.println("文件数据关联性检测通过");
+//            }
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        }
         try {
             try{
                 Helper h = new Helper();
