@@ -428,7 +428,7 @@ public final class XmlUtil {
                             this.jobIdStartsFrom++;
                         }
                         for (Element file : fileListT) {
-                            if (file.getName().equals("A653SamplingPort")) {
+                            if (file.getName().equals("TxPort")) {
                                 List<Pair<String, String>> ipAndSizes = new ArrayList<>();
                                 List<Element> f1 = file.getChildren();
                                 if (f1.isEmpty()) {
@@ -439,7 +439,7 @@ public final class XmlUtil {
                                     String messageName = port.getAttributeValue("Name");
                                     String messageSize = port.getAttributeValue("MessageSize");
                                     String ipS = port.getAttributeValue("IpAddress");
-                                    String period = port.getAttributeValue("SamplePeriod");
+                                    String period = port.getAttributeValue("RefreshPeriod");
                                     ipAndSizes.add(new Pair<>(ipS, messageSize));
                                     Message message = new Message(Double.parseDouble(period) * Constants.averageMIPS, ipS, ip, messageName, Double.parseDouble(messageSize));
                                     Log.printLine("消息建模:\t源:" + ip + "\t目的:" + ipS + "\t消息负载:" + messageSize + "\t消息周期:" + period);
