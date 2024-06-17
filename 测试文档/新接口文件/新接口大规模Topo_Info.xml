@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NetworkTopo ICDVerison="BP2.3.1" RleaseDate="11/24/23 16:31:48" >
+  <Switches>
+    <!--    Type分为两种，Switch和WirelessAp。前者表示普通交换机，后者表示无线接入点-->
+    <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.1" Name="edge1" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host1" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host2" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host3" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host4" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host5" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host6" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host7" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host8" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host9" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host10" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+    <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.2" Name="edge2" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host11" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host12" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host13" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host14" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host15" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host16" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host17" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host18" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host19" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host20" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+
+    <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.3" Name="edge3" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host21" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host22" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host23" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host24" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host25" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host26" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host27" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host28" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host29" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host30" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+            <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.4" Name="edge4" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host31" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host32" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host33" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host34" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host35" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host36" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host37" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host38" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host39" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host40" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+        <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.5" Name="edge5" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host41" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host42" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host43" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host44" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host45" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host46" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host47" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host48" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host49" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host50" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+    //
+
+
+    <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.6" Name="edge6" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host51" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host52" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host53" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host54" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host55" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host56" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host57" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host58" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host59" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host60" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+    <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.7" Name="edge7" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host61" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host62" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host63" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host64" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host65" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host66" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host67" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host68" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host69" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host70" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+
+        <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.8" Name="edge8" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host71" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host72" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host73" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host74" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host75" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host76" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host77" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host78" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host79" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host80" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+    <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.9" Name="edge9" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host81" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host82" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host83" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host84" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host85" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host86" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host87" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host88" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host89" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host90" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+
+    <Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.10" Name="edge10" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="host91" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="host92" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="host93" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="host94" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="host95" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="host96" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host97" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host98" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="host99" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="host100" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+
+<Switch Guid="a2e6640e-8d60-411a-977f-d09c5aab8d04" Group="A" IpAddress="10.31.42.11" Name="core1" Model="SK(SK=盛科,DT=东土,CU=自定义)" ACL="ON" ACLStartTime="" ACLEndTime="" LearnEnable="ON">
+      <AswPhysPorts>
+        <AswPhysPort DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e3" LinkedHwName="edge1" LinkedHwPort="pio_Ether_A" Medium="COPPER" Name="0" PortID="0" PriorityQueueDepth1="512" PriorityQueueDepth2="512" PriorityQueueDepth3="512" PriorityQueueDepth4="512" PriorityQueueDepth5="512" Speed="10" State="ON"/>
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="59dde72e-1060-4363-90f7-86bf060994e4" LinkedHwName="edge2" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT1" PortID="1" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="8aeda968-b045-4c50-8bbc-650ad515b9d6" LinkedHwName="edge3" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT2" PortID="2" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="681a2d1d-a453-4395-83e9-ac5ba44161f7" LinkedHwName="edge4" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT3" PortID="3" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="ec35d43c-ff5f-427b-b191-7326b6eea1c4" LinkedHwName="edge5" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT4" PortID="4" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="e626c435-1aa0-4ceb-ac8e-74bf9aeb9381" LinkedHwName="edge6" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT5" PortID="5" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="edge7" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT6" PortID="6" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="edge8" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT7" PortID="7" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="1524b45f-c945-4156-9dd3-d4dc8b3d8d52" LinkedHwName="edge9" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT8" PortID="8" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+        <AswPhysPort CalculatedWatermark1="-1" CalculatedWatermark2="-1" DwellTime="-1" ExtGuid="123" Guid="10f22168-02ee-449d-807a-202cbc07cc45" LinkedHwName="edge10" LinkedHwPort="A" Medium="COPPER" Name="Ether_PORT9" PortID="9" PriorityQueueDepth1="256" PriorityQueueDepth2="256" Speed="10" State="ON" />
+      </AswPhysPorts>
+    </Switch>
+
+
+
+
+
+  </Switches>
+
+  <EndSystems>
+    <EndSystem Group="A" TA="-1" EdeSubscriberIndex="-1" EquipmentPosition="-1" HwTableBankIndex="-1" HwType="GPM" Name="XXX">
+      <AesPhysPorts>
+        <AesPhysPort MACAddress="-1" Name="A" Network="A" Speed="100" />
+      </AesPhysPorts>
+    </EndSystem>
+    <EndSystem Group="A" ATA="快取记录装置" HwType="GPM" Name="AGPM1">
+      <AesPhysPorts>
+        <AesPhysPort Name="A" Speed="2g" />
+      </AesPhysPorts>
+    </EndSystem>
+    <EndSystem Group="A" ATA="大屏触摸显示器1" HwType="GPM" Name="AGPM2">
+      <AesPhysPorts>
+        <AesPhysPort Name="A" Speed="2g" />
+      </AesPhysPorts>
+    </EndSystem>
+   </EndSystems>
+
+</NetworkTopo>
